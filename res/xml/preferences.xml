@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference android:key="serverhostname" android:title="Server Host Name" android:summary="The host name of the Server which msDaemon runs" android:defaultValue="Tomoya" />
+  	<EditTextPreference android:key="serverurl" android:title="Server URL" android:summary="The URL of the Server which contains take SOAP calls" android:defaultValue="http://173.3.14.224:500" />
+  	<CheckBoxPreference android:title="KTorrent Notifications" android:summary="Turn On/Off ktorrent Notifications" android:key="ktorrentcheck" />
+</PreferenceScreen>

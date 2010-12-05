@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_root"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="10dp" android:orientation="vertical">
+    		
+<TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Server Host Name"></TextView><EditText android:layout_height="wrap_content" android:id="@+id/serverhostname" android:text="Server Host Name" android:layout_width="fill_parent"></EditText><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextView02" android:layout_marginTop="15px" android:text="Server URL"></TextView><EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/serveripaddress" android:text="Server IP Address"></EditText>
+
+
+
+
+<LinearLayout android:id="@+id/LinearLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="60px"><Button android:layout_height="wrap_content" android:text="Save" android:id="@+id/save" android:layout_width="200px"></Button><Button android:layout_height="wrap_content" android:id="@+id/back" android:text="Back" android:layout_width="200px" android:layout_marginLeft="60px"></Button></LinearLayout>
+</LinearLayout>
