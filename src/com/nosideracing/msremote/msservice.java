@@ -37,6 +37,7 @@ public class msservice extends Service {
 	private static final String METHOD_NAME_GETINFO = "getSongInfo";
 	private static final String METHOD_NAME_SENDCMD = "sendCmd";
 	private static final String METHOD_NAME_GETCMD = "getCmd";
+	private static final String METHOD_NAME_REGISTERACTIVEDEVICE = "registerActiveDevice";
 	private static final String METHOD_NAME_REGISTERMESSAGES = "registerMessages";
 	private static final String NAMESPACE = "http://192.168.1.3/";
 	private String LOG_TAG = "msremote";
@@ -74,7 +75,7 @@ public class msservice extends Service {
 		 */
 		Bundle incoming = intent.getExtras();
 		URL = incoming.get("SETTING_URL").toString();
-		// URL = "http://173.3.14.224:500";
+		URL = "http://173.3.14.224:500";
 		HOSTNAME = incoming.get("SETTING_SOURCENAME").toString();
 		DESTHOSTNAME = incoming.get("SETTING_DESTNAME").toString();
 		LOG_TAG = incoming.get("SETTING_LOG_TAG").toString();
@@ -88,7 +89,7 @@ public class msservice extends Service {
 		songinfo.put("tottime", "9999");
 		Log.i(LOG_TAG, "Soap Messaging Service Started");
 		/* Start Streaming Rhythmbox and Start getting messages from kTorrent */
-		sendCmdToSoap("STRB", null);
+		registerDevice(true);
 		/*
 		 * Prime the Song Info Field NOTE: this is usually called from msremote
 		 * NOT msmusic, this way, when msmusic calls it the above default values
@@ -106,7 +107,7 @@ public class msservice extends Service {
 		 * ohh now that we are rebound, start streaming again (since we stop on
 		 * unbind)
 		 */
-		sendCmdToSoap("STRB", null);
+		registerDevice(true);
 		/* Reprime and relaunch the update thread */
 		getSongInfo();
 		if (!running) {
@@ -137,7 +138,7 @@ public class msservice extends Service {
 		 * whence we unbind, we disconnect from Rhythmbox Streaming NOTE: we
 		 * don't ask KTorrent to stop, we only do that on destroy
 		 */
-		sendCmdToSoap("SPRB", null);
+		registerDevice(false);
 		return true;
 	}
 
@@ -297,13 +298,44 @@ public class msservice extends Service {
 			return false;
 		}
 	}
+	
+	private boolean registerDevice(boolean state){
+		/*
+		 * Creating the SOAP envelope using the registerMessage SOAP command
+		 */
+		SoapObject request = new SoapObject(NAMESPACE,
+				METHOD_NAME_REGISTERACTIVEDEVICE);
+		request.addProperty("host", HOSTNAME);
+		request.addProperty("onoff", state);
+		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+				SoapEnvelope.VER11);
+		envelope.setOutputSoapObject(request);
+		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		/* Added so that if the SOAP servers crash, we don't crash this remote */
+		try {
+			androidHttpTransport.call(SOAP_ACTION, envelope);
+			return true;
+		} catch (Exception e) {
 
+			Log.e(LOG_TAG, "registerDevice: Http Transport Failed");
+			Log.e(LOG_TAG, e.getMessage());
+			return false;
+		}
+	}
+	
 	private boolean sendCmdToSoap(String cmd, String cmdTxt) {
 		/*
 		 * This function send a command to the SOAP method sendCmd, which passes
 		 * a command into the database defaulting to default destination
 		 */
 		/* Again sets up the SOAP envelope */
+		if (cmd == "STRB") {
+				Log.e(LOG_TAG,"STRB DEPRECIATED");
+				return registerDevice(true);
+		} else if (cmd == "SPRB") {
+				Log.e(LOG_TAG,"SPRB DEPRECIATED");
+				return registerDevice(false);
+		}
 		String destination = DESTHOSTNAME;
 		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_SENDCMD);
 		request.addProperty("cmd", cmd);
