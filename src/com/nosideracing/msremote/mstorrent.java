@@ -37,54 +37,57 @@ public class mstorrent extends Activity {
 	private static List<String> torEpsName = new ArrayList<String>();
 	private static List<String> torLocation = new ArrayList<String>();
 	public FileObserver observer;
-	
+
 	private static class EfficientAdapter extends BaseAdapter {
-		 private LayoutInflater mInflater;
+		private LayoutInflater mInflater;
 
-		 public EfficientAdapter(Context context) {
-		 mInflater = LayoutInflater.from(context);
+		public EfficientAdapter(Context context) {
+			mInflater = LayoutInflater.from(context);
 
-		 }
+		}
 
-		 public int getCount() {
-		 return torName.size();
-		 }
+		public int getCount() {
+			return torName.size();
+		}
 
-		 public Object getItem(int position) {
-		 return position;
-		 }
+		public Object getItem(int position) {
+			return position;
+		}
 
-		 public long getItemId(int position) {
-		 return position;
-		 }
+		public long getItemId(int position) {
+			return position;
+		}
 
-		 public View getView(int position, View convertView, ViewGroup parent) {
-		 ViewHolder holder;
-		 if (convertView == null) {
-		 convertView = mInflater.inflate(R.layout.listview, null);
-		 holder = new ViewHolder();
-		 holder.text = (TextView) convertView.findViewById(R.id.TextView01);
-		 holder.text2 = (TextView) convertView.findViewById(R.id.TextView02);
-		 holder.text3 = (TextView) convertView.findViewById(R.id.TextView03);
-		 convertView.setTag(holder);
-		 } else {
-		 holder = (ViewHolder) convertView.getTag();
-		 }
-		 Log.w(LOG_TAG,"TorName Postion"+torName.get(position));
-		 holder.text.setText(torName.get(position));
-		 holder.text2.setText(torNumber.get(position));
-		 holder.text3.setText(torEpsName.get(position));
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+			if (convertView == null) {
+				convertView = mInflater.inflate(R.layout.listview, null);
+				holder = new ViewHolder();
+				holder.text = (TextView) convertView
+						.findViewById(R.id.TextView01);
+				holder.text2 = (TextView) convertView
+						.findViewById(R.id.TextView02);
+				holder.text3 = (TextView) convertView
+						.findViewById(R.id.TextView03);
+				convertView.setTag(holder);
+			} else {
+				holder = (ViewHolder) convertView.getTag();
+			}
+			Log.w(LOG_TAG, "TorName Postion" + torName.get(position));
+			holder.text.setText(torName.get(position));
+			holder.text2.setText(torNumber.get(position));
+			holder.text3.setText(torEpsName.get(position));
 
-		 return convertView;
-		 }
+			return convertView;
+		}
 
-		 static class ViewHolder {
-			 TextView text;
-			 TextView text2;
-			 TextView text3;
-		 }
-		 }
-	
+		static class ViewHolder {
+			TextView text;
+			TextView text2;
+			TextView text3;
+		}
+	}
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.torrent);
@@ -105,7 +108,7 @@ public class mstorrent extends Activity {
 			}
 		};
 		observer.startWatching();
-		
+
 	}
 
 	public void onResume() {
@@ -120,18 +123,18 @@ public class mstorrent extends Activity {
 				int i = 0;
 				String line = null;
 				while ((line = in.readLine()) != null) {
-					Log.w(LOG_TAG,"Read Line: "+ line);
+					Log.w(LOG_TAG, "Read Line: " + line);
 					String[] temp = (line.split("\\|"));
 					String name = temp[0].replace('_', ' ');
 					String SeasonInfo = temp[1];
 					String EpsName = temp[2].replace('_', ' ');
 					String location;
-					try{
+					try {
 						location = temp[3];
 					} catch (Exception e) {
 						location = "Unknown";
 					}
-					if (!(torEpsName.contains(EpsName))) {						
+					if (!(torEpsName.contains(EpsName))) {
 						torName.add(name);
 						torNumber.add(SeasonInfo);
 						torEpsName.add(EpsName);
@@ -152,25 +155,8 @@ public class mstorrent extends Activity {
 	public void onStop() {
 		super.onStop();
 		Log.w(LOG_TAG, "Got to onStop, Torrent");
+		writeFile();
 		observer.stopWatching();
-		try {
-			File root = Environment.getExternalStorageDirectory();
-			if (root.canWrite()) {
-				Log.w(LOG_TAG, "GOT HERE!");
-				File gpxfile = new File(root, "msremote/torrent.gpx");
-				FileWriter gpxwriter = new FileWriter(gpxfile);
-				BufferedWriter out = new BufferedWriter(gpxwriter);
-				for (int i = 0; i < torName.size(); i++) {
-					String writeOutput = torName.get(i)+"|"+torNumber.get(i)+"|"+torEpsName.get(i) + "\n";
-					Log.w(LOG_TAG,"Wrote: "+writeOutput);
-					out.write(writeOutput);
-					Log.w(LOG_TAG, torName.get(i));
-				}
-				out.close();
-			}
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "Could not write file " + e.getMessage());
-		}
 	}
 
 	public void onCreateContextMenu(ContextMenu menu, View v,
@@ -180,6 +166,7 @@ public class mstorrent extends Activity {
 		menu.setHeaderTitle("<3");
 		menu.add(0, v.getId(), 0, "Watch");
 		menu.add(0, v.getId(), 1, "Delete");
+		menu.add(0, v.getId(), 3, "Remove Show");
 		menu.add(0, v.getId(), 2, "Delete All");
 
 	}
@@ -193,6 +180,8 @@ public class mstorrent extends Activity {
 			delete(info.id);
 		} else if (item.getTitle() == "Delete All") {
 			deleteall(info.id);
+		} else if (item.getTitle() == "Remove Show"){
+			deleteShow(info.id);
 		} else
 			return false;
 		return true;
@@ -207,16 +196,37 @@ public class mstorrent extends Activity {
 		torName.remove(torName.get((int) id));
 		torNumber.remove(torNumber.get((int) id));
 		torEpsName.remove(torEpsName.get((int) id));
-		torLocation.remove(torLocation.get((int)id ));
+		torLocation.remove(torLocation.get((int) id));
+		writeFile();
 		refreshList();
 		return;
 	}
-	
-	public void deleteall(long id){
+	public void deleteShow(long id){
+		String show = torName.get((int)id);
+		for (int i = 0; i < torName.size();) {
+			Log.v(LOG_TAG,"TorName:"+torName.get(i)+":");
+			Log.v(LOG_TAG,"REMOAVE:"+show+":");
+			String curShow = torName.get(i);
+			if (curShow.equalsIgnoreCase(show)){
+				torName.remove(i);
+				torNumber.remove(i);
+				torEpsName.remove(i);
+				torLocation.remove(i);
+			} else {
+				i++;
+			}
+		}
+		writeFile();
+		refreshList();
+		return;
+	}
+
+	public void deleteall(long id) {
 		torName.clear();
 		torNumber.clear();
 		torEpsName.remove(torEpsName.get((int) id));
-		torLocation.remove(torLocation.get((int)id ));
+		torLocation.remove(torLocation.get((int) id));
+		writeFile();
 		refreshList();
 	}
 
@@ -236,12 +246,12 @@ public class mstorrent extends Activity {
 					String SeasonInfo = temp[1];
 					String EpsName = temp[2].replace('_', ' ');
 					String location;
-					try{
+					try {
 						location = temp[3];
 					} catch (Exception e) {
 						location = "Unknown";
 					}
-					if (!(torEpsName.contains(EpsName))) {						
+					if (!(torEpsName.contains(EpsName))) {
 						torName.add(name);
 						torNumber.add(SeasonInfo);
 						torEpsName.add(EpsName);
@@ -260,25 +270,26 @@ public class mstorrent extends Activity {
 
 	private void refreshList() {
 		List<String> tempArray = new ArrayList<String>();
-		for (int i = 0; i < torName.size();i++) {
-			tempArray.add(torName.get(i)+"|"+torNumber.get(i)+"|"+torEpsName.get(i));
+		for (int i = 0; i < torName.size(); i++) {
+			tempArray.add(torName.get(i) + "|" + torNumber.get(i) + "|"
+					+ torEpsName.get(i));
 		}
 		Collections.sort(tempArray);
 		torName.clear();
 		torNumber.clear();
 		torEpsName.clear();
-		for (int i = 0; i < tempArray.size();i++){
+		for (int i = 0; i < tempArray.size(); i++) {
 			String[] temp = (tempArray.get(i).split("\\|"));
-			String name = temp[0].replace('_', ' ');
+			String name = temp[0];
 			String SeasonInfo = temp[1];
 			String EpsName = temp[2].replace('_', ' ');
 			String location;
-			try{
+			try {
 				location = temp[3];
 			} catch (Exception e) {
 				location = "Unknown";
 			}
-			if (!(torEpsName.contains(EpsName))) {						
+			if (!(torEpsName.contains(EpsName))) {
 				torName.add(name);
 				torNumber.add(SeasonInfo);
 				torEpsName.add(EpsName);
@@ -287,6 +298,7 @@ public class mstorrent extends Activity {
 		}
 		torrents.setAdapter(new EfficientAdapter(this));
 	}
+
 	/* Creates the menu items */
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -306,6 +318,29 @@ public class mstorrent extends Activity {
 			return true;
 		}
 		return false;
+	}
+	private void writeFile(){
+		observer.stopWatching();
+		try {
+			File root = Environment.getExternalStorageDirectory();
+			if (root.canWrite()) {
+				Log.w(LOG_TAG, "GOT HERE!");
+				File gpxfile = new File(root, "msremote/torrent.gpx");
+				FileWriter gpxwriter = new FileWriter(gpxfile);
+				BufferedWriter out = new BufferedWriter(gpxwriter);
+				for (int i = 0; i < torName.size(); i++) {
+					String writeOutput = torName.get(i) + "|"
+							+ torNumber.get(i) + "|" + torEpsName.get(i) + "\n";
+					Log.w(LOG_TAG, "Wrote: " + writeOutput);
+					out.write(writeOutput);
+					Log.w(LOG_TAG, torName.get(i));
+				}
+				out.close();
+			}
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Could not write file " + e.getMessage());
+		}
+		observer.startWatching();
 	}
 	private void quit() {
 		Log.i(LOG_TAG, "Quitting");

@@ -400,11 +400,12 @@ public class msservice extends Service {
 		/* Here we set the notification icon equal to the program icon */
 		int icon = R.drawable.icon;
 		/* Notification Manager uses CharSequence instead of Strings */
-		CharSequence tickerText = tickerString;
-		CharSequence contentTitle = notificationTitle;
+		String[] tickerTextTemp= tickerString.split("\\/");
+		CharSequence tickerText =tickerTextTemp[tickerTextTemp.length-1];
+		CharSequence contentTitle = notificationTitle.split("\\/")[notificationTitle.split("\\/").length-1];
 		CharSequence contentText = noticicationText;
 		String t1 = (String) contentTitle;
-		/* we need to know the curent time to set the notification time */
+		/* we need to know the current time to set the notification time */
 		long when = System.currentTimeMillis();
 		if (currentNotifcationIDs.isEmpty()) {
 			numberOfNotifications = 0;
@@ -414,7 +415,7 @@ public class msservice extends Service {
 			contentText = numberOfNotifications + " torrents done";
 		}
 		/*
-		 * We declair notifcation then the current application Context
+		 * We declare notifications then the current application Context
 		 */
 		Notification notification = new Notification(icon, tickerText, when);
 		Context context = getApplicationContext();
@@ -435,18 +436,26 @@ public class msservice extends Service {
 		currentNotifcationIDs.add(NOTIFICATION_ID);
 		// NOTIFICATION_ID++;
 		numberOfNotifications++;
-
-		String[] temp = (t1.split("\\."));
-		String name = temp[0].replace('_', ' ');
-		String SeasonInfo = temp[1];
-		String EpsName = temp[2].replace('_', ' ');
+		String name = "ERROR";
+		String SeasonInfo = "ERROR";
+		String EpsName = "ERROR";
+		try{
+			String[] temp = (t1.split("\\."));
+			name = temp[0].replace('_', ' ');
+			SeasonInfo = temp[1];
+			EpsName = temp[2].replace('_', ' ');
+		} catch (Exception e) {
+			Log.e(LOG_TAG,"Spliting t1: "+ t1);
+			Log.e(LOG_TAG,"Message"+e.getMessage());
+		}
 		try {
 			File root = Environment.getExternalStorageDirectory();
 			if (root.canWrite()) {
-				Log.w(LOG_TAG, "GOT HERE!");
 				File gpxfile = new File(root, "msremote/torrent.gpx");
 				FileWriter gpxwriter = new FileWriter(gpxfile, true);
 				BufferedWriter out = new BufferedWriter(gpxwriter);
+				//String[] tempName=name.split("\\/");
+				//name = tempName[tempName.length-1];
 				String outputString = name + "|" + SeasonInfo + "|" + EpsName
 						+ "|" + contentText;
 				Log.e(LOG_TAG, "String:" + outputString);
@@ -537,8 +546,6 @@ public class msservice extends Service {
 			Log.v(LOG_TAG, "Command: " + cmd);
 			if (cmd.equals("TMSG")) {
 				String[] cmdTemp = cmdTxt.split("\\|");
-				Log.i(LOG_TAG, cmdTemp.toString());
-				Log.i(LOG_TAG, Integer.toString(cmdTemp.length));
 				if (cmdTemp.length == 3) {
 					setStatusNotification(cmdTemp[0], cmdTemp[1], cmdTemp[2]);
 				}
