@@ -19,6 +19,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -42,9 +43,14 @@ public class msservice extends Service {
 	private static final String NAMESPACE = "http://192.168.1.3/";
 	private String LOG_TAG = "msremote";
 	/* These are global so that we can reference them from many a method */
-	private String URL;
+	private String URL_EXT;
+	private String URL_INT;
+	private String INT_NETWORK_NAME;
 	private String HOSTNAME;
 	private String DESTHOSTNAME;
+	private int EXT_DELAY;
+	private int INT_DELAY;
+
 	/* We use this to set the ID number of the current notification */
 	private static final int NOTIFICATION_ID = 0x0081;
 	private int numberOfNotifications = 0;
@@ -74,11 +80,16 @@ public class msservice extends Service {
 		 * multiple destinations on one SOAP server LOG_TAG is just that
 		 */
 		Bundle incoming = intent.getExtras();
-		URL = incoming.get("SETTING_URL").toString();
-		URL = "http://173.3.14.224:500";
+		URL_EXT = incoming.get("SETTING_URL_EXTERNAL").toString();
+		// URL = "http://173.3.14.224:500";
+		URL_INT = incoming.get("SETTING_URL_INTERNAL").toString();
 		HOSTNAME = incoming.get("SETTING_SOURCENAME").toString();
 		DESTHOSTNAME = incoming.get("SETTING_DESTNAME").toString();
+		INT_NETWORK_NAME = incoming.get("SETTING_INTERNAL_NETWORK_NAME")
+				.toString();
 		LOG_TAG = incoming.get("SETTING_LOG_TAG").toString();
+		EXT_DELAY = incoming.getInt("SETTING_EXTERNAL_DELAY");
+		INT_DELAY = incoming.getInt("SETTING_INTERNAL_DELAY");
 		boolean ktornot = incoming.getBoolean("SETTING_KTORRENTNOTIFICATION");
 		set_ktorrent_notifications(ktornot);
 		/* Initialze SongInfo to default values */
@@ -241,7 +252,7 @@ public class msservice extends Service {
 			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 					SoapEnvelope.VER11);
 			envelope.setOutputSoapObject(request);
-			HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+			HttpTransportSE androidHttpTransport = get_transport();
 			androidHttpTransport.call(SOAP_ACTION, envelope);
 			SoapObject resultsRequestSOAP = (SoapObject) envelope.bodyIn;
 			/* We get the result */
@@ -286,7 +297,7 @@ public class msservice extends Service {
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 				SoapEnvelope.VER11);
 		envelope.setOutputSoapObject(request);
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
 			androidHttpTransport.call(SOAP_ACTION, envelope);
@@ -298,8 +309,8 @@ public class msservice extends Service {
 			return false;
 		}
 	}
-	
-	private boolean registerDevice(boolean state){
+
+	private boolean registerDevice(boolean state) {
 		/*
 		 * Creating the SOAP envelope using the registerMessage SOAP command
 		 */
@@ -310,7 +321,7 @@ public class msservice extends Service {
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 				SoapEnvelope.VER11);
 		envelope.setOutputSoapObject(request);
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
 			androidHttpTransport.call(SOAP_ACTION, envelope);
@@ -322,7 +333,7 @@ public class msservice extends Service {
 			return false;
 		}
 	}
-	
+
 	private boolean sendCmdToSoap(String cmd, String cmdTxt) {
 		/*
 		 * This function send a command to the SOAP method sendCmd, which passes
@@ -330,11 +341,11 @@ public class msservice extends Service {
 		 */
 		/* Again sets up the SOAP envelope */
 		if (cmd == "STRB") {
-				Log.e(LOG_TAG,"STRB DEPRECIATED");
-				return registerDevice(true);
+			Log.e(LOG_TAG, "STRB DEPRECIATED");
+			return registerDevice(true);
 		} else if (cmd == "SPRB") {
-				Log.e(LOG_TAG,"SPRB DEPRECIATED");
-				return registerDevice(false);
+			Log.e(LOG_TAG, "SPRB DEPRECIATED");
+			return registerDevice(false);
 		}
 		String destination = DESTHOSTNAME;
 		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_SENDCMD);
@@ -346,7 +357,7 @@ public class msservice extends Service {
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 				SoapEnvelope.VER11);
 		envelope.setOutputSoapObject(request);
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
 			androidHttpTransport.call(SOAP_ACTION, envelope);
@@ -377,7 +388,7 @@ public class msservice extends Service {
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 				SoapEnvelope.VER11);
 		envelope.setOutputSoapObject(request);
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
 			androidHttpTransport.call(SOAP_ACTION, envelope);
@@ -390,6 +401,25 @@ public class msservice extends Service {
 		return true;
 	}
 
+	private HttpTransportSE get_transport() {
+		Context f_context = getApplicationContext();
+		NetworkInfo networkinfo = (NetworkInfo) ((ConnectivityManager) f_context
+				.getSystemService(Context.CONNECTIVITY_SERVICE))
+				.getActiveNetworkInfo();
+		HttpTransportSE androidHttpTransport = null;
+		if ((networkinfo != null) && (networkinfo.isConnected())) {
+			int itype = networkinfo.getType();
+			if (itype == 1) {
+				androidHttpTransport = new HttpTransportSE(URL_INT);
+			} else {
+				androidHttpTransport = new HttpTransportSE(URL_EXT);
+			}
+		} else {
+			androidHttpTransport = new HttpTransportSE(URL_EXT);
+		}
+		return androidHttpTransport;
+	}
+
 	private boolean setStatusNotification(String tickerString,
 			String notificationTitle, String noticicationText) {
 		/*
@@ -400,9 +430,10 @@ public class msservice extends Service {
 		/* Here we set the notification icon equal to the program icon */
 		int icon = R.drawable.icon;
 		/* Notification Manager uses CharSequence instead of Strings */
-		String[] tickerTextTemp= tickerString.split("\\/");
-		CharSequence tickerText =tickerTextTemp[tickerTextTemp.length-1];
-		CharSequence contentTitle = notificationTitle.split("\\/")[notificationTitle.split("\\/").length-1];
+		String[] tickerTextTemp = tickerString.split("\\/");
+		CharSequence tickerText = tickerTextTemp[tickerTextTemp.length - 1];
+		CharSequence contentTitle = notificationTitle.split("\\/")[notificationTitle
+				.split("\\/").length - 1];
 		CharSequence contentText = noticicationText;
 		String t1 = (String) contentTitle;
 		/* we need to know the current time to set the notification time */
@@ -439,14 +470,14 @@ public class msservice extends Service {
 		String name = "ERROR";
 		String SeasonInfo = "ERROR";
 		String EpsName = "ERROR";
-		try{
+		try {
 			String[] temp = (t1.split("\\."));
 			name = temp[0].replace('_', ' ');
 			SeasonInfo = temp[1];
 			EpsName = temp[2].replace('_', ' ');
 		} catch (Exception e) {
-			Log.e(LOG_TAG,"Spliting t1: "+ t1);
-			Log.e(LOG_TAG,"Message"+e.getMessage());
+			Log.e(LOG_TAG, "Spliting t1: " + t1);
+			Log.e(LOG_TAG, "Message" + e.getMessage());
 		}
 		try {
 			File root = Environment.getExternalStorageDirectory();
@@ -454,8 +485,8 @@ public class msservice extends Service {
 				File gpxfile = new File(root, "msremote/torrent.gpx");
 				FileWriter gpxwriter = new FileWriter(gpxfile, true);
 				BufferedWriter out = new BufferedWriter(gpxwriter);
-				//String[] tempName=name.split("\\/");
-				//name = tempName[tempName.length-1];
+				// String[] tempName=name.split("\\/");
+				// name = tempName[tempName.length-1];
 				String outputString = name + "|" + SeasonInfo + "|" + EpsName
 						+ "|" + contentText;
 				Log.e(LOG_TAG, "String:" + outputString);
@@ -468,6 +499,7 @@ public class msservice extends Service {
 		return true;
 	}
 
+	@SuppressWarnings("unused")
 	private boolean checkMessages() {
 		Log.i(LOG_TAG, "checking Messages");
 		/*
@@ -480,7 +512,7 @@ public class msservice extends Service {
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 				SoapEnvelope.VER11);
 		envelope.setOutputSoapObject(request);
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
 			androidHttpTransport.call(SOAP_ACTION, envelope);
@@ -525,11 +557,9 @@ public class msservice extends Service {
 		for (int j = 0; j < info.size(); j++) {
 			String[] infoString = info.get(j).split("; ");
 			Log.i(LOG_TAG, "Info:" + info.get(j));
-			@SuppressWarnings("unused")
 			int id = 0;
 			String cmd = "";
 			String cmdTxt = "";
-			@SuppressWarnings("unused")
 			String timeupdated = "";
 			String[] temp = infoString[0].split("=");
 			cmd = temp[1];
@@ -584,21 +614,26 @@ public class msservice extends Service {
 				- checkInterval - 100000L;
 
 		public void run() {
-			long sleep = 5000L;
+			long sleep = 1000L;
 			Context f_context = getApplicationContext();
 			NetworkInfo info = (NetworkInfo) ((ConnectivityManager) f_context
 					.getSystemService(Context.CONNECTIVITY_SERVICE))
 					.getActiveNetworkInfo();
-			if (update) {
-				if (info.isConnected()) {
-					int itype = info.getType();
-					sleep = 5000L;
-					if (itype == 1) {
-						sleep = 1000L;
-					}
+			String SSID = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).getConnectionInfo().getSSID();
+
+			if (info != null && info.isConnected()) {
+				int itype = info.getType();
+				
+				sleep = (long) EXT_DELAY;
+				if ((SSID != null) && ((itype == 1) && (SSID.compareTo(INT_NETWORK_NAME) == 0))) {
+					sleep = (long) INT_DELAY;
+				}
+				if (update) {
 					getSongInfo();
 				}
+				Log.v(LOG_TAG, "Sleep : " + sleep);
 			}
+
 			if (System.currentTimeMillis() - timeSinceCheckedMessages > checkInterval) {
 				timeSinceCheckedMessages = System.currentTimeMillis();
 				checkMessages();
@@ -618,7 +653,7 @@ public class msservice extends Service {
 			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 					SoapEnvelope.VER11);
 			envelope.setOutputSoapObject(request);
-			HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+			HttpTransportSE androidHttpTransport = get_transport();
 			/*
 			 * Added so that if the SOAP servers crash, we don't crash this
 			 * remote
@@ -714,7 +749,7 @@ public class msservice extends Service {
 				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 						SoapEnvelope.VER11);
 				envelope.setOutputSoapObject(request);
-				HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+				HttpTransportSE androidHttpTransport = get_transport();
 				androidHttpTransport.call(SOAP_ACTION, envelope);
 				SoapObject resultsRequestSOAP = (SoapObject) envelope.bodyIn;
 				/* We get the result */

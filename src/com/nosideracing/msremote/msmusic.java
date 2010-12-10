@@ -5,8 +5,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +16,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -172,15 +175,22 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 
 	/* Handles item selections */
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(LOG_TAG, "onOptionsItemSelected: Got To Start");
+		Log.d(LOG_TAG, "onOptionsItemSelected: msremote");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
 			startActivity(new Intent(this, msprefs.class));
 			return true;
 		} else if (calledMenuItem == R.id.quit) {
-			Intent mIntent = new Intent();
-			setResult(RESULT_CANCELED, mIntent);
-			finish();
+			quit();
+			return true;
+		} else if (calledMenuItem == R.id.wifiset) {
+			SharedPreferences.Editor editor = PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext())
+					.edit();
+			editor.putString("internalnetname",
+					((WifiManager) getSystemService(Context.WIFI_SERVICE))
+							.getConnectionInfo().getSSID());
+			editor.commit();
 			return true;
 		}
 		return false;
@@ -259,10 +269,10 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 						.getTimeElapised())));
 			}
 			if (backendService.getSongLength() != null) {
-				TOTTIME.setText(formatIntoHHMMSS(Integer.parseInt(backendService
-						.getSongLength())));
+				TOTTIME.setText(formatIntoHHMMSS(Integer
+						.parseInt(backendService.getSongLength())));
 			}
-			
+
 			/*
 			 * Simply put, there was a problem with when you hit stop or play
 			 * the button would switch but because of latency between all the
@@ -293,6 +303,12 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 		return ((hours > 0 ? disHour + ":" : "") + disMinu + ":" + disSec);
 	}
 
+	private void quit() {
+		Log.i(LOG_TAG, "Quitting");
+		/* Unbinds the service, and closes the program */
+		this.finish();
+	}
+
 	class BackendServiceConnection implements ServiceConnection {
 		public void onServiceConnected(ComponentName className,
 				IBinder boundService) {
@@ -317,15 +333,12 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 		// TODO Auto-generated method stub
 		CompoundButton btn = (ToggleButton) v;
 		if (btn.isChecked()) {
-
+			new runCmd().execute("PLAY", null);
 			dontSwitch = System.currentTimeMillis();
-
 		} else {
-
 			new runCmd().execute("STOP", null);
 			dontSwitch = System.currentTimeMillis();
 			updateTags();
-
 		}
 	};
 

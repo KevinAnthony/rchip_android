@@ -1,13 +1,12 @@
 package com.nosideracing.msremote;
 
-import com.nosideracing.msremote.R;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -30,6 +29,7 @@ public class msremote extends Activity {
 
 	/* the following numeric constants are for the Activity results */
 	protected static final int RC_MUSIC = 0x0031;
+	protected static final int PREFS_UPDATED = 0x0032;
 	/* LOG_TAG for standard logging */
 	private String LOG_TAG = "msremote";
 	/* This is the Pref window from MENU->Settings */
@@ -60,6 +60,15 @@ public class msremote extends Activity {
 		 * new phone
 		 */
 		settings = PreferenceManager.getDefaultSharedPreferences(f_context);
+		settings
+				.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+					public void onSharedPreferenceChanged(
+							SharedPreferences prefs, String key) {
+						Log.w(LOG_TAG, "SharePrefsChanged");
+						restartService();
+						System.out.println(key);
+					}
+				});
 		TelephonyManager tManager = (TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		String phoneNumber;
@@ -73,7 +82,7 @@ public class msremote extends Activity {
 		button_music.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				/* Perform action on clicks */
-				Log.d(LOG_TAG,"Music Pushed");
+				Log.d(LOG_TAG, "Music Pushed");
 				activity_music();
 			}
 		});
@@ -98,16 +107,27 @@ public class msremote extends Activity {
 		// }
 		// });
 		/* Pulls the URL, and Destination Host Name from the settings */
-		String msb_url = settings.getString("serverurl",
-				"http://192.168.1.4:8080/");
+		if (settings.getBoolean("firstRun", true)) {
+			// startActivity(new Intent(this, msprefs.class));
+
+			settings.edit();
+		}
+		String msb_url_external = settings.getString("serverurlexternal",
+				"http://173.3.14.224:500/");
+		String msb_url_internal = settings.getString("serverurlinternal",
+				"http://192.168.1.3:500/");
 		String msb_desthost = settings.getString("serverhostname", "Tomoya");
 		Boolean msb_ktornot = settings.getBoolean("ktorrentcheck", false);
+		String int_net_name = settings.getString("internalnetname", "Node_77");
+		String int_delay = settings.getString("internaldelay", "1000");
+		String ext_delay = settings.getString("externaldelay", "5000");
 		/*
 		 * Starting Service Creates an Intent, sets some extra's (settings)
 		 * connects and binds to said service
 		 */
-		new startService().execute(msb_url, phoneNumber, msb_desthost,
-				msb_ktornot.toString(), LOG_TAG);
+		new startService().execute(msb_url_external, msb_url_internal,
+				phoneNumber, msb_desthost, msb_ktornot.toString(), LOG_TAG,
+				int_net_name, int_delay, ext_delay);
 
 	}
 
@@ -136,6 +156,7 @@ public class msremote extends Activity {
 
 	public void onRestart() {
 		super.onRestart();
+		restartService();
 		Log.d(LOG_TAG, "onRestart: msremote");
 	}
 
@@ -167,8 +188,47 @@ public class msremote extends Activity {
 		} else if (calledMenuItem == R.id.quit) {
 			quit();
 			return true;
+		} else if (calledMenuItem == R.id.wifiset) {
+			SharedPreferences.Editor editor = PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext())
+					.edit();
+			editor.putString("internalnetname",
+					((WifiManager) getSystemService(Context.WIFI_SERVICE))
+							.getConnectionInfo().getSSID());
+			editor.commit();
+			return true;
 		}
 		return false;
+	}
+
+	protected void restartService() {
+		Log.i(LOG_TAG, "Restarting Service(i think)");
+		unbindService(conn);
+		String msb_url_external = settings.getString("serverurlexternal",
+				"http://173.3.14.224:500/");
+		String msb_url_internal = settings.getString("serverurlinternal",
+				"http://192.168.1.3:500/");
+		String msb_desthost = settings.getString("serverhostname", "Tomoya");
+		Boolean msb_ktornot = settings.getBoolean("ktorrentcheck", false);
+		String int_net_name = settings.getString("internalnetname", "Node_77");
+		String int_delay = settings.getString("internaldelay", "1000");
+		String ext_delay = settings.getString("externaldelay", "5000");
+		/*
+		 * Starting Service Creates an Intent, sets some extra's (settings)
+		 * connects and binds to said service
+		 */
+		Context f_context = getApplicationContext();
+		TelephonyManager tManager = (TelephonyManager) f_context
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		String phoneNumber;
+		phoneNumber = tManager.getLine1Number();
+		/* If there is no phone number, we use (111) 111-1111 */
+		if (phoneNumber == null) {
+			phoneNumber = "1111111111";
+		}
+		new startService().execute(msb_url_external, msb_url_internal,
+				phoneNumber, msb_desthost, msb_ktornot.toString(), LOG_TAG,
+				int_net_name, int_delay, ext_delay);
 	}
 
 	private void activity_music() {
@@ -202,21 +262,29 @@ public class msremote extends Activity {
 		}
 	}
 
-	private class startService extends AsyncTask<String, Integer, Boolean> {
+	public class startService extends AsyncTask<String, Integer, Boolean> {
 
 		protected Boolean doInBackground(String... incoming) {
-			String msb_url = incoming[0];
-			String phoneNumber = incoming[1];
-			String msb_desthost = incoming[2];
-			Boolean msb_ktornot = Boolean.parseBoolean(incoming[3]);
-			String log_tag = incoming[4];
+			String msb_url_external = incoming[0];
+			String msb_url_internal = incoming[1];
+			String phoneNumber = incoming[2];
+			String msb_desthost = incoming[3];
+			Boolean msb_ktornot = Boolean.parseBoolean(incoming[4]);
+			String log_tag = incoming[5];
+			String msb_int_net_name = incoming[6];
+			int msb_int_delay = Integer.parseInt(incoming[7]);
+			int msb_ext_delay = Integer.parseInt(incoming[8]);
 			Intent i1 = new Intent();
 			i1.setAction("com.nosideracing.msremote.msservice");
-			i1.putExtra("SETTING_URL", msb_url);
+			i1.putExtra("SETTING_URL_EXTERNAL", msb_url_external);
+			i1.putExtra("SETTING_URL_INTERNAL", msb_url_internal);
+			i1.putExtra("SETTING_INTERNAL_NETWORK_NAME", msb_int_net_name);
 			i1.putExtra("SETTING_SOURCENAME", phoneNumber);
 			i1.putExtra("SETTING_DESTNAME", msb_desthost);
 			i1.putExtra("SETTING_KTORRENTNOTIFICATION", msb_ktornot);
 			i1.putExtra("SETTING_LOG_TAG", log_tag);
+			i1.putExtra("SETTING_EXTERNAL_DELAY", msb_ext_delay);
+			i1.putExtra("SETTING_INTERNAL_DELAY", msb_int_delay);
 			startService(i1);
 			conn = new BackendServiceConnection();
 			Intent i = new Intent();

@@ -3,8 +3,8 @@ package com.nosideracing.msremote;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,9 +12,12 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileObserver;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -229,6 +232,30 @@ public class mstorrent extends Activity {
 		writeFile();
 		refreshList();
 	}
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.options_menu, menu);
+		return true;
+	}
+
+	/* Handles item selections */
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Log.d(LOG_TAG, "onOptionsItemSelected: msremote");
+		int calledMenuItem = item.getItemId();
+		if (calledMenuItem == R.id.settings) {
+			startActivity(new Intent(this, msprefs.class));
+			return true;
+		} else if (calledMenuItem == R.id.quit) {
+			quit();
+			return true;
+		} else if (calledMenuItem == R.id.wifiset) {
+			 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+			 editor.putString("internalnetname",((WifiManager) getSystemService(Context.WIFI_SERVICE)).getConnectionInfo().getSSID());
+			 editor.commit();
+			return true;
+		}
+		return false;
+	}
 
 	private void updateList() {
 		try {
@@ -299,26 +326,8 @@ public class mstorrent extends Activity {
 		torrents.setAdapter(new EfficientAdapter(this));
 	}
 
-	/* Creates the menu items */
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
-		return true;
-	}
 
-	/* Handles item selections */
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(LOG_TAG, "onOptionsItemSelected: msremote");
-		int calledMenuItem = item.getItemId();
-		if (calledMenuItem == R.id.settings) {
-			startActivity(new Intent(this, msprefs.class));
-			return true;
-		} else if (calledMenuItem == R.id.quit) {
-			quit();
-			return true;
-		}
-		return false;
-	}
+	
 	private void writeFile(){
 		observer.stopWatching();
 		try {
@@ -342,6 +351,7 @@ public class mstorrent extends Activity {
 		}
 		observer.startWatching();
 	}
+
 	private void quit() {
 		Log.i(LOG_TAG, "Quitting");
 		/* Unbinds the service, and closes the program */

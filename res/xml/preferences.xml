@@ -1,7 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference android:key="serverhostname" android:title="Server Host Name" android:summary="The host name of the Server which msDaemon runs" android:defaultValue="Tomoya" />
-  	<EditTextPreference android:key="serverurl" android:title="Server URL" android:summary="The URL of the Server which contains take SOAP calls" android:defaultValue="http://173.3.14.224:500" />
-  	<CheckBoxPreference android:title="KTorrent Notifications" android:summary="Turn On/Off ktorrent Notifications" android:key="ktorrentcheck" />
+    <EditTextPreference 
+    	android:key="serverhostname" 
+    	android:title="Server Host Name" 
+    	android:summary="The host name of the Server which msDaemon runs" 
+    	android:defaultValue="Tomoya" />
+  	<EditTextPreference 
+  		android:key="serverurlexternal" 
+  		android:title="Server URL External" 
+  		android:summary="The URL of the Server which contains take SOAP calls when your outside your network" 
+  		android:defaultValue="http://173.3.14.224:500" />
+  	<EditTextPreference 
+  		android:key="serverurlinternal" 
+  		android:title="Server URL Internal" 
+  		android:summary="The URL of the Server which contains take SOAP calls when your inside your network" 
+  		android:defaultValue="http://192.168.1.3:500" />
+  	<CheckBoxPreference 
+  		android:title="KTorrent Notifications" 
+  		android:summary="Turn On/Off ktorrent Notifications" 
+  		android:key="ktorrentcheck" />
+  	<EditTextPreference 
+  		android:key="internalnetname" 
+  		android:title="Wifi Network Name" 
+  		android:summary="The URL of the Server which contains take SOAP calls when your inside your network" 
+  		android:defaultValue="http://192.168.1.3:500" />
+  	 <ListPreference
+     	android:title="Internal Network Delay"
+        android:summary="The delay between updates when on on internal network"
+        android:key="internaldelay"
+        android:defaultValue="1000"
+        android:entries="@array/DelayArray"
+        android:entryValues="@array/DelayValues" />
+    <ListPreference
+     	android:title="External Network Delay"
+        android:summary="The delay between updates when on an external network"
+        android:key="externaldelay"
+        android:defaultValue="5000"
+        android:entries="@array/DelayArray"
+        android:entryValues="@array/DelayValues" />
 </PreferenceScreen>
