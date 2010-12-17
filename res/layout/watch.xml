@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ android:orientation="vertical" android:layout_width="fill_parent"
+ android:layout_height="fill_parent">
+
+
+<TextView android:text="Show Name" android:id="@+id/sName" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+<TextView android:text="Episode Number" android:id="@+id/eNum" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+<TextView android:text="Episode Name" android:id="@+id/eName" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+<TextView android:text="Location" android:id="@+id/loc" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+</LinearLayout>

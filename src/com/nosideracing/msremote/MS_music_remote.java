@@ -1,5 +1,6 @@
 package com.nosideracing.msremote;
 
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,12 +29,8 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class msmusic extends Activity implements Runnable, OnClickListener {
+public class MS_music_remote extends Activity implements Runnable, OnClickListener {
 
-	// Signal from runnable to update the GUI
-	protected static final int UPDATEGUI = 0x0042;
-	// LOG_TAG for standard logging
-	private String LOG_TAG = "msremote";
 	// Tags from the GUI
 	private TextView ARTIST;
 	private TextView ALBUM;
@@ -59,7 +56,7 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 		/** Gets called on every message that is received */
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case UPDATEGUI:
+			case MS_constants.UPDATEGUI:
 				// We identified the Message by its What-ID
 				if (update) {
 					updateTags();
@@ -73,9 +70,9 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		LOG_TAG = this.getString(R.string.log_name);
+		MS_constants.LOG_TAG = this.getString(R.string.log_name);
 		setContentView(R.layout.music);
-		Log.d(LOG_TAG, "onCreate: Got to start");
+		Log.d(MS_constants.LOG_TAG, "onCreate: Got to start");
 		// get the wakelock from the PowerManager
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
@@ -96,29 +93,27 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 		button3.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on clicks
-				new runCmd().execute("BACK", null);
+				new runCmd().execute("BACKRB", null);
 			}
 		});
 		final Button button4 = (Button) findViewById(R.id.next);
 		button4.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on clicks
-				new runCmd().execute("NEXT", null);
-
+				new runCmd().execute("NEXTRB", null);
 			}
-
 		});
-
+		new startService().execute();
 	}
 
 	public void onPause() {
 		super.onPause();
-		Log.d(LOG_TAG, "onPause: msmusic");
+		Log.d(MS_constants.LOG_TAG, "onPause: msmusic");
 	}
 
 	public void onResume() {
 		super.onResume();
-		Log.d(LOG_TAG, "onResume: msmusic");
+		Log.d(MS_constants.LOG_TAG, "onResume: msmusic");
 		/* if update is false (we are not updating) update and set to true) */
 		if (!update) {
 			updateTags();
@@ -132,8 +127,8 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 		try {
 			bindService(i, conn, Context.BIND_AUTO_CREATE);
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Error binding service");
-			Log.e(LOG_TAG, "Error:" + e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "Error binding service");
+			Log.e(MS_constants.LOG_TAG, "Error:" + e.getMessage());
 		}
 		// lock the screen and start the update thread
 		wl.acquire();
@@ -148,23 +143,24 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 		try {
 			backendService.stopMusicUpdating();
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Error StopMusicUpdating:" + e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "Error StopMusicUpdating:" + e.getMessage());
 		}
 		// release the wake, lock and set update = false (so we don't keep
 		// updating the screen when we don't have to
 		wl.release();
 		update = false;
-		Log.d(LOG_TAG, "onStop: msmusic");
-		Log.d(LOG_TAG, "Stoping Thread");
+		Log.d(MS_constants.LOG_TAG, "onStop: msmusic");
+		Log.d(MS_constants.LOG_TAG, "Stoping Thread");
 		// Finally we stop the thread
 		stopThread();
+		this.finish();
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		unbindService(conn);
-		Log.d(LOG_TAG, "onDestroy msmusic");
+		Log.d(MS_constants.LOG_TAG, "onDestroy msmusic");
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -175,10 +171,10 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 
 	/* Handles item selections */
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(LOG_TAG, "onOptionsItemSelected: msremote");
+		Log.d(MS_constants.LOG_TAG, "onOptionsItemSelected: msremote");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
-			startActivity(new Intent(this, msprefs.class));
+			startActivity(new Intent(this, MS_preferences.class));
 			return true;
 		} else if (calledMenuItem == R.id.quit) {
 			quit();
@@ -195,28 +191,35 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 		}
 		return false;
 	}
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+	    // See which child activity is calling us back.
+	    if (resultCode == MS_constants.QUITREMOTE){
+	                quit();
+	            } 
+		}
 
 	/* If we don't already have a thread running, start it */
 	private synchronized void startThread() {
-		Log.i(LOG_TAG, "msMusic: Starting New Thread");
+		Log.i(MS_constants.LOG_TAG, "msMusic: Starting New Thread");
 		if (updater == null) {
 			updater = new Thread(this);
 			updater.start();
 		} else {
-			Log.w(LOG_TAG,
+			Log.w(MS_constants.LOG_TAG,
 					"We Tried to start a thread when one existed already");
 		}
 	}
 
 	private synchronized void stopThread() {
-		Log.i(LOG_TAG, "msMusic: Stoping Old Thread");
+		Log.i(MS_constants.LOG_TAG, "msMusic: Stoping Old Thread");
 		if (updater != null) {
 			// moribund is being in the state of dieing
 			Thread moribund = updater;
 			updater = null;
 			moribund.interrupt();
 		} else {
-			Log.w(LOG_TAG,
+			Log.w(MS_constants.LOG_TAG,
 					"We Tried to kill a thread when one did not already exist");
 		}
 	}
@@ -239,12 +242,12 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 				}
 				try {
 					Message m = new Message();
-					m.what = UPDATEGUI;
+					m.what = MS_constants.UPDATEGUI;
 					musicHandler.sendMessage(m);
 					Thread.sleep(sleep);
 				} catch (Exception ex) {
-					Log.e(LOG_TAG, "ERROR in message sender, sleep");
-					Log.e(LOG_TAG, "error:" + ex.getMessage());
+					Log.e(MS_constants.LOG_TAG, "ERROR in message sender, sleep");
+					Log.e(MS_constants.LOG_TAG, "error:" + ex.getMessage());
 				}
 			}
 		}
@@ -289,7 +292,7 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 				}
 			}
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Error Update Tags:" + e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "Error Update Tags:" + e.getMessage());
 		}
 
 	}
@@ -304,8 +307,9 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 	}
 
 	private void quit() {
-		Log.i(LOG_TAG, "Quitting");
+		Log.i(MS_constants.LOG_TAG, "Quitting");
 		/* Unbinds the service, and closes the program */
+		setResult(MS_constants.QUITREMOTE);
 		this.finish();
 	}
 
@@ -314,29 +318,28 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 				IBinder boundService) {
 			backendService = backendservice.Stub
 					.asInterface((IBinder) boundService);
-			Log.d(LOG_TAG, "onServiceConnected");
+			Log.d(MS_constants.LOG_TAG, "onServiceConnected");
 			try {
 				// Here we start calling the soap server for music updates.
 				backendService.startMusicUpdating();
 			} catch (RemoteException e) {
-				Log.e(LOG_TAG, "Error Start Music Updating:" + e.getMessage());
+				Log.e(MS_constants.LOG_TAG, "Error Start Music Updating:" + e.getMessage());
 			}
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
 			backendService = null;
-			Log.d(LOG_TAG, "onServiceDisconnected");
+			Log.d(MS_constants.LOG_TAG, "onServiceDisconnected");
 		}
 	}
 
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		CompoundButton btn = (ToggleButton) v;
 		if (btn.isChecked()) {
-			new runCmd().execute("PLAY", null);
+			new runCmd().execute("PLAYRB", null);
 			dontSwitch = System.currentTimeMillis();
 		} else {
-			new runCmd().execute("STOP", null);
+			new runCmd().execute("STOPRB", null);
 			dontSwitch = System.currentTimeMillis();
 			updateTags();
 		}
@@ -350,9 +353,28 @@ public class msmusic extends Activity implements Runnable, OnClickListener {
 			try {
 				backendService.sendCmd(cmd, txt);
 			} catch (RemoteException e) {
-				Log.e(LOG_TAG, "Error sendcmd " + cmd + ":" + e.getMessage());
+				Log.e(MS_constants.LOG_TAG, "Error sendcmd " + cmd + ":" + e.getMessage());
+			}
+			return true;
+		}
+	}
+	
+	public class startService extends AsyncTask<String, Integer, Boolean> {
+
+		protected Boolean doInBackground(String... incoming) {
+			conn = new BackendServiceConnection();
+			Intent i = new Intent();
+			i.setClassName("com.nosideracing.msremote",
+					"com.nosideracing.msremote.MS_soap_service");
+			try {
+				bindService(i, conn, Context.BIND_AUTO_CREATE);
+			} catch (Exception e) {
+				Log.e(MS_constants.LOG_TAG, "Error binding service");
+				Log.e(MS_constants.LOG_TAG, "Error:" + e.getMessage());
+				return false;
 			}
 			return true;
 		}
 	}
 }
+

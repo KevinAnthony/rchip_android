@@ -28,20 +28,13 @@ import android.os.Handler;
 import android.content.Context;
 import android.content.Intent;
 
-public class msservice extends Service {
+public class MS_soap_service extends Service {
 
 	private Handler serviceHandler = null;
 	/* primary song info, Tag and Info */
 	public Hashtable<String, String> songinfo = new Hashtable<String, String>();
 	/* We use static Strings here so if it changes, we can change it up here */
-	private static final String SOAP_ACTION = "getSongInfo";
-	private static final String METHOD_NAME_GETINFO = "getSongInfo";
-	private static final String METHOD_NAME_SENDCMD = "sendCmd";
-	private static final String METHOD_NAME_GETCMD = "getCmd";
-	private static final String METHOD_NAME_REGISTERACTIVEDEVICE = "registerActiveDevice";
-	private static final String METHOD_NAME_REGISTERMESSAGES = "registerMessages";
-	private static final String NAMESPACE = "http://192.168.1.3/";
-	private String LOG_TAG = "msremote";
+
 	/* These are global so that we can reference them from many a method */
 	private String URL_EXT;
 	private String URL_INT;
@@ -52,7 +45,8 @@ public class msservice extends Service {
 	private int INT_DELAY;
 
 	/* We use this to set the ID number of the current notification */
-	private static final int NOTIFICATION_ID = 0x0081;
+
+	
 	private int numberOfNotifications = 0;
 	/* Are we updating? */
 	private boolean update = false;
@@ -87,7 +81,6 @@ public class msservice extends Service {
 		DESTHOSTNAME = incoming.get("SETTING_DESTNAME").toString();
 		INT_NETWORK_NAME = incoming.get("SETTING_INTERNAL_NETWORK_NAME")
 				.toString();
-		LOG_TAG = incoming.get("SETTING_LOG_TAG").toString();
 		EXT_DELAY = incoming.getInt("SETTING_EXTERNAL_DELAY");
 		INT_DELAY = incoming.getInt("SETTING_INTERNAL_DELAY");
 		boolean ktornot = incoming.getBoolean("SETTING_KTORRENTNOTIFICATION");
@@ -98,7 +91,7 @@ public class msservice extends Service {
 		songinfo.put("title", "Nothing Playing");
 		songinfo.put("etime", "0");
 		songinfo.put("tottime", "9999");
-		Log.i(LOG_TAG, "Soap Messaging Service Started");
+		Log.i(MS_constants.LOG_TAG, "Soap Messaging Service Started");
 		/* Start Streaming Rhythmbox and Start getting messages from kTorrent */
 		registerDevice(true);
 		/*
@@ -130,21 +123,21 @@ public class msservice extends Service {
 			 * The thread should not die on unbind, so you should see this
 			 * message
 			 */
-			Log.v(LOG_TAG, "Already running (you should see this message");
+			Log.v(MS_constants.LOG_TAG, "Already running (you should see this message");
 		}
-		Log.d(LOG_TAG, "onRebind: msserivce");
+		Log.d(MS_constants.LOG_TAG, "onRebind: msserivce");
 
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		Log.d(LOG_TAG, "OnBind: msserivce");
+		Log.d(MS_constants.LOG_TAG, "OnBind: msserivce");
 		return interfaceBinder;
 	}
 
 	@Override
 	public boolean onUnbind(Intent intent) {
-		Log.d(LOG_TAG, "onUnbind: msservice");
+		Log.d(MS_constants.LOG_TAG, "onUnbind: msservice");
 		/*
 		 * whence we unbind, we disconnect from Rhythmbox Streaming NOTE: we
 		 * don't ask KTorrent to stop, we only do that on destroy
@@ -156,13 +149,13 @@ public class msservice extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d(LOG_TAG, "onCreate: msservice");
+		Log.d(MS_constants.LOG_TAG, "onCreate: msservice");
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.d(LOG_TAG, "onDestroy: msservice");
+		Log.d(MS_constants.LOG_TAG, "onDestroy: msservice");
 	}
 
 	/* These are when you call backend.method, these are the methods */
@@ -234,8 +227,8 @@ public class msservice extends Service {
 			}
 			return result;
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "set_ktorrent_notifications:Something Failed");
-			Log.e(LOG_TAG, e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "set_ktorrent_notifications:Something Failed");
+			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
 	}
@@ -247,13 +240,13 @@ public class msservice extends Service {
 		 */
 		try {
 			/* Create a SOAP package using host name */
-			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_GETINFO);
+			SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_GETINFO);
 			request.addProperty("host", HOSTNAME);
 			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 					SoapEnvelope.VER11);
 			envelope.setOutputSoapObject(request);
 			HttpTransportSE androidHttpTransport = get_transport();
-			androidHttpTransport.call(SOAP_ACTION, envelope);
+			androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 			SoapObject resultsRequestSOAP = (SoapObject) envelope.bodyIn;
 			/* We get the result */
 			String result = resultsRequestSOAP.getProperty("Result").toString();
@@ -262,7 +255,6 @@ public class msservice extends Service {
 			/* First 7 chars are garbage */
 			result = result.substring(8, end);
 			/* Split it via the ';' */
-			Log.i(LOG_TAG, "Result:" + result);
 			String[] info = result.split("; ");
 			for (int i = 0; i < info.length - 1; i++) {
 				/*
@@ -278,8 +270,8 @@ public class msservice extends Service {
 				songinfo.put(key, value);
 			}
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "SongInfo:Something Failed");
-			Log.e(LOG_TAG, e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "SongInfo:Something Failed");
+			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
 		return true;
@@ -289,8 +281,8 @@ public class msservice extends Service {
 		/*
 		 * Creating the SOAP envelope using the registerMessage SOAP command
 		 */
-		SoapObject request = new SoapObject(NAMESPACE,
-				METHOD_NAME_REGISTERMESSAGES);
+		SoapObject request = new SoapObject(MS_constants.NAMESPACE,
+				MS_constants.METHOD_NAME_REGISTERMESSAGES);
 		request.addProperty("shost", HOSTNAME);
 		request.addProperty("dhost", DESTHOSTNAME);
 		request.addProperty("active", active);
@@ -300,12 +292,12 @@ public class msservice extends Service {
 		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
-			androidHttpTransport.call(SOAP_ACTION, envelope);
+			androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 			return true;
 		} catch (Exception e) {
 
-			Log.e(LOG_TAG, "registerForMessages: Http Transport Failed");
-			Log.e(LOG_TAG, e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "registerForMessages: Http Transport Failed");
+			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
 	}
@@ -314,8 +306,8 @@ public class msservice extends Service {
 		/*
 		 * Creating the SOAP envelope using the registerMessage SOAP command
 		 */
-		SoapObject request = new SoapObject(NAMESPACE,
-				METHOD_NAME_REGISTERACTIVEDEVICE);
+		SoapObject request = new SoapObject(MS_constants.NAMESPACE,
+				MS_constants.METHOD_NAME_REGISTERACTIVEDEVICE);
 		request.addProperty("host", HOSTNAME);
 		request.addProperty("onoff", state);
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -324,12 +316,12 @@ public class msservice extends Service {
 		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
-			androidHttpTransport.call(SOAP_ACTION, envelope);
+			androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 			return true;
 		} catch (Exception e) {
 
-			Log.e(LOG_TAG, "registerDevice: Http Transport Failed");
-			Log.e(LOG_TAG, e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "registerDevice: Http Transport Failed");
+			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
 	}
@@ -341,14 +333,14 @@ public class msservice extends Service {
 		 */
 		/* Again sets up the SOAP envelope */
 		if (cmd == "STRB") {
-			Log.e(LOG_TAG, "STRB DEPRECIATED");
+			Log.e(MS_constants.LOG_TAG, "STRB DEPRECIATED");
 			return registerDevice(true);
 		} else if (cmd == "SPRB") {
-			Log.e(LOG_TAG, "SPRB DEPRECIATED");
+			Log.e(MS_constants.LOG_TAG, "SPRB DEPRECIATED");
 			return registerDevice(false);
 		}
 		String destination = DESTHOSTNAME;
-		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_SENDCMD);
+		SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_SENDCMD);
 		request.addProperty("cmd", cmd);
 		request.addProperty("txt", cmdTxt);
 		request.addProperty("shost", HOSTNAME);
@@ -360,11 +352,11 @@ public class msservice extends Service {
 		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
-			androidHttpTransport.call(SOAP_ACTION, envelope);
+			androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 		} catch (Exception e) {
 
-			Log.e(LOG_TAG, "sendCmdToSoap: Http Transport Failed");
-			Log.e(LOG_TAG, e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "sendCmdToSoap: Http Transport Failed");
+			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
 		return true;
@@ -379,7 +371,7 @@ public class msservice extends Service {
 		 */
 
 		/* Again sets up the SOAP envelope */
-		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_SENDCMD);
+		SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_SENDCMD);
 		request.addProperty("cmd", cmd);
 		request.addProperty("txt", cmdTxt);
 		request.addProperty("shost", HOSTNAME);
@@ -391,11 +383,11 @@ public class msservice extends Service {
 		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
-			androidHttpTransport.call(SOAP_ACTION, envelope);
+			androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 		} catch (Exception e) {
 
-			Log.e(LOG_TAG, "sendCmdToSoap: Http Transport Failed");
-			Log.e(LOG_TAG, e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "sendCmdToSoap: Http Transport Failed");
+			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
 		return true;
@@ -426,59 +418,63 @@ public class msservice extends Service {
 		 * We get three String Varables representing the three Strings we need
 		 * to set to use Notification Manager
 		 */
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		/* Here we set the notification icon equal to the program icon */
-		int icon = R.drawable.icon;
-		/* Notification Manager uses CharSequence instead of Strings */
-		String[] tickerTextTemp = tickerString.split("\\/");
-		CharSequence tickerText = tickerTextTemp[tickerTextTemp.length - 1];
-		CharSequence contentTitle = notificationTitle.split("\\/")[notificationTitle
-				.split("\\/").length - 1];
-		CharSequence contentText = noticicationText;
-		String t1 = (String) contentTitle;
-		/* we need to know the current time to set the notification time */
-		long when = System.currentTimeMillis();
-		if (currentNotifcationIDs.isEmpty()) {
-			numberOfNotifications = 0;
-		}
-		if (numberOfNotifications > 1) {
-			contentTitle = "Torrents Done";
-			contentText = numberOfNotifications + " torrents done";
-		}
-		/*
-		 * We declare notifications then the current application Context
-		 */
-		Notification notification = new Notification(icon, tickerText, when);
-		Context context = getApplicationContext();
+		try {
+			String[] filename = notificationTitle.split("\\/")[notificationTitle
+					.split("\\/").length - 1].split("\\.");
+			;
+			String Name = filename[0].replace("_", " ");
+			String epsName = filename[2].replace("_", " ");
+			String epsNumber = filename[1];
+			String loc = notificationTitle;
+			NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			/* Here we set the notification icon equal to the program icon */
+			int icon = R.drawable.icon;
+			/* Notification Manager uses CharSequence instead of Strings */
+			String[] tickerTextTemp = tickerString.split("\\/");
+			CharSequence tickerText = tickerTextTemp[tickerTextTemp.length - 1];
+			CharSequence contentTitle = notificationTitle.split("\\/")[notificationTitle
+					.split("\\/").length - 1];
+			CharSequence contentText = noticicationText;
+			/* we need to know the current time to set the notification time */
+			long when = System.currentTimeMillis();
+			if (currentNotifcationIDs.isEmpty()) {
+				numberOfNotifications = 0;
+			}
+			if (numberOfNotifications > 1) {
+				contentTitle = "Torrents Done";
+				contentText = numberOfNotifications + " torrents done";
+			}
+			/*
+			 * We declare notifications then the current application Context
+			 */
+			Notification notification = new Notification(icon, tickerText, when);
+			Context context = getApplicationContext();
 
-		/**/
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-				new Intent(this, mstorrent.class), 0);
-		notification.setLatestEventInfo(context, contentTitle, contentText,
-				contentIntent);
-		notification.defaults |= Notification.DEFAULT_ALL;
-		mNotificationManager.cancel(NOTIFICATION_ID);
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		mNotificationManager.notify(NOTIFICATION_ID, notification);
-		currentNotifcationIDs.add(NOTIFICATION_ID);
-		// NOTIFICATION_ID++;
-		numberOfNotifications++;
-		String name = "ERROR";
-		String SeasonInfo = "ERROR";
-		String EpsName = "ERROR";
-		try {
-			String[] temp = (t1.split("\\."));
-			name = temp[0].replace('_', ' ');
-			SeasonInfo = temp[1];
-			EpsName = temp[2].replace('_', ' ');
+			/**/
+			PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+					new Intent(this, MS_show_list.class), 0);
+			notification.setLatestEventInfo(context, contentTitle, contentText,
+					contentIntent);
+			notification.defaults |= Notification.DEFAULT_ALL;
+			mNotificationManager.cancel(MS_constants.NOTIFICATION_ID);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+			mNotificationManager.notify(MS_constants.NOTIFICATION_ID, notification);
+			currentNotifcationIDs.add(MS_constants.NOTIFICATION_ID);
+			// NOTIFICATION_ID++;
+			numberOfNotifications++;
+			passDataToShowWindow(Name, epsNumber, epsName, loc);
+			return true;
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Spliting t1: " + t1);
-			Log.e(LOG_TAG, "Message" + e.getMessage());
+			return false;
 		}
+	}
+
+	private void passDataToShowWindow(String Name, String SeasonNumber,
+			String EpsName, String Location) {
 		try {
 			File root = Environment.getExternalStorageDirectory();
 			if (root.canWrite()) {
@@ -487,26 +483,25 @@ public class msservice extends Service {
 				BufferedWriter out = new BufferedWriter(gpxwriter);
 				// String[] tempName=name.split("\\/");
 				// name = tempName[tempName.length-1];
-				String outputString = name + "|" + SeasonInfo + "|" + EpsName
-						+ "|" + contentText;
-				Log.e(LOG_TAG, "String:" + outputString);
+				String outputString = Name + "|" + SeasonNumber + "|" + EpsName
+						+ "|" + Location;
+				Log.e(MS_constants.LOG_TAG, "String:" + outputString);
 				out.write(outputString + "\n");
 				out.close();
 			}
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Could not write file " + e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "Could not write file " + e.getMessage());
 		}
-		return true;
 	}
 
 	@SuppressWarnings("unused")
 	private boolean checkMessages() {
-		Log.i(LOG_TAG, "checking Messages");
+		Log.i(MS_constants.LOG_TAG, "checking Messages");
 		/*
 		 * This function send a command to the SOAP method sendCmd, which checks
 		 * for messages sitting on the SOAP server's Database
 		 */
-		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_GETCMD);
+		SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_GETCMD);
 		request.addProperty("host", HOSTNAME);
 
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -515,11 +510,11 @@ public class msservice extends Service {
 		HttpTransportSE androidHttpTransport = get_transport();
 		/* Added so that if the SOAP servers crash, we don't crash this remote */
 		try {
-			androidHttpTransport.call(SOAP_ACTION, envelope);
+			androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 		} catch (Exception e) {
 
-			Log.e(LOG_TAG, "Check Messages: Http Transport Failed");
-			Log.e(LOG_TAG, e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "Check Messages: Http Transport Failed");
+			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
 		/*
@@ -556,7 +551,7 @@ public class msservice extends Service {
 		 */
 		for (int j = 0; j < info.size(); j++) {
 			String[] infoString = info.get(j).split("; ");
-			Log.i(LOG_TAG, "Info:" + info.get(j));
+			Log.i(MS_constants.LOG_TAG, "Info:" + info.get(j));
 			int id = 0;
 			String cmd = "";
 			String cmdTxt = "";
@@ -573,7 +568,7 @@ public class msservice extends Service {
 			 * TMSG is Torrent Message(the only kind of message right now Since
 			 * the cmdTxt acually equals all three Status Notification Fields
 			 */
-			Log.v(LOG_TAG, "Command: " + cmd);
+			Log.v(MS_constants.LOG_TAG, "Command: " + cmd);
 			if (cmd.equals("TMSG")) {
 				String[] cmdTemp = cmdTxt.split("\\|");
 				if (cmdTemp.length == 3) {
@@ -619,19 +614,20 @@ public class msservice extends Service {
 			NetworkInfo info = (NetworkInfo) ((ConnectivityManager) f_context
 					.getSystemService(Context.CONNECTIVITY_SERVICE))
 					.getActiveNetworkInfo();
-			String SSID = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).getConnectionInfo().getSSID();
+			String SSID = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
+					.getConnectionInfo().getSSID();
 
 			if (info != null && info.isConnected()) {
 				int itype = info.getType();
-				
+
 				sleep = (long) EXT_DELAY;
-				if ((SSID != null) && ((itype == 1) && (SSID.compareTo(INT_NETWORK_NAME) == 0))) {
+				if ((SSID != null)
+						&& ((itype == 1) && (SSID.compareTo(INT_NETWORK_NAME) == 0))) {
 					sleep = (long) INT_DELAY;
 				}
 				if (update) {
 					getSongInfo();
 				}
-				Log.v(LOG_TAG, "Sleep : " + sleep);
 			}
 
 			if (System.currentTimeMillis() - timeSinceCheckedMessages > checkInterval) {
@@ -642,12 +638,12 @@ public class msservice extends Service {
 		}
 
 		private boolean checkMessages() {
-			Log.i(LOG_TAG, "checking Messages within runnable");
+			Log.i(MS_constants.LOG_TAG, "checking Messages within runnable");
 			/*
 			 * This function send a command to the SOAP method sendCmd, which
 			 * checks for messages sitting on the SOAP server's Database
 			 */
-			SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_GETCMD);
+			SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_GETCMD);
 			request.addProperty("host", HOSTNAME);
 
 			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -659,11 +655,11 @@ public class msservice extends Service {
 			 * remote
 			 */
 			try {
-				androidHttpTransport.call(SOAP_ACTION, envelope);
+				androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 			} catch (Exception e) {
 
-				Log.e(LOG_TAG, "Check Messages: Http Transport Failed");
-				Log.e(LOG_TAG, e.getMessage());
+				Log.e(MS_constants.LOG_TAG, "Check Messages: Http Transport Failed");
+				Log.e(MS_constants.LOG_TAG, e.getMessage());
 				return false;
 			}
 			/*
@@ -700,7 +696,7 @@ public class msservice extends Service {
 			 */
 			for (int j = 0; j < info.size(); j++) {
 				String[] infoString = info.get(j).split("; ");
-				Log.i(LOG_TAG, "Info:" + info.get(j));
+				Log.i(MS_constants.LOG_TAG, "Info:" + info.get(j));
 				@SuppressWarnings("unused")
 				int id = 0;
 				String cmd = "";
@@ -720,11 +716,11 @@ public class msservice extends Service {
 				 * Since the cmdTxt acually equals all three Status Notification
 				 * Fields
 				 */
-				Log.v(LOG_TAG, "Command: " + cmd);
+				Log.v(MS_constants.LOG_TAG, "Command: " + cmd);
 				if (cmd.equals("TMSG")) {
 					String[] cmdTemp = cmdTxt.split("\\|");
-					Log.i(LOG_TAG, cmdTemp.toString());
-					Log.i(LOG_TAG, Integer.toString(cmdTemp.length));
+					Log.i(MS_constants.LOG_TAG, cmdTemp.toString());
+					Log.i(MS_constants.LOG_TAG, Integer.toString(cmdTemp.length));
 					if (cmdTemp.length == 3) {
 						setStatusNotification(cmdTemp[0], cmdTemp[1],
 								cmdTemp[2]);
@@ -743,14 +739,14 @@ public class msservice extends Service {
 			 */
 			try {
 				/* Create a SOAP package using host name */
-				SoapObject request = new SoapObject(NAMESPACE,
-						METHOD_NAME_GETINFO);
+				SoapObject request = new SoapObject(MS_constants.NAMESPACE,
+						MS_constants.METHOD_NAME_GETINFO);
 				request.addProperty("host", HOSTNAME);
 				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 						SoapEnvelope.VER11);
 				envelope.setOutputSoapObject(request);
 				HttpTransportSE androidHttpTransport = get_transport();
-				androidHttpTransport.call(SOAP_ACTION, envelope);
+				androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 				SoapObject resultsRequestSOAP = (SoapObject) envelope.bodyIn;
 				/* We get the result */
 				String result = resultsRequestSOAP.getProperty("Result")
@@ -760,7 +756,6 @@ public class msservice extends Service {
 				/* First 7 chars are garbage */
 				result = result.substring(8, end);
 				/* Split it via the ';' */
-				Log.i(LOG_TAG, "Result:" + result);
 				String[] info = result.split("; ");
 				for (int i = 0; i < info.length - 1; i++) {
 					/*
@@ -776,8 +771,8 @@ public class msservice extends Service {
 					songinfo.put(key, value);
 				}
 			} catch (Exception e) {
-				Log.e(LOG_TAG, "SongInfo:Something Failed");
-				Log.e(LOG_TAG, e.getMessage());
+				Log.e(MS_constants.LOG_TAG, "SongInfo:Something Failed");
+				Log.e(MS_constants.LOG_TAG, e.getMessage());
 				return false;
 			}
 			return true;

@@ -31,22 +31,26 @@ public final class R {
         public static final int artest=0x7f08000f;
         public static final int back=0x7f08000b;
         public static final int by=0x7f08000e;
+        public static final int eName=0x7f08001c;
+        public static final int eNum=0x7f08001b;
         public static final int etime=0x7f080014;
         public static final int from=0x7f080011;
         public static final int layout_root=0x7f080007;
+        public static final int loc=0x7f08001d;
         public static final int music=0x7f080005;
         public static final int next=0x7f080018;
         public static final int of=0x7f080015;
         public static final int play=0x7f080017;
-        public static final int quit=0x7f08001b;
+        public static final int quit=0x7f08001f;
+        public static final int sName=0x7f08001a;
         public static final int save=0x7f08000a;
         public static final int serverhostname=0x7f080008;
         public static final int serveripaddress=0x7f080009;
-        public static final int settings=0x7f08001a;
+        public static final int settings=0x7f08001e;
         public static final int title=0x7f08000c;
         public static final int torrent=0x7f080006;
         public static final int tottime=0x7f080016;
-        public static final int wifiset=0x7f08001c;
+        public static final int wifiset=0x7f080020;
     }
     public static final class layout {
         public static final int listview=0x7f030000;
@@ -55,6 +59,7 @@ public final class R {
         public static final int music=0x7f030003;
         public static final int settings=0x7f030004;
         public static final int torrent=0x7f030005;
+        public static final int watch=0x7f030006;
     }
     public static final class menu {
         public static final int options_menu=0x7f070000;
