@@ -46,7 +46,6 @@ public class MS_soap_service extends Service {
 
 	/* We use this to set the ID number of the current notification */
 
-	
 	private int numberOfNotifications = 0;
 	/* Are we updating? */
 	private boolean update = false;
@@ -123,7 +122,8 @@ public class MS_soap_service extends Service {
 			 * The thread should not die on unbind, so you should see this
 			 * message
 			 */
-			Log.v(MS_constants.LOG_TAG, "Already running (you should see this message");
+			Log.v(MS_constants.LOG_TAG,
+					"Already running (you should see this message");
 		}
 		Log.d(MS_constants.LOG_TAG, "onRebind: msserivce");
 
@@ -168,8 +168,11 @@ public class MS_soap_service extends Service {
 		/* We set a notificaion, */
 		public boolean setNotification(String tickerString,
 				String notificationTitle, String noticicationText) {
-			return setStatusNotification(tickerString, notificationTitle,
-					noticicationText);
+			if (setStatusNotification(tickerString, notificationTitle,
+					noticicationText) == null) {
+				return false;
+			}
+			return true;
 		}
 
 		public void clearNotifications() {
@@ -227,7 +230,8 @@ public class MS_soap_service extends Service {
 			}
 			return result;
 		} catch (Exception e) {
-			Log.e(MS_constants.LOG_TAG, "set_ktorrent_notifications:Something Failed");
+			Log.e(MS_constants.LOG_TAG,
+					"set_ktorrent_notifications:Something Failed");
 			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
@@ -240,7 +244,8 @@ public class MS_soap_service extends Service {
 		 */
 		try {
 			/* Create a SOAP package using host name */
-			SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_GETINFO);
+			SoapObject request = new SoapObject(MS_constants.NAMESPACE,
+					MS_constants.METHOD_NAME_GETINFO);
 			request.addProperty("host", HOSTNAME);
 			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
 					SoapEnvelope.VER11);
@@ -296,7 +301,8 @@ public class MS_soap_service extends Service {
 			return true;
 		} catch (Exception e) {
 
-			Log.e(MS_constants.LOG_TAG, "registerForMessages: Http Transport Failed");
+			Log.e(MS_constants.LOG_TAG,
+					"registerForMessages: Http Transport Failed");
 			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
@@ -306,6 +312,7 @@ public class MS_soap_service extends Service {
 		/*
 		 * Creating the SOAP envelope using the registerMessage SOAP command
 		 */
+		state = true;
 		SoapObject request = new SoapObject(MS_constants.NAMESPACE,
 				MS_constants.METHOD_NAME_REGISTERACTIVEDEVICE);
 		request.addProperty("host", HOSTNAME);
@@ -320,7 +327,9 @@ public class MS_soap_service extends Service {
 			return true;
 		} catch (Exception e) {
 
-			Log.e(MS_constants.LOG_TAG, "registerDevice: Http Transport Failed");
+			Log
+					.e(MS_constants.LOG_TAG,
+							"registerDevice: Http Transport Failed");
 			Log.e(MS_constants.LOG_TAG, e.getMessage());
 			return false;
 		}
@@ -340,7 +349,8 @@ public class MS_soap_service extends Service {
 			return registerDevice(false);
 		}
 		String destination = DESTHOSTNAME;
-		SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_SENDCMD);
+		SoapObject request = new SoapObject(MS_constants.NAMESPACE,
+				MS_constants.METHOD_NAME_SENDCMD);
 		request.addProperty("cmd", cmd);
 		request.addProperty("txt", cmdTxt);
 		request.addProperty("shost", HOSTNAME);
@@ -371,7 +381,8 @@ public class MS_soap_service extends Service {
 		 */
 
 		/* Again sets up the SOAP envelope */
-		SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_SENDCMD);
+		SoapObject request = new SoapObject(MS_constants.NAMESPACE,
+				MS_constants.METHOD_NAME_SENDCMD);
 		request.addProperty("cmd", cmd);
 		request.addProperty("txt", cmdTxt);
 		request.addProperty("shost", HOSTNAME);
@@ -412,7 +423,7 @@ public class MS_soap_service extends Service {
 		return androidHttpTransport;
 	}
 
-	private boolean setStatusNotification(String tickerString,
+	private String[] setStatusNotification(String tickerString,
 			String notificationTitle, String noticicationText) {
 		/*
 		 * We get three String Varables representing the three Strings we need
@@ -462,22 +473,25 @@ public class MS_soap_service extends Service {
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-			mNotificationManager.notify(MS_constants.NOTIFICATION_ID, notification);
+			mNotificationManager.notify(MS_constants.NOTIFICATION_ID,
+					notification);
 			currentNotifcationIDs.add(MS_constants.NOTIFICATION_ID);
 			// NOTIFICATION_ID++;
 			numberOfNotifications++;
-			passDataToShowWindow(Name, epsNumber, epsName, loc);
-			return true;
+			String[] temp = {Name, epsNumber, epsName, loc};
+			return temp;
 		} catch (Exception e) {
-			return false;
+			return null;
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void passDataToShowWindow(String Name, String SeasonNumber,
 			String EpsName, String Location) {
 		try {
 			File root = Environment.getExternalStorageDirectory();
 			if (root.canWrite()) {
+				MS_show_list.observer.stopWatching();
 				File gpxfile = new File(root, "msremote/torrent.gpx");
 				FileWriter gpxwriter = new FileWriter(gpxfile, true);
 				BufferedWriter out = new BufferedWriter(gpxwriter);
@@ -485,99 +499,37 @@ public class MS_soap_service extends Service {
 				// name = tempName[tempName.length-1];
 				String outputString = Name + "|" + SeasonNumber + "|" + EpsName
 						+ "|" + Location;
-				Log.e(MS_constants.LOG_TAG, "String:" + outputString);
 				out.write(outputString + "\n");
 				out.close();
-			}
+				MS_show_list.observer.startWatching();
+				Thread.sleep(1000);
+				}
 		} catch (Exception e) {
-			Log.e(MS_constants.LOG_TAG, "Could not write file " + e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "Could not write file "
+					+ e.getMessage());
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private boolean checkMessages() {
-		Log.i(MS_constants.LOG_TAG, "checking Messages");
-		/*
-		 * This function send a command to the SOAP method sendCmd, which checks
-		 * for messages sitting on the SOAP server's Database
-		 */
-		SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_GETCMD);
-		request.addProperty("host", HOSTNAME);
-
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-				SoapEnvelope.VER11);
-		envelope.setOutputSoapObject(request);
-		HttpTransportSE androidHttpTransport = get_transport();
-		/* Added so that if the SOAP servers crash, we don't crash this remote */
+	private void passDataToShowWindow(List<String[]> shows) {
 		try {
-			androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
-		} catch (Exception e) {
-
-			Log.e(MS_constants.LOG_TAG, "Check Messages: Http Transport Failed");
-			Log.e(MS_constants.LOG_TAG, e.getMessage());
-			return false;
-		}
-		/*
-		 * Here we pull the return results from the incoming envelope and parses
-		 * it so we get the full information
-		 */
-		SoapObject resultsRequestSOAP = (SoapObject) envelope.bodyIn;
-		String result = resultsRequestSOAP.getProperty("Result").toString();
-		int end = result.length() - 1;
-		if (result.length() < 10) {
-			return false;
-		}
-		result = result.substring(8, end);
-		int start = 0;
-		end = 0;
-		ArrayList<String> info = new ArrayList<String>();
-		/*
-		 * results look like {someinfo}garbage{someinfo}... So we split it up
-		 * into each message, inserting it into the ArrayList for later
-		 * proccessing
-		 */
-		while (result.length() > 0) {
-			start = result.indexOf('{');
-			end = result.indexOf('}');
-			if (start <= end) {
-				info.add(result.substring(start + 1, end));
-				result = result.substring(end + 3);
-			}
-		}
-		/*
-		 * We Loop threw the ArrayList info, pulling the data Then we get the
-		 * info, spliting if by ';' so that we get all the values in separate
-		 * variables
-		 */
-		for (int j = 0; j < info.size(); j++) {
-			String[] infoString = info.get(j).split("; ");
-			Log.i(MS_constants.LOG_TAG, "Info:" + info.get(j));
-			int id = 0;
-			String cmd = "";
-			String cmdTxt = "";
-			String timeupdated = "";
-			String[] temp = infoString[0].split("=");
-			cmd = temp[1];
-			temp = infoString[1].split("=");
-			id = Integer.parseInt(temp[1]);
-			temp = infoString[2].split("=");
-			cmdTxt = temp[1];
-			temp = infoString[3].split("=");
-			timeupdated = temp[1];
-			/*
-			 * TMSG is Torrent Message(the only kind of message right now Since
-			 * the cmdTxt acually equals all three Status Notification Fields
-			 */
-			Log.v(MS_constants.LOG_TAG, "Command: " + cmd);
-			if (cmd.equals("TMSG")) {
-				String[] cmdTemp = cmdTxt.split("\\|");
-				if (cmdTemp.length == 3) {
-					setStatusNotification(cmdTemp[0], cmdTemp[1], cmdTemp[2]);
+			File root = Environment.getExternalStorageDirectory();
+			if (root.canWrite()) {
+				File gpxfile = new File(root, "msremote/torrent.gpx");
+				FileWriter gpxwriter = new FileWriter(gpxfile, true);
+				BufferedWriter out = new BufferedWriter(gpxwriter);
+				for (int i = 0; i < shows.size(); i++) {
+					String[] curShow = shows.get(i);
+					String outputString = curShow[0] + "|" + curShow[1] + "|"
+							+ curShow[2] + "|" + curShow[3];
+					out.write(outputString + "\n");
 				}
+				out.close();
 			}
 
+		} catch (Exception e) {
+			Log.e(MS_constants.LOG_TAG, "Could not write file "
+					+ e.getMessage());
 		}
-		return true;
 	}
 
 	private void clearAllNotifications() {
@@ -643,7 +595,8 @@ public class MS_soap_service extends Service {
 			 * This function send a command to the SOAP method sendCmd, which
 			 * checks for messages sitting on the SOAP server's Database
 			 */
-			SoapObject request = new SoapObject(MS_constants.NAMESPACE, MS_constants.METHOD_NAME_GETCMD);
+			SoapObject request = new SoapObject(MS_constants.NAMESPACE,
+					MS_constants.METHOD_NAME_GETCMD);
 			request.addProperty("host", HOSTNAME);
 
 			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -658,7 +611,8 @@ public class MS_soap_service extends Service {
 				androidHttpTransport.call(MS_constants.SOAP_ACTION, envelope);
 			} catch (Exception e) {
 
-				Log.e(MS_constants.LOG_TAG, "Check Messages: Http Transport Failed");
+				Log.e(MS_constants.LOG_TAG,
+						"Check Messages: Http Transport Failed");
 				Log.e(MS_constants.LOG_TAG, e.getMessage());
 				return false;
 			}
@@ -694,6 +648,7 @@ public class MS_soap_service extends Service {
 			 * the info, spliting if by ';' so that we get all the values in
 			 * separate variables
 			 */
+			List<String[]> shows = new ArrayList<String[]>();
 			for (int j = 0; j < info.size(); j++) {
 				String[] infoString = info.get(j).split("; ");
 				Log.i(MS_constants.LOG_TAG, "Info:" + info.get(j));
@@ -716,18 +671,34 @@ public class MS_soap_service extends Service {
 				 * Since the cmdTxt acually equals all three Status Notification
 				 * Fields
 				 */
-				Log.v(MS_constants.LOG_TAG, "Command: " + cmd);
+				String[] curShow = new String[4];
 				if (cmd.equals("TMSG")) {
 					String[] cmdTemp = cmdTxt.split("\\|");
 					Log.i(MS_constants.LOG_TAG, cmdTemp.toString());
-					Log.i(MS_constants.LOG_TAG, Integer.toString(cmdTemp.length));
+					Log.i(MS_constants.LOG_TAG, Integer
+							.toString(cmdTemp.length));
 					if (cmdTemp.length == 3) {
-						setStatusNotification(cmdTemp[0], cmdTemp[1],
+						curShow = setStatusNotification(cmdTemp[0], cmdTemp[1],
 								cmdTemp[2]);
 					}
+				} else if (cmd.equals("ADDS")) {
+					String[] cmdTemp = cmdTxt.split("\\|");
+					if (cmdTemp.length == 4) {
+						curShow[0] = cmdTemp[0];
+						curShow[1] = cmdTemp[1];
+						curShow[2] = cmdTemp[2];
+						curShow[3] = cmdTemp[3];
+					}
+				} else {
+					Log.w(MS_constants.LOG_TAG, "Commad:" + cmd
+							+ " Not supported");
+				}
+				if (curShow != null){
+					shows.add(curShow);
 				}
 
 			}
+			passDataToShowWindow(shows);
 			return true;
 		}
 

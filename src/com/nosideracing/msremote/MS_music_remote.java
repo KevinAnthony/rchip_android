@@ -153,8 +153,7 @@ public class MS_music_remote extends Activity implements Runnable, OnClickListen
 		Log.d(MS_constants.LOG_TAG, "Stoping Thread");
 		// Finally we stop the thread
 		stopThread();
-		this.finish();
-	}
+		}
 
 	@Override
 	public void onDestroy() {

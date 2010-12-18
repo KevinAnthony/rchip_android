@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 import android.app.ExpandableListActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -40,15 +39,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
-
 public class MS_show_list extends ExpandableListActivity {
 
-
-	public FileObserver observer;
+	public static FileObserver observer;
 
 	private backendservice backendService;
-	//private BackendServiceConnection conn;
-	
+	// private BackendServiceConnection conn;
+
 	private static List<String> torName = new ArrayList<String>();
 	private static List<String> torNumber = new ArrayList<String>();
 	private static List<String> torEpsName = new ArrayList<String>();
@@ -72,13 +69,13 @@ public class MS_show_list extends ExpandableListActivity {
 
 			@Override
 			public void onEvent(int event, String path) {
-				if (event == FileObserver.MODIFY) {
+				if (event == FileObserver.CLOSE_WRITE) {
 					Log.v(MS_constants.LOG_TAG, "onevent, file done something");
 					updateList();
 				}
 			}
 		};
-		
+
 		try {
 			backendService.clearNotifications();
 		} catch (Exception e) {
@@ -142,7 +139,7 @@ public class MS_show_list extends ExpandableListActivity {
 		i1.putExtra("EpsNumber", torNumber.get((int) id));
 		i1.putExtra("EpsName", torEpsName.get((int) id));
 		i1.putExtra("Location", torLocation.get((int) id));
-		MS_show_list.this.startActivityForResult(i1,MS_constants.RC_WATCHMOVE);
+		MS_show_list.this.startActivityForResult(i1, MS_constants.RC_WATCHMOVE);
 		delete(id);
 		return;
 	}
@@ -161,8 +158,6 @@ public class MS_show_list extends ExpandableListActivity {
 	public void deleteShow(long id) {
 		String show = torName.get((int) id);
 		for (int i = 0; i < torName.size();) {
-			Log.v(MS_constants.LOG_TAG, "TorName:" + torName.get(i) + ":");
-			Log.v(MS_constants.LOG_TAG, "REMOAVE:" + show + ":");
 			String curShow = torName.get(i);
 			if (curShow.equalsIgnoreCase(show)) {
 				torName.remove(i);
@@ -215,12 +210,13 @@ public class MS_show_list extends ExpandableListActivity {
 		}
 		return false;
 	}
-	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-	    // See which child activity is calling us back.
-	    if (resultCode == MS_constants.QUITREMOTE){
-	                quit();
-	            } 
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// See which child activity is calling us back.
+		if (resultCode == MS_constants.QUITREMOTE) {
+			quit();
 		}
+	}
 
 	private void updateList() {
 		readFile();
@@ -245,7 +241,8 @@ public class MS_show_list extends ExpandableListActivity {
 			String SeasonInfo = temp[1];
 			String EpsName = temp[2].replace('_', ' ');
 			String location = temp[3];
-			if (!(torEpsName.contains(EpsName))) {
+			if (!((torEpsName.contains(EpsName)) && (torNumber
+					.contains(SeasonInfo)))) {
 				torName.add(name);
 				torNumber.add(SeasonInfo);
 				torEpsName.add(EpsName);
@@ -276,7 +273,8 @@ public class MS_show_list extends ExpandableListActivity {
 				out.close();
 			}
 		} catch (Exception e) {
-			Log.e(MS_constants.LOG_TAG, "Could not write file " + e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "Could not write file "
+					+ e.getMessage());
 		}
 		observer.startWatching();
 	}
@@ -296,11 +294,15 @@ public class MS_show_list extends ExpandableListActivity {
 					String SeasonInfo = temp[1];
 					String EpsName = temp[2].replace('_', ' ');
 					String location = temp[3];
-					if (!(torEpsName.contains(EpsName))) {
+					if (!((torEpsName.contains(EpsName)) && (torNumber
+							.contains(SeasonInfo)))) {
 						torName.add(name);
 						torNumber.add(SeasonInfo);
 						torEpsName.add(EpsName);
 						torLocation.add(location);
+					} else {
+						Log.w(MS_constants.LOG_TAG, name + " " + SeasonInfo
+								+ " " + EpsName);
 					}
 					if (!(group.contains(name))) {
 						group.add(name);
@@ -311,9 +313,10 @@ public class MS_show_list extends ExpandableListActivity {
 				in.close();
 			}
 		} catch (Exception e) {
-			Log.e(MS_constants.LOG_TAG, "Could not read file 1 " + e.getMessage());
+			Log.e(MS_constants.LOG_TAG, "Could not read file 1 "
+					+ e.getMessage());
 		}
-		updateList();
+		refreshList();
 	}
 
 	private void quit() {
@@ -447,6 +450,7 @@ public class MS_show_list extends ExpandableListActivity {
 			TextView text3;
 		}
 	}
+
 	class BackendServiceConnection implements ServiceConnection {
 		public void onServiceConnected(ComponentName className,
 				IBinder boundService) {
