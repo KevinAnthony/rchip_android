@@ -10,16 +10,15 @@ import java.util.Collections;
 import java.util.List;
 
 import android.app.ExpandableListActivity;
-import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileObserver;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -43,8 +42,8 @@ public class MS_show_list extends ExpandableListActivity {
 
 	public static FileObserver observer;
 
-	private backendservice backendService;
-	// private BackendServiceConnection conn;
+	//private backendservice backendService;
+	//private BackendServiceConnection conn;
 
 	private static List<String> torName = new ArrayList<String>();
 	private static List<String> torNumber = new ArrayList<String>();
@@ -56,7 +55,7 @@ public class MS_show_list extends ExpandableListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+			
 		readFile();
 		// Set up our adapter
 		mAdapter = new MyExpandableListAdapter(this);
@@ -77,7 +76,7 @@ public class MS_show_list extends ExpandableListActivity {
 		};
 
 		try {
-			backendService.clearNotifications();
+			MS_remote.backendService.clearNotifications();
 		} catch (Exception e) {
 			Log
 					.e(
@@ -86,6 +85,11 @@ public class MS_show_list extends ExpandableListActivity {
 									+ e.getLocalizedMessage());
 		}
 		observer.startWatching();
+	}
+	
+	public void onPause() {
+		super.onPause();
+		Log.d(MS_constants.LOG_TAG, "onPause: MS_show_list");
 	}
 
 	public void onCreateContextMenu(ContextMenu menu, View v,
@@ -99,7 +103,7 @@ public class MS_show_list extends ExpandableListActivity {
 		menu.add(0, v.getId(), 2, "Delete All");
 
 	}
-
+	
 	public boolean onContextItemSelected(MenuItem item) {
 		int id = 0;
 		ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item
@@ -140,7 +144,7 @@ public class MS_show_list extends ExpandableListActivity {
 		i1.putExtra("EpsName", torEpsName.get((int) id));
 		i1.putExtra("Location", torLocation.get((int) id));
 		MS_show_list.this.startActivityForResult(i1, MS_constants.RC_WATCHMOVE);
-		delete(id);
+		//delete(id);
 		return;
 	}
 
@@ -395,8 +399,11 @@ public class MS_show_list extends ExpandableListActivity {
 						.findViewById(R.id.TextView03);
 				convertView.setTag(holder);
 			} else {
+				convertView.setClickable(true);
 				holder = (ViewHolder) convertView.getTag();
 			}
+			
+
 			holder.text.setText(children.get(groupPosition).get(childPosition)
 					.get(0));
 			holder.text2.setText(children.get(groupPosition).get(childPosition)
@@ -450,7 +457,7 @@ public class MS_show_list extends ExpandableListActivity {
 			TextView text3;
 		}
 	}
-
+/*
 	class BackendServiceConnection implements ServiceConnection {
 		public void onServiceConnected(ComponentName className,
 				IBinder boundService) {
@@ -463,5 +470,5 @@ public class MS_show_list extends ExpandableListActivity {
 			backendService = null;
 			Log.d(MS_constants.LOG_TAG, "onServiceDisconnected: msremote");
 		}
-	}
+	}*/
 }

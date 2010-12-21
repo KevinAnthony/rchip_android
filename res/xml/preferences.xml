@@ -39,4 +39,9 @@
         android:defaultValue="5000"
         android:entries="@array/DelayArray"
         android:entryValues="@array/DelayValues" />
+	<ListPreference
+     	android:title="Video Path"
+        android:summary="The Path the the root of the NFS server"
+        android:key="videopath"
+        android:defaultValue="/mnt/raid/" />
 </PreferenceScreen>

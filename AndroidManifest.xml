@@ -13,7 +13,8 @@
 		<activity android:name=".MS_music_remote" android:alwaysRetainTaskState = "true"/>
 		<activity android:name=".MS_show_list" android:alwaysRetainTaskState = "true"/>
 		<activity android:name=".MS_preferences" android:alwaysRetainTaskState = "true"/>
-		<activity android:name=".MS_watch_movie" android:alwaysRetainTaskState = "true"/>
+		<activity android:name=".MS_watch_movie" android:alwaysRetainTaskState = "true" android:screenOrientation="portrait"/>
+
 		<service android:name=".MS_soap_service">
 			<intent-filter>
 				<action android:name="com.nosideracing.msremote.MS_soap_service" />

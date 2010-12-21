@@ -19,6 +19,9 @@ public final class R {
     }
     public static final class id {
         public static final int Control=0x7f080004;
+        public static final int LL_Text=0x7f08001a;
+        public static final int LL_buttons_first=0x7f08001d;
+        public static final int LL_buttons_second=0x7f080022;
         public static final int LinearLayout01=0x7f080001;
         public static final int LinearLayout02=0x7f08000d;
         public static final int LinearLayout03=0x7f080010;
@@ -27,30 +30,35 @@ public final class R {
         public static final int TextView01=0x7f080000;
         public static final int TextView02=0x7f080002;
         public static final int TextView03=0x7f080003;
+        public static final int ToggleButton01=0x7f080020;
         public static final int album=0x7f080012;
         public static final int artest=0x7f08000f;
         public static final int back=0x7f08000b;
         public static final int by=0x7f08000e;
-        public static final int eName=0x7f08001c;
-        public static final int eNum=0x7f08001b;
+        public static final int eNum=0x7f08001c;
         public static final int etime=0x7f080014;
+        public static final int foward=0x7f080021;
         public static final int from=0x7f080011;
+        public static final int fullscreen=0x7f080024;
         public static final int layout_root=0x7f080007;
-        public static final int loc=0x7f08001d;
         public static final int music=0x7f080005;
+        public static final int mute=0x7f080025;
         public static final int next=0x7f080018;
         public static final int of=0x7f080015;
+        public static final int pause=0x7f080023;
         public static final int play=0x7f080017;
-        public static final int quit=0x7f08001f;
-        public static final int sName=0x7f08001a;
+        public static final int playpause=0x7f08001f;
+        public static final int quit=0x7f080026;
+        public static final int rewind=0x7f08001e;
+        public static final int sName=0x7f08001b;
         public static final int save=0x7f08000a;
         public static final int serverhostname=0x7f080008;
         public static final int serveripaddress=0x7f080009;
-        public static final int settings=0x7f08001e;
+        public static final int settings=0x7f080027;
         public static final int title=0x7f08000c;
         public static final int torrent=0x7f080006;
         public static final int tottime=0x7f080016;
-        public static final int wifiset=0x7f080020;
+        public static final int wifiset=0x7f080028;
     }
     public static final class layout {
         public static final int listview=0x7f030000;

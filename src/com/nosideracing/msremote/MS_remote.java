@@ -30,7 +30,7 @@ public class MS_remote extends Activity {
 	/* This is the Pref window from MENU->Settings */
 	SharedPreferences settings;
 	/* For the services the service then the actual connection */
-	private backendservice backendService;
+	static backendservice backendService;
 	private BackendServiceConnection conn;
 
 	@Override
