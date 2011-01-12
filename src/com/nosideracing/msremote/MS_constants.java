@@ -10,6 +10,7 @@ public class MS_constants {
 	protected static final int PREFS_UPDATED = 0x0041;
 	protected static final int UPDATEGUI = 0x0042;
 	protected static final int QUITREMOTE = 0x0043;
+	protected static final int REMOVESHOW = 0x0044;
 	protected static final int NOTIFICATION_ID = 0x0081;
 	
 	protected static final String SOAP_ACTION = "getSongInfo";
@@ -18,7 +19,10 @@ public class MS_constants {
 	protected static final String METHOD_NAME_GETCMD = "getCmd";
 	protected static final String METHOD_NAME_REGISTERACTIVEDEVICE = "registerActiveDevice";
 	protected static final String METHOD_NAME_REGISTERMESSAGES = "registerMessages";
+	protected static final String METHOD_NAME_GETVIDEOPATH = "getVideoPath";
+	protected static final String METHOD_NAME_GETDAEMONS = "getDaemons";
 	protected static final String NAMESPACE = "http://192.168.1.3/";
 	
 	protected static String LOG_TAG = "msremote";
+		
 }

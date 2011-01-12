@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference 
+    <ListPreference
     	android:key="serverhostname" 
     	android:title="Server Host Name" 
     	android:summary="The host name of the Server which msDaemon runs" 
@@ -39,7 +39,7 @@
         android:defaultValue="5000"
         android:entries="@array/DelayArray"
         android:entryValues="@array/DelayValues" />
-	<ListPreference
+	<EditTextPreference
      	android:title="Video Path"
         android:summary="The Path the the root of the NFS server"
         android:key="videopath"

@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /home/gigaroc/workspace/msremote/src/com/nosideracing/msremote/backendservice.aidl
+ * Original file: /home/gigaroc/code/msremote/src/com/nosideracing/msremote/backendservice.aidl
  */
 package com.nosideracing.msremote;
 public interface backendservice extends android.os.IInterface
@@ -145,6 +145,31 @@ _arg0 = (0!=data.readInt());
 boolean _result = this.setKtorrentNotifications(_arg0);
 reply.writeNoException();
 reply.writeInt(((_result)?(1):(0)));
+return true;
+}
+case TRANSACTION_getRootValue:
+{
+data.enforceInterface(DESCRIPTOR);
+java.lang.String _arg0;
+_arg0 = data.readString();
+java.lang.String _result = this.getRootValue(_arg0);
+reply.writeNoException();
+reply.writeString(_result);
+return true;
+}
+case TRANSACTION_getHostNames:
+{
+data.enforceInterface(DESCRIPTOR);
+java.lang.String _result = this.getHostNames();
+reply.writeNoException();
+reply.writeString(_result);
+return true;
+}
+case TRANSACTION_UpdateSongInfo_Once:
+{
+data.enforceInterface(DESCRIPTOR);
+this.UpdateSongInfo_Once();
+reply.writeNoException();
 return true;
 }
 }
@@ -366,6 +391,55 @@ _data.recycle();
 }
 return _result;
 }
+public java.lang.String getRootValue(java.lang.String hn) throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+java.lang.String _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeString(hn);
+mRemote.transact(Stub.TRANSACTION_getRootValue, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readString();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+}
+public java.lang.String getHostNames() throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+java.lang.String _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_getHostNames, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readString();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+}
+public void UpdateSongInfo_Once() throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_UpdateSongInfo_Once, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+}
 }
 static final int TRANSACTION_sendCmd = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
 static final int TRANSACTION_setNotification = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);
@@ -379,6 +453,9 @@ static final int TRANSACTION_getTimeElapised = (android.os.IBinder.FIRST_CALL_TR
 static final int TRANSACTION_getSongLength = (android.os.IBinder.FIRST_CALL_TRANSACTION + 9);
 static final int TRANSACTION_getIsPlaying = (android.os.IBinder.FIRST_CALL_TRANSACTION + 10);
 static final int TRANSACTION_setKtorrentNotifications = (android.os.IBinder.FIRST_CALL_TRANSACTION + 11);
+static final int TRANSACTION_getRootValue = (android.os.IBinder.FIRST_CALL_TRANSACTION + 12);
+static final int TRANSACTION_getHostNames = (android.os.IBinder.FIRST_CALL_TRANSACTION + 13);
+static final int TRANSACTION_UpdateSongInfo_Once = (android.os.IBinder.FIRST_CALL_TRANSACTION + 14);
 }
 public boolean sendCmd(java.lang.String cmd, java.lang.String cmdText) throws android.os.RemoteException;
 public boolean setNotification(java.lang.String tickerString, java.lang.String notificationTitle, java.lang.String noticicationText) throws android.os.RemoteException;
@@ -392,4 +469,7 @@ public java.lang.String getTimeElapised() throws android.os.RemoteException;
 public java.lang.String getSongLength() throws android.os.RemoteException;
 public int getIsPlaying() throws android.os.RemoteException;
 public boolean setKtorrentNotifications(boolean ktornot) throws android.os.RemoteException;
+public java.lang.String getRootValue(java.lang.String hn) throws android.os.RemoteException;
+public java.lang.String getHostNames() throws android.os.RemoteException;
+public void UpdateSongInfo_Once() throws android.os.RemoteException;
 }

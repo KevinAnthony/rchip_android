@@ -6,37 +6,38 @@
 		android:id="@+id/LL_Text" android:layout_width="wrap_content"
 		android:orientation="horizontal" android:layout_marginTop="10px"
 		android:layout_marginBottom="10px" android:gravity="center">
-		<TextView android:layout_height="wrap_content" android:id="@+id/sName"
-			android:layout_width="wrap_content" android:text="Show Name"
-			android:layout_marginLeft="3px"></TextView>
-		<TextView android:layout_height="wrap_content" android:id="@+id/eNum"
-			android:layout_width="wrap_content" android:text="Episode Number"
-			android:layout_marginLeft="10px"></TextView>
+		
+		<TextView android:layout_height="wrap_content" android:id="@+id/MSWMTopText"
+			android:layout_width="wrap_content" android:text="Episode Info"
+			android:layout_marginLeft="10px" android:ellipsize="marquee" android:textColor="#ffffff" 
+			android:marqueeRepeatLimit="marquee_forever" android:scrollHorizontally="true"></TextView>
 	</LinearLayout>
 	<LinearLayout android:layout_height="wrap_content"
 		android:id="@+id/LL_buttons_first" android:layout_width="fill_parent">
-		<Button android:text="Rewind" android:id="@+id/rewind"
+		<Button android:text="Rewind" android:id="@+id/MSWMrewind"
 			android:layout_width="wrap_content" android:layout_height="fill_parent"></Button>
-		<ToggleButton android:id="@+id/playpause" android:textOn="Stop" android:textOff="Play"
-			android:layout_height="fill_parent" android:layout_width="wrap_content"
-			android:text="@+id/ToggleButton01" android:layout_gravity="center"></ToggleButton>
+		<ToggleButton android:id="@+id/MSWMplaypause" android:textOn="Pause"
+			android:textOff="Play" android:layout_height="fill_parent"
+			android:layout_width="wrap_content" android:text="@+id/ToggleButton01"
+			android:layout_gravity="center"></ToggleButton>
 		<Button android:text="Fast F" android:layout_gravity="fill"
-			android:id="@+id/foward" android:layout_height="fill_parent"
+			android:id="@+id/MSWMfoward" android:layout_height="fill_parent"
 			android:layout_width="wrap_content"></Button>
 	</LinearLayout>
 	<LinearLayout android:id="@+id/LL_buttons_second"
 		android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<Button android:text="Pause" android:id="@+id/pause"
+		<Button android:text="Stop" android:id="@+id/MSWMstop"
 			android:layout_width="wrap_content" android:layout_height="fill_parent"></Button>
-		<ToggleButton android:id="@+id/fullscreen" android:textOn="Normal Size" android:textOff="FullScreen"
+		<ToggleButton android:id="@+id/MSWMfullscreen"
+			android:textOn="Normal Size" android:textOff="FullScreen"
 			android:layout_height="fill_parent" android:layout_width="wrap_content"
 			android:text="@+id/ToggleButton01" android:layout_gravity="center"
 			android:gravity="center|center_vertical"></ToggleButton>
-		<Button android:text="Mute" android:id="@+id/mute"
+		<Button android:text="Mute" android:id="@+id/MSWMmute"
 			android:layout_width="wrap_content" android:layout_height="fill_parent"
 			android:layout_gravity="fill"></Button>
 	</LinearLayout>
-	<Button android:text="Quit" android:id="@+id/quit"
+	<Button android:text="Quit" android:id="@+id/MSWMquit"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
 		android:layout_gravity="fill"></Button>
 </LinearLayout>
