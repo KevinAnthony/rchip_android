@@ -76,14 +76,22 @@ public class MS_show_list extends ExpandableListActivity {
 	    Log.e(MS_constants.LOG_TAG, "Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):"
 		    + e.getLocalizedMessage());
 	}
+	
+    }
+    
+    public void onResume() {
+	super.onResume();
+	Log.d(MS_constants.LOG_TAG, "onResume: MS_show_list");
+	updateList();
 	observer.startWatching();
     }
-
+    
     public void onPause() {
 	super.onPause();
 	Log.d(MS_constants.LOG_TAG, "onPause: MS_show_list");
+	observer.stopWatching();
     }
-
+   
  
     public boolean onChildClick(ExpandableListView info, View v, int groupPos, int childPos,
 	    long id) {
@@ -179,7 +187,7 @@ public class MS_show_list extends ExpandableListActivity {
     }
 
     private void delete(long id) {
-	if (id > 0) {
+	if (id >= 0) {
 	    Log.i(MS_constants.LOG_TAG, "Got to Delete with Id " + id);
 	    torName.remove(torName.get((int) id));
 	    torNumber.remove(torNumber.get((int) id));
@@ -212,8 +220,8 @@ public class MS_show_list extends ExpandableListActivity {
     private void deleteall(long id) {
 	torName.clear();
 	torNumber.clear();
-	torEpsName.remove(torEpsName.get((int) id));
-	torLocation.remove(torLocation.get((int) id));
+	torEpsName.clear();
+	torLocation.clear();
 	writeFile();
 	refreshList();
     }

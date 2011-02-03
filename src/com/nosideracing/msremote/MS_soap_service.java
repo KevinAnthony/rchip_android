@@ -72,7 +72,7 @@ public class MS_soap_service extends Service {
 	 * Destination identifier that the daemon is running (we can have
 	 * multiple destinations on one SOAP server LOG_TAG is just that
 	 */
-	try{
+	try {
 	    Bundle incoming = intent.getExtras();
 	    URL_EXT = incoming.get("SETTING_URL_EXTERNAL").toString();
 	    // URL = "http://173.3.14.224:500";
@@ -83,14 +83,13 @@ public class MS_soap_service extends Service {
 	    EXT_DELAY = incoming.getInt("SETTING_EXTERNAL_DELAY");
 	    INT_DELAY = incoming.getInt("SETTING_INTERNAL_DELAY");
 	    boolean ktornot = incoming.getBoolean("SETTING_KTORRENTNOTIFICATION");
-		set_ktorrent_notifications(ktornot);
-	}
-	catch (Exception e) {
+	    set_ktorrent_notifications(ktornot);
+	} catch (Exception e) {
 	    Log.e(MS_constants.LOG_TAG, "Could not read file 1 " + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	    return START_FLAG_RETRY;
 	}
-	
+
 	/* Initialze SongInfo to default values */
 	songinfo.put("artist", "Nobody");
 	songinfo.put("album", "Nothing");
@@ -167,6 +166,7 @@ public class MS_soap_service extends Service {
 	 * don't ask KTorrent to stop, we only do that on destroy
 	 */
 	registerDevice(false);
+	running = false;
 	return true;
     }
 
@@ -288,7 +288,7 @@ public class MS_soap_service extends Service {
 	    return result;
 	} catch (Exception e) {
 	    Log.e(MS_constants.LOG_TAG, "set_ktorrent_notifications:Something Failed");
-	    Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+	    Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	    return false;
 	}
@@ -332,7 +332,7 @@ public class MS_soap_service extends Service {
 	    }
 	} catch (Exception e) {
 	    Log.e(MS_constants.LOG_TAG, "SongInfo:Something Failed");
-	    Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+	    Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	    return false;
 	}
@@ -357,7 +357,7 @@ public class MS_soap_service extends Service {
 	} catch (Exception e) {
 
 	    Log.e(MS_constants.LOG_TAG, "registerForMessages: Http Transport Failed");
-	    Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+	    Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	    return false;
 	}
@@ -381,7 +381,7 @@ public class MS_soap_service extends Service {
 	} catch (Exception e) {
 
 	    Log.e(MS_constants.LOG_TAG, "registerDevice: Http Transport Failed");
-	    Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+	    Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	    return false;
 	}
@@ -416,7 +416,7 @@ public class MS_soap_service extends Service {
 	} catch (Exception e) {
 
 	    Log.e(MS_constants.LOG_TAG, "sendCmdToSoap: Http Transport Failed");
-	    Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+	    Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	    return false;
 	}
@@ -447,7 +447,7 @@ public class MS_soap_service extends Service {
 	} catch (Exception e) {
 
 	    Log.e(MS_constants.LOG_TAG, "sendCmdToSoap: Http Transport Failed");
-	    Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+	    Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	    return false;
 	}
@@ -498,7 +498,7 @@ public class MS_soap_service extends Service {
 		}
 		Name = Name.substring(0, Name.length() - 1);
 		Log.v("msremote", Name);
-		epsNumber= temp[temp.length - 1];
+		epsNumber = temp[temp.length - 1];
 		epsName = filename[1].substring(0, filename[1].length() - 1);
 		epsName = epsName.substring(0, epsName.length() - 1);
 	    }
@@ -584,7 +584,7 @@ public class MS_soap_service extends Service {
 		    String[] curShow = shows.get(i);
 		    String outputString = curShow[0] + "|" + curShow[1] + "|" + curShow[2] + "|"
 			    + curShow[3];
-		      out.write(outputString + "\n");
+		    out.write(outputString + "\n");
 		}
 		out.close();
 	    }
@@ -627,24 +627,27 @@ public class MS_soap_service extends Service {
 	    Context f_context = getApplicationContext();
 	    NetworkInfo info = (NetworkInfo) ((ConnectivityManager) f_context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 	    String SSID = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).getConnectionInfo().getSSID();
+	    if (running) {
+		if (info != null && info.isConnected()) {
+		    int itype = info.getType();
 
-	    if (info != null && info.isConnected()) {
-		int itype = info.getType();
-
-		sleep = (long) EXT_DELAY;
-		if ((SSID != null) && ((itype == 1) && (SSID.compareTo(INT_NETWORK_NAME) == 0))) {
-		    sleep = (long) INT_DELAY;
+		    sleep = (long) EXT_DELAY;
+		    if ((SSID != null) && ((itype == 1) && (SSID.compareTo(INT_NETWORK_NAME) == 0))) {
+			sleep = (long) INT_DELAY;
+		    }
+		    if (update) {
+			getSongInfo();
+		    }
 		}
-		if (update) {
-		    getSongInfo();
-		}
-	    }
 
-	    if (System.currentTimeMillis() - timeSinceCheckedMessages > checkInterval) {
-		timeSinceCheckedMessages = System.currentTimeMillis();
-		checkMessages();
+		if (System.currentTimeMillis() - timeSinceCheckedMessages > checkInterval) {
+		    timeSinceCheckedMessages = System.currentTimeMillis();
+		    checkMessages();
+		}
+		serviceHandler.postDelayed(this, sleep);
+	    } else {
+		Log.i(MS_constants.LOG_TAG, "Exiting runnable");
 	    }
-	    serviceHandler.postDelayed(this, sleep);
 	}
 
 	private boolean checkMessages() {
@@ -668,7 +671,7 @@ public class MS_soap_service extends Service {
 	    } catch (Exception e) {
 
 		Log.e(MS_constants.LOG_TAG, "Check Messages: Http Transport Failed");
-		Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+		Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 		Log.e(MS_constants.LOG_TAG, "", e);
 		return false;
 	    }
@@ -684,7 +687,7 @@ public class MS_soap_service extends Service {
 		end = result.length() - 1;
 	    } catch (Exception e) {
 		Log.e(MS_constants.LOG_TAG, "Check Messages:Soap Failed");
-		Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+		Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 		Log.e(MS_constants.LOG_TAG, "", e);
 		return false;
 	    }
@@ -805,7 +808,7 @@ public class MS_soap_service extends Service {
 		}
 	    } catch (Exception e) {
 		Log.e(MS_constants.LOG_TAG, "SongInfo:Something Failed");
-		Log.e(MS_constants.LOG_TAG, ""+e.getMessage());
+		Log.e(MS_constants.LOG_TAG, "" + e.getMessage());
 		Log.e(MS_constants.LOG_TAG, "", e);
 		return false;
 	    }

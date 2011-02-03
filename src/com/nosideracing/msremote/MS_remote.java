@@ -191,6 +191,7 @@ public class MS_remote extends Activity {
     protected void restartService() {
 	Log.i(MS_constants.LOG_TAG, "Restarting Service(i think)");
 	unbindService(conn);
+	conn =null;
 	Intent i1 = new Intent();
 	i1.setAction("com.nosideracing.msremote.MS_soap_service");
 	stopService(i1);
@@ -231,6 +232,7 @@ public class MS_remote extends Activity {
 	Log.i(MS_constants.LOG_TAG, "Quitting");
 	/* Unbinds the service, and closes the program */
 	unbindService(conn);
+	conn = null;
 	setResult(MS_constants.QUITREMOTE);
 	this.finish();
     }
@@ -250,6 +252,11 @@ public class MS_remote extends Activity {
     public class startService extends AsyncTask<String, Integer, Boolean> {
 
 	protected Boolean doInBackground(String... incoming) {
+	    if (conn != null){
+		Log.w(MS_constants.LOG_TAG, "Trying to bind service, another service running");
+		unbindService(conn);
+		conn = null;
+	    }
 	    String msb_url_external = incoming[0];
 	    String msb_url_internal = incoming[1];
 	    String phoneNumber = incoming[2];
