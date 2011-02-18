@@ -1,12 +1,6 @@
 package com.nosideracing.msremote;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import android.app.ExpandableListActivity;
@@ -15,8 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.FileObserver;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
