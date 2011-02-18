@@ -27,6 +27,7 @@ import android.util.Log;
 import android.os.Handler;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 
 public class MS_soap_service extends Service {
 
@@ -52,7 +53,8 @@ public class MS_soap_service extends Service {
     /* Are we running? */
     private boolean running = false;
     List<Integer> currentNotifcationIDs = new ArrayList<Integer>();
-
+    private MS_database mOpenHelper;
+    
     @Override
     public int onStartCommand(Intent intent, int startFlags, int startId) {
 	super.onStart(intent, startId);
@@ -73,6 +75,7 @@ public class MS_soap_service extends Service {
 	 * multiple destinations on one SOAP server LOG_TAG is just that
 	 */
 	try {
+	    mOpenHelper = new MS_database(getApplicationContext());
 	    Bundle incoming = intent.getExtras();
 	    URL_EXT = incoming.get("SETTING_URL_EXTERNAL").toString();
 	    // URL = "http://173.3.14.224:500";
@@ -553,44 +556,21 @@ public class MS_soap_service extends Service {
     private void passDataToShowWindow(String Name, String SeasonNumber, String EpsName,
 	    String Location) {
 	try {
-	    File root = Environment.getExternalStorageDirectory();
-	    if (root.canWrite()) {
-		MS_show_list.observer.stopWatching();
-		File gpxfile = new File(root, "msremote/torrent.gpx");
-		FileWriter gpxwriter = new FileWriter(gpxfile, true);
-		BufferedWriter out = new BufferedWriter(gpxwriter);
-		// String[] tempName=name.split("\\/");
-		// name = tempName[tempName.length-1];
-		String outputString = Name + "|" + SeasonNumber + "|" + EpsName + "|" + Location;
-		out.write(outputString + "\n");
-		out.close();
-		MS_show_list.observer.startWatching();
-		Thread.sleep(1000);
-	    }
+	    mOpenHelper.insertShow(Name,EpsName,SeasonNumber,Location);
 	} catch (Exception e) {
-	    Log.e(MS_constants.LOG_TAG, "Could not write file " + e.getMessage());
+	    Log.e(MS_constants.LOG_TAG, "Could not insert " + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	}
     }
 
     private void passDataToShowWindow(List<String[]> shows) {
 	try {
-	    File root = Environment.getExternalStorageDirectory();
-	    if (root.canWrite()) {
-		File gpxfile = new File(root, "msremote/torrent.gpx");
-		FileWriter gpxwriter = new FileWriter(gpxfile, true);
-		BufferedWriter out = new BufferedWriter(gpxwriter);
-		for (int i = 0; i < shows.size(); i++) {
+	    	for (int i = 0; i < shows.size(); i++) {
 		    String[] curShow = shows.get(i);
-		    String outputString = curShow[0] + "|" + curShow[1] + "|" + curShow[2] + "|"
-			    + curShow[3];
-		    out.write(outputString + "\n");
+		    mOpenHelper.insertShow(curShow[0],curShow[2],curShow[1],curShow[3]);
 		}
-		out.close();
-	    }
-
-	} catch (Exception e) {
-	    Log.e(MS_constants.LOG_TAG, "Could not write file " + e.getMessage());
+		} catch (Exception e) {
+	    Log.e(MS_constants.LOG_TAG, "Could not insert " + e.getMessage());
 	    Log.e(MS_constants.LOG_TAG, "", e);
 	}
     }

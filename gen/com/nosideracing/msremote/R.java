@@ -51,6 +51,7 @@ public final class R {
         public static final int of=0x7f080015;
         public static final int play=0x7f080017;
         public static final int quit=0x7f080027;
+        public static final int refresh=0x7f080029;
         public static final int save=0x7f08000a;
         public static final int serverhostname=0x7f080008;
         public static final int serveripaddress=0x7f080009;
@@ -72,6 +73,7 @@ public final class R {
     public static final class menu {
         public static final int options_menu=0x7f070000;
         public static final int options_menu_child=0x7f070001;
+        public static final int options_menu_show_list=0x7f070002;
     }
     public static final class string {
         public static final int app_name=0x7f060000;

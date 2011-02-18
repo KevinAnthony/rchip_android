@@ -38,63 +38,45 @@ import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
 public class MS_show_list extends ExpandableListActivity {
 
-    public static FileObserver observer;
-
+    private static List<Integer> torID = new ArrayList<Integer>();
     private static List<String> torName = new ArrayList<String>();
     private static List<String> torNumber = new ArrayList<String>();
     private static List<String> torEpsName = new ArrayList<String>();
     private static List<String> torLocation = new ArrayList<String>();
     private static List<String> group = new ArrayList<String>();
     ExpandableListAdapter mAdapter;
+    MS_database msdb;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 
-	readFile();
 	// Set up our adapter
+	msdb = new MS_database(getBaseContext());
 	mAdapter = new MyExpandableListAdapter(this);
 	setListAdapter(mAdapter);
 	registerForContextMenu(getExpandableListView());
-
-	File root = Environment.getExternalStorageDirectory();
-	File gpxfile = new File(root, "msremote/torrent.gpx");
-	observer = new FileObserver(gpxfile.toString()) {
-
-	    @Override
-	    public void onEvent(int event, String path) {
-		if (event == FileObserver.CLOSE_WRITE) {
-		    Log.v(MS_constants.LOG_TAG, "onevent, file done something");
-		    updateList();
-		}
-	    }
-	};
-
 	try {
 	    MS_remote.backendService.clearNotifications();
 	} catch (Exception e) {
 	    Log.e(MS_constants.LOG_TAG, "Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):"
 		    + e.getLocalizedMessage());
 	}
-	
+
     }
-    
+
     public void onResume() {
 	super.onResume();
 	Log.d(MS_constants.LOG_TAG, "onResume: MS_show_list");
-	updateList();
-	observer.startWatching();
+	refreshList();
     }
-    
+
     public void onPause() {
 	super.onPause();
 	Log.d(MS_constants.LOG_TAG, "onPause: MS_show_list");
-	observer.stopWatching();
     }
-   
- 
-    public boolean onChildClick(ExpandableListView info, View v, int groupPos, int childPos,
-	    long id) {
+
+    public boolean onChildClick(ExpandableListView info, View v, int groupPos, int childPos, long id) {
 	Log.d(MS_constants.LOG_TAG, "Got to OnChildClick");
 	int Listid = ((MyExpandableListAdapter) mAdapter).getlongID(groupPos, childPos);
 	watch(Listid);
@@ -141,7 +123,7 @@ public class MS_show_list extends ExpandableListActivity {
 
     public boolean onCreateOptionsMenu(Menu menu) {
 	MenuInflater inflater = getMenuInflater();
-	inflater.inflate(R.menu.options_menu_child, menu);
+	inflater.inflate(R.menu.options_menu_show_list, menu);
 	return true;
     }
 
@@ -187,15 +169,8 @@ public class MS_show_list extends ExpandableListActivity {
     }
 
     private void delete(long id) {
-	if (id >= 0) {
-	    Log.i(MS_constants.LOG_TAG, "Got to Delete with Id " + id);
-	    torName.remove(torName.get((int) id));
-	    torNumber.remove(torNumber.get((int) id));
-	    torEpsName.remove(torEpsName.get((int) id));
-	    torLocation.remove(torLocation.get((int) id));
-	    writeFile();
-	    refreshList();
-	}
+	msdb.deleteOneSL(torID.get((int) id));
+	refreshList();
 	return;
     }
 
@@ -204,122 +179,52 @@ public class MS_show_list extends ExpandableListActivity {
 	for (int i = 0; i < torName.size();) {
 	    String curShow = torName.get(i);
 	    if (curShow.equalsIgnoreCase(show)) {
-		torName.remove(i);
-		torNumber.remove(i);
-		torEpsName.remove(i);
-		torLocation.remove(i);
+		delete(i);
 	    } else {
 		i++;
 	    }
 	}
-	writeFile();
 	refreshList();
 	return;
     }
 
     private void deleteall(long id) {
-	torName.clear();
-	torNumber.clear();
-	torEpsName.clear();
-	torLocation.clear();
-	writeFile();
-	refreshList();
-    }
-
-    private void updateList() {
-	readFile();
+	msdb.deleteAllSL();
 	refreshList();
     }
 
     private void refreshList() {
-	List<String> tempArray = new ArrayList<String>();
-	for (int i = 0; i < torName.size(); i++) {
-	    tempArray.add(torName.get(i) + "|" + torNumber.get(i) + "|" + torEpsName.get(i) + "|"
-		    + torLocation.get(i));
-	}
-	Collections.sort(tempArray);
+	torID.clear();
 	torName.clear();
 	torNumber.clear();
 	torEpsName.clear();
 	torLocation.clear();
 	group.clear();
-	for (int i = 0; i < tempArray.size(); i++) {
-	    String[] temp = (tempArray.get(i).split("\\|"));
-	    String name = temp[0];
-	    String SeasonInfo = temp[1];
-	    String EpsName = temp[2].replace('_', ' ');
-	    String location = temp[3];
-	    if (!((torEpsName.contains(EpsName)) && (torNumber.contains(SeasonInfo)))) {
-		torName.add(name);
-		torNumber.add(SeasonInfo);
-		torEpsName.add(EpsName);
-		torLocation.add(location);
-		if (!(group.contains(name))) {
-		    group.add(name);
+	String[] showArray = msdb.getShows();
+	if ((showArray != null) && (showArray.length > 0)) {
+	    for (int i = 0; i < showArray.length; i++) {
+		String[] temp = (showArray[i].split("\\|"));
+		int id = Integer.parseInt(temp[0]);
+		String name = temp[1];
+		String SeasonInfo = temp[2];
+		String EpsName = temp[3].replace('_', ' ');
+		String location = temp[4];
+		if (!((torEpsName.contains(EpsName)) && (torNumber.contains(SeasonInfo)))) {
+		    torID.add(id);
+		    torName.add(name);
+		    torNumber.add(SeasonInfo);
+		    torEpsName.add(EpsName);
+		    torLocation.add(location);
+		    if (!(group.contains(name))) {
+			group.add(name);
+		    }
+		} else {
+		    msdb.deleteOneSL(id);
 		}
 	    }
 	}
 	mAdapter = new MyExpandableListAdapter(this);
 	setListAdapter(mAdapter);
-    }
-
-    private void writeFile() {
-	observer.stopWatching();
-	try {
-	    File root = Environment.getExternalStorageDirectory();
-	    if (root.canWrite()) {
-		File gpxfile = new File(root, "msremote/torrent.gpx");
-		FileWriter gpxwriter = new FileWriter(gpxfile);
-		BufferedWriter out = new BufferedWriter(gpxwriter);
-		for (int i = 0; i < torName.size(); i++) {
-		    String writeOutput = torName.get(i) + "|" + torNumber.get(i) + "|"
-			    + torEpsName.get(i) + "|" + torLocation.get(i) + "\n";
-		    out.write(writeOutput);
-		}
-		out.close();
-	    }
-	} catch (Exception e) {
-	    Log.e(MS_constants.LOG_TAG, "Could not write file " + e.getMessage());
-	    Log.e(MS_constants.LOG_TAG, "", e);
-	}
-	observer.startWatching();
-    }
-
-    private void readFile() {
-	try {
-	    File root = Environment.getExternalStorageDirectory();
-	    File gpxfile = new File(root, "msremote/torrent.gpx");
-	    BufferedReader in = new BufferedReader(new FileReader(gpxfile));
-	    try {
-		Log.i(MS_constants.LOG_TAG, "Opened Buffer");
-		int i = 0;
-		String line = null;
-		while ((line = in.readLine()) != null) {
-		    String[] temp = (line.split("\\|"));
-		    String name = temp[0].replace('_', ' ');
-		    String SeasonInfo = temp[1];
-		    String EpsName = temp[2].replace('_', ' ');
-		    String location = temp[3];
-		    if (!((torEpsName.contains(EpsName)) && (torNumber.contains(SeasonInfo)))) {
-			torName.add(name);
-			torNumber.add(SeasonInfo);
-			torEpsName.add(EpsName);
-			torLocation.add(location);
-		    }
-		    if (!(group.contains(name))) {
-			group.add(name);
-		    }
-		    i++;
-		}
-	    } finally {
-		Log.i(MS_constants.LOG_TAG, "Closed Buffer");
-		in.close();
-	    }
-	} catch (Exception e) {
-	    Log.e(MS_constants.LOG_TAG, "Could not read file 1 " + e.getMessage());
-	    Log.e(MS_constants.LOG_TAG, "", e);
-	}
-	refreshList();
     }
 
     private void quit() {
