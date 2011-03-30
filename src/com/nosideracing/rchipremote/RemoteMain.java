@@ -122,6 +122,7 @@ public class RemoteMain extends Activity {
 		 * if we get to this spot, we clear the notifications, we should also be
 		 * doing this in any other activity that potentialy could be called.
 		 */
+		Notifications.clearAllNotifications();
 		Log.d(Consts.LOG_TAG, "onResume: msremote");
 		alarm.cancel(CheckMessagesPendingIntent);
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),Consts.DELAY_LENGTH_ACTIVE, CheckMessagesPendingIntent);

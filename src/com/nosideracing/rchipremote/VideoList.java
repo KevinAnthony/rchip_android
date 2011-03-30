@@ -60,7 +60,7 @@ public class VideoList extends ExpandableListActivity {
 							"Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):"
 									+ e.getLocalizedMessage());
 		}
-
+		Notifications.clearAllNotifications();
 	}
 
 	public void onResume() {
