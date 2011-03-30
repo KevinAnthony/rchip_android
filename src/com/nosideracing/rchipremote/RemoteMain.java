@@ -67,7 +67,7 @@ public class RemoteMain extends Activity {
 		if (phoneNumber == null) {
 			phoneNumber = "1111111111";
 		}
-		msb_desthost = settings.getString("serverhostname","Tomoya");
+		msb_desthost = settings.getString("serverhostname", "Tomoya");
 		/* creates the music button */
 		final Button button_music = (Button) findViewById(R.id.music);
 		button_music.setOnClickListener(new OnClickListener() {
@@ -103,12 +103,13 @@ public class RemoteMain extends Activity {
 		Intent intent = new Intent(f_context, CheckMessages.class);
 		// In reality, you would want to have a static variable for the request
 		// code instead of 192837
-		CheckMessagesPendingIntent = PendingIntent.getBroadcast(this, 192837, intent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
+		CheckMessagesPendingIntent = PendingIntent.getBroadcast(this, 192837,
+				intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Get the AlarmManager service
 		alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),Consts.DELAY_LENGTH_ACTIVE, CheckMessagesPendingIntent);
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+				Consts.DELAY_LENGTH, CheckMessagesPendingIntent);
 	}
 
 	public void onPause() {
@@ -122,9 +123,8 @@ public class RemoteMain extends Activity {
 		 * if we get to this spot, we clear the notifications, we should also be
 		 * doing this in any other activity that potentialy could be called.
 		 */
+		Notifications.clearAllNotifications();
 		Log.d(Consts.LOG_TAG, "onResume: msremote");
-		alarm.cancel(CheckMessagesPendingIntent);
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),Consts.DELAY_LENGTH_ACTIVE, CheckMessagesPendingIntent);
 	}
 
 	public void onRestart() {
@@ -134,14 +134,13 @@ public class RemoteMain extends Activity {
 
 	public void onStop() {
 		super.onStop();
-		alarm.cancel(CheckMessagesPendingIntent);
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),Consts.DELAY_LENGTH_INACTIVE, CheckMessagesPendingIntent);
 		Log.d(Consts.LOG_TAG, "onStop: msremote");
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		alarm.cancel(CheckMessagesPendingIntent);
 		Log.d(Consts.LOG_TAG, "onDestroy: msremote");
 	}
 

@@ -34,7 +34,7 @@ public class Soap {
 	/* We set a notificaion, */
 	public static boolean setNotification(String tickerString,
 			String notificationTitle, String noticicationText) {
-		if (new CheckMessages().setStatusNotification(tickerString,
+		if (Notifications.setStatusNotification(tickerString,
 				notificationTitle, noticicationText) == null) {
 			return false;
 		}
@@ -42,7 +42,7 @@ public class Soap {
 	}
 
 	public static void clearNotifications() {
-		new CheckMessages().clearAllNotifications();
+		Notifications.clearAllNotifications();
 	}
 
 	/* The following only return a value from SongInfo */
