@@ -29,11 +29,6 @@ public class CheckMessages extends BroadcastReceiver {
 	private String HOSTNAME;
 	/* We use this to set the ID number of the current notification */
 
-<<<<<<< HEAD
-=======
-	private Database mOpenHelper;
-
->>>>>>> 9da46ef2e4c13b77c6e29ff1d8a43af5c1163fa4
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onReceive(Context context, Intent intent) {
