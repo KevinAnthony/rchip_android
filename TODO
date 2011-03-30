@@ -1,0 +1,7 @@
+
+	* TMESG not being handled properly, shows not getting added to database
+	
+	* When application starts, notifications not being cleared
+
+	* Check to make sure ADDS is being handled
+
