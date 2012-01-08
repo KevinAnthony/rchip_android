@@ -247,6 +247,7 @@ public class JSON {
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(f_context);
 		URL = settings.getString("serverurl", "http://www.nosideholdings.com/");
+		Log.d(Consts.LOG_TAG,"URL:"+URL);
 		HOSTNAME = ((TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
 		// DESTHOSTNAME = settings.getString("serverhostname", "Tomoya");
