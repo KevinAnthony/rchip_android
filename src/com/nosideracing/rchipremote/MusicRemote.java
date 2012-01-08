@@ -6,16 +6,13 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -172,15 +169,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 			return true;
 		} else if (calledMenuItem == R.id.quit) {
 			quit();
-			return true;
-		} else if (calledMenuItem == R.id.wifiset) {
-			SharedPreferences.Editor editor = PreferenceManager
-					.getDefaultSharedPreferences(getApplicationContext())
-					.edit();
-			editor.putString("internalnetname",
-					((WifiManager) getSystemService(Context.WIFI_SERVICE))
-							.getConnectionInfo().getSSID());
-			editor.commit();
 			return true;
 		}
 		return false;

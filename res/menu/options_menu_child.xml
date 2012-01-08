@@ -6,7 +6,4 @@
     <item android:id="@+id/quit"
           android:title="Quit" 
           android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
-    <item android:id="@+id/wifiset"
-    	  android:title="Set Wifi Name"
-    	  android:icon="@android:drawable/ic_menu_compass"/>
 </menu>

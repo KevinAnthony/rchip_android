@@ -6,13 +6,11 @@ import java.util.List;
 import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,14 +18,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
 public class VideoList extends ExpandableListActivity {
 
@@ -140,16 +137,7 @@ public class VideoList extends ExpandableListActivity {
 		} else if (calledMenuItem == R.id.quit) {
 			quit();
 			return true;
-		} else if (calledMenuItem == R.id.wifiset) {
-			SharedPreferences.Editor editor = PreferenceManager
-					.getDefaultSharedPreferences(getApplicationContext())
-					.edit();
-			editor.putString("internalnetname",
-					((WifiManager) getSystemService(Context.WIFI_SERVICE))
-							.getConnectionInfo().getSSID());
-			editor.commit();
-			return true;
-		}
+		} 
 		return false;
 	}
 
