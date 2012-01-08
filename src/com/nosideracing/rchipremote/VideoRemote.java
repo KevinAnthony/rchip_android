@@ -121,16 +121,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 		} else if (calledMenuItem == R.id.quit) {
 			quit(true);
 			return true;
-		} else if (calledMenuItem == R.id.wifiset) {
-			SharedPreferences.Editor editor = PreferenceManager
-					.getDefaultSharedPreferences(getApplicationContext())
-					.edit();
-			editor.putString("internalnetname",
-					((WifiManager) getSystemService(Context.WIFI_SERVICE))
-							.getConnectionInfo().getSSID());
-			editor.commit();
-			return true;
-		}
+		} 
 		return false;
 	}
 
