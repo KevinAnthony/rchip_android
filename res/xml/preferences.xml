@@ -19,7 +19,7 @@
      	android:title="Network Delay"
         android:summary="The delay between updates"
         android:key="networkdelay"
-        android:defaultValue="5000"
+        android:defaultValue="300000"
         android:entries="@array/DelayArray"
         android:entryValues="@array/DelayValues" />
 	<EditTextPreference

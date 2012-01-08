@@ -52,7 +52,7 @@ public final class R {
         public static final int of=0x7f080015;
         public static final int play=0x7f080017;
         public static final int quit=0x7f080027;
-        public static final int refresh=0x7f080029;
+        public static final int refresh=0x7f080028;
         public static final int save=0x7f08000a;
         public static final int serverhostname=0x7f080008;
         public static final int serveripaddress=0x7f080009;
@@ -60,7 +60,6 @@ public final class R {
         public static final int title=0x7f08000c;
         public static final int torrent=0x7f080006;
         public static final int tottime=0x7f080016;
-        public static final int wifiset=0x7f080028;
     }
     public static final class layout {
         public static final int listview=0x7f030000;
@@ -81,7 +80,6 @@ public final class R {
         public static final int log_name=0x7f060001;
     }
     public static final class xml {
-        public static final int account_preferences=0x7f040000;
-        public static final int preferences=0x7f040001;
+        public static final int preferences=0x7f040000;
     }
 }

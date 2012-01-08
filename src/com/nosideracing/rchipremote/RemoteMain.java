@@ -111,7 +111,7 @@ public class RemoteMain extends Activity {
 		// Get the AlarmManager service
 		alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-				Consts.DELAY_LENGTH, CheckMessagesPendingIntent);
+				settings.getInt("networkdelay",300000), CheckMessagesPendingIntent);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("device_name", phoneNumber);
 		params.put("state", "true");

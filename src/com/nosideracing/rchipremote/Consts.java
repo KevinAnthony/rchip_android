@@ -21,9 +21,6 @@ public class Consts {
 	protected static final String METHOD_NAME_REGISTERMESSAGES = "registerMessages";
 	protected static final String METHOD_NAME_GETVIDEOPATH = "getVideoPath";
 	protected static final String METHOD_NAME_GETDAEMONS = "getDaemons";
-	protected static final String NAMESPACE = "http://192.168.1.3/";
-
-	protected static final long DELAY_LENGTH = 300000;
 
 	protected static String LOG_TAG = "rchip";
 

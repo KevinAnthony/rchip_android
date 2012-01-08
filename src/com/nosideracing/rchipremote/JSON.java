@@ -246,8 +246,7 @@ public class JSON {
 	protected void updateSettings() {
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(f_context);
-		URL = settings.getString("serverurlexternal",
-				"http://www.nosideholdings.com/");
+		URL = settings.getString("serverurl", "http://www.nosideholdings.com/");
 		HOSTNAME = ((TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
 		// DESTHOSTNAME = settings.getString("serverhostname", "Tomoya");
