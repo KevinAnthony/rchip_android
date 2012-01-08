@@ -18,6 +18,7 @@ public class CheckMessages extends BroadcastReceiver {
 
 	/* We use this to set the ID number of the current notification */
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public void onReceive(Context context, Intent intent) {
 		f_context = context;

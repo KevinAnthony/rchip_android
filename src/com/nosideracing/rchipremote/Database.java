@@ -86,6 +86,7 @@ public class Database extends SQLiteOpenHelper {
 	 * android.database.sqlite.SQLiteOpenHelper#onCreate(android.database.sqlite
 	 * .SQLiteDatabase)
 	 */
+	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL("CREATE TABLE `"
 				+ TABLE_NAME_SL
@@ -97,6 +98,7 @@ public class Database extends SQLiteOpenHelper {
 
 	}
 
+	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Log.d(Consts.LOG_TAG, "Database: Got to On Upgrade");
 		// put new create tables, or changes here

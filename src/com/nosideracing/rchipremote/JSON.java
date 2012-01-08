@@ -268,11 +268,11 @@ public class JSON {
 					JSONObject jsonObject = jsonArray.getJSONObject(i);
 					songinfo.put("album", (String) jsonObject.get("album"));
 					songinfo.put("total_time",
-							(String) jsonObject.get("total_time").toString());
+							jsonObject.get("total_time").toString());
 					songinfo.put("song", (String) jsonObject.get("song"));
 					songinfo.put("artist", (String) jsonObject.get("artist"));
 					songinfo.put("elapsed_time",
-							(String) jsonObject.get("elapsed_time").toString());
+							jsonObject.get("elapsed_time").toString());
 					songinfo.put("is_playing", (jsonObject.get("is_playing")
 							.equals("false")) ? "0" : "1");
 				}

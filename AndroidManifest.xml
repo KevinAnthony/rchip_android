@@ -1,32 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.nosideracing.rchipremote" android:versionName="1.0.1.0"
-	android:versionCode="1010">
-		<uses-sdk android:minSdkVersion="10" />
-	<application android:icon="@drawable/icon" android:label="@string/app_name"
-		android:debuggable="true">
-		<activity android:name="RemoteMain" android:label="@string/app_name"
-			android:alwaysRetainTaskState="true">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		<activity android:name="MusicRemote"
-			android:alwaysRetainTaskState="true" />
-		<activity android:name="VideoList"
-			android:alwaysRetainTaskState="true" />
-		<activity android:name="Preferences"
-			android:alwaysRetainTaskState="true" />
-		<activity android:name="VideoRemote" android:alwaysRetainTaskState="true" android:screenOrientation="portrait" />
-		<receiver  android:process=":remote" android:name="CheckMessages"></receiver>
-	</application>
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
-	<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-	<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+    package="com.nosideracing.rchipremote"
+    android:versionCode="1010"
+    android:versionName="1.0.1.0" >
 
-</manifest> 
+    <uses-sdk android:minSdkVersion="10" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.VIBRATE" >
+    </uses-permission>
+
+    <application
+        android:debuggable="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name" >
+        <activity
+            android:name="RemoteMain"
+            android:alwaysRetainTaskState="true"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="MusicRemote"
+            android:alwaysRetainTaskState="true" />
+        <activity
+            android:name="VideoList"
+            android:alwaysRetainTaskState="true" />
+        <activity
+            android:name="Preferences"
+            android:alwaysRetainTaskState="true" />
+        <activity
+            android:name="VideoRemote"
+            android:alwaysRetainTaskState="true"
+            android:screenOrientation="portrait" />
+
+        <receiver
+            android:name="CheckMessages"
+            android:process=":remote" >
+        </receiver>
+    </application>
+
+</manifest>

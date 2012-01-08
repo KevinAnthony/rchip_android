@@ -56,17 +56,20 @@ public class VideoList extends ExpandableListActivity {
 		Notifications.clearAllNotifications(getApplicationContext());
 	}
 
+	@Override
 	public void onResume() {
 		super.onResume();
 		Log.d(Consts.LOG_TAG, "onResume: VideoList");
 		refreshList();
 	}
 
+	@Override
 	public void onPause() {
 		super.onPause();
 		Log.d(Consts.LOG_TAG, "onPause: VideoList");
 	}
 
+	@Override
 	public boolean onChildClick(ExpandableListView info, View v, int groupPos,
 			int childPos, long id) {
 		Log.d(Consts.LOG_TAG, "Got to OnChildClick");
@@ -76,6 +79,7 @@ public class VideoList extends ExpandableListActivity {
 		return true;
 	}
 
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -88,6 +92,7 @@ public class VideoList extends ExpandableListActivity {
 
 	}
 
+	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		int id = 0;
 		ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item
@@ -121,6 +126,7 @@ public class VideoList extends ExpandableListActivity {
 
 	}
 
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.options_menu_show_list, menu);
@@ -128,6 +134,7 @@ public class VideoList extends ExpandableListActivity {
 	}
 
 	/* Handles item selections */
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
@@ -137,10 +144,11 @@ public class VideoList extends ExpandableListActivity {
 		} else if (calledMenuItem == R.id.quit) {
 			quit();
 			return true;
-		} 
+		}
 		return false;
 	}
 
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// See which child activity is calling us back.
 		if (resultCode == Consts.QUITREMOTE) {

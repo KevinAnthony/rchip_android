@@ -50,6 +50,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 
 	Handler musicHandler = new Handler() {
 		/** Gets called on every message that is received */
+		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case Consts.UPDATEGUI:
@@ -114,11 +115,13 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		}).start();
 	}
 
+	@Override
 	public void onPause() {
 		super.onPause();
 		Log.d(Consts.LOG_TAG, "onPause: msmusic");
 	}
 
+	@Override
 	public void onResume() {
 		super.onResume();
 		Log.d(Consts.LOG_TAG, "onResume: msmusic");
@@ -154,6 +157,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		Log.d(Consts.LOG_TAG, "onDestroy msmusic");
 	}
 
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.options_menu_child, menu);
@@ -161,6 +165,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	}
 
 	/* Handles item selections */
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
@@ -174,6 +179,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		return false;
 	}
 
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// See which child activity is calling us back.
 		if (resultCode == Consts.QUITREMOTE) {
@@ -212,7 +218,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		// also if we are not connected, we don't try and fail to get soap
 		// commands
 		Context f_context = getApplicationContext();
-		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) f_context
+		NetworkInfo info = ((ConnectivityManager) f_context
 				.getSystemService(Context.CONNECTIVITY_SERVICE))
 				.getActiveNetworkInfo();
 		while ((Thread.currentThread() == updater) && (update)) {
@@ -310,6 +316,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 
 	private class runCmd extends AsyncTask<String, Integer, Boolean> {
 
+		@Override
 		protected Boolean doInBackground(String... incoming) {
 			String cmd = incoming[0];
 			String cmdTxt = incoming[1];

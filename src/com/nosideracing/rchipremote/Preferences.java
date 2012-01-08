@@ -8,6 +8,7 @@ import android.util.Log;
 public class Preferences extends PreferenceActivity {
 	private CharSequence[] hostsListEntryValues = null;
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);

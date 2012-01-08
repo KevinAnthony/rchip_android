@@ -118,11 +118,13 @@ public class RemoteMain extends Activity {
 		new JSON(f_context).JSONSendCmd("registerremotedevice", params);
 	}
 
+	@Override
 	public void onPause() {
 		super.onPause();
 		Log.d(Consts.LOG_TAG, "onPause: rchip");
 	}
 
+	@Override
 	public void onResume() {
 		super.onResume();
 		/*
@@ -133,11 +135,13 @@ public class RemoteMain extends Activity {
 		Log.d(Consts.LOG_TAG, "onResume: rchip");
 	}
 
+	@Override
 	public void onRestart() {
 		super.onRestart();
 		Log.d(Consts.LOG_TAG, "onRestart: rchip");
 	}
 
+	@Override
 	public void onStop() {
 		super.onStop();
 		Log.d(Consts.LOG_TAG, "onStop: rchip");
@@ -151,6 +155,7 @@ public class RemoteMain extends Activity {
 	}
 
 	/* Creates the menu items */
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.options_menu, menu);
@@ -158,6 +163,7 @@ public class RemoteMain extends Activity {
 	}
 
 	/* Handles item selections */
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
@@ -171,6 +177,7 @@ public class RemoteMain extends Activity {
 		return false;
 	}
 
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// See which child activity is calling us back.
 		if (resultCode == Consts.QUITREMOTE) {

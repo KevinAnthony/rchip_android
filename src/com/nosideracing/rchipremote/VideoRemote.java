@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -74,15 +73,17 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 	}
 
+	@Override
 	public void onPause() {
 		super.onPause();
 		Log.d(Consts.LOG_TAG, "onPause: MS_Watch_Movie");
 	}
 
+	@Override
 	public void onResume() {
 		super.onResume();
 		Log.d(Consts.LOG_TAG, "onResume: MS_Watch_Movie");
-		wl = (WakeLock) ((PowerManager) getSystemService(Context.POWER_SERVICE))
+		wl = ((PowerManager) getSystemService(Context.POWER_SERVICE))
 				.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
 						| PowerManager.ON_AFTER_RELEASE, "VideoRemote");
 		wl.acquire();
@@ -104,12 +105,14 @@ public class VideoRemote extends Activity implements OnClickListener {
 		Log.d(Consts.LOG_TAG, "onDestroy msmusic");
 	}
 
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.options_menu_child, menu);
 		return true;
 	}
 
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
@@ -119,10 +122,11 @@ public class VideoRemote extends Activity implements OnClickListener {
 		} else if (calledMenuItem == R.id.quit) {
 			quit(true);
 			return true;
-		} 
+		}
 		return false;
 	}
 
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// See which child activity is calling us back.
 		if (resultCode == Consts.QUITREMOTE) {
@@ -292,6 +296,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 	private class runCmd extends AsyncTask<String, Integer, Boolean> {
 
+		@Override
 		protected Boolean doInBackground(String... incoming) {
 			String cmd = incoming[0];
 			String cmdTxt = incoming[1];
