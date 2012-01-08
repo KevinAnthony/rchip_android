@@ -76,16 +76,11 @@ public class Database extends SQLiteOpenHelper {
 			}
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in insertShow", e);
+		} finally {
+			db.close();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.database.sqlite.SQLiteOpenHelper#onCreate(android.database.sqlite
-	 * .SQLiteDatabase)
-	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL("CREATE TABLE `"
