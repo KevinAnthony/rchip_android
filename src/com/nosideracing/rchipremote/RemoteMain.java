@@ -1,5 +1,8 @@
 package com.nosideracing.rchipremote;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -20,7 +23,7 @@ import android.widget.Button;
 
 /*
  * NOTE: Starts MSREMOTE when icon clicked, exit doesn't close
- * duplicate-> start msremote, Music home, msremote,Music(two instances of window now)
+ * duplicate-> start rchip, Music home, rchip,Music(two instances of window now)
  *
  */
 public class RemoteMain extends Activity {
@@ -28,9 +31,10 @@ public class RemoteMain extends Activity {
 	AlarmManager alarm;
 	/* This is the Pref window from MENU->Settings */
 	SharedPreferences settings;
-	static Context f_context;
+	private static Context f_context;
 	/* For the services the service then the actual connection */
 	public static String msb_desthost;
+	public static String phoneNumber;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +49,7 @@ public class RemoteMain extends Activity {
 		 * We put the LOG_TAG in the string.xml file, so we can change it one
 		 * place not everyplace in our code
 		 */
-		Log.d(Consts.LOG_TAG, "onCreate: msremote");
+		Log.d(Consts.LOG_TAG, "onCreate: rchip");
 		/*
 		 * We pull the settings from the prefmanager, then we pull the telephone
 		 * number to use as a HOST_ID the reason i used the telephone number was
@@ -53,16 +57,15 @@ public class RemoteMain extends Activity {
 		 * new phone
 		 */
 		settings = PreferenceManager.getDefaultSharedPreferences(f_context);
-		settings
-				.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-					public void onSharedPreferenceChanged(
-							SharedPreferences prefs, String key) {
-						Log.w(Consts.LOG_TAG, "SharePrefsChanged");
-					}
-				});
+		settings.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+			public void onSharedPreferenceChanged(SharedPreferences prefs,
+					String key) {
+				Log.w(Consts.LOG_TAG, "SharePrefsChanged");
+			}
+		});
 		TelephonyManager tManager = (TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE);
-		String phoneNumber = tManager.getLine1Number();
+		phoneNumber = tManager.getLine1Number();
 		/* If there is no phone number, we use (111) 111-1111 */
 		if (phoneNumber == null) {
 			phoneNumber = "1111111111";
@@ -110,11 +113,15 @@ public class RemoteMain extends Activity {
 		alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 				Consts.DELAY_LENGTH, CheckMessagesPendingIntent);
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("device_name", phoneNumber);
+		params.put("state", "true");
+		new JSON(f_context).JSONSendCmd("registerremotedevice", params);
 	}
 
 	public void onPause() {
 		super.onPause();
-		Log.d(Consts.LOG_TAG, "onPause: msremote");
+		Log.d(Consts.LOG_TAG, "onPause: rchip");
 	}
 
 	public void onResume() {
@@ -123,25 +130,25 @@ public class RemoteMain extends Activity {
 		 * if we get to this spot, we clear the notifications, we should also be
 		 * doing this in any other activity that potentialy could be called.
 		 */
-		Notifications.clearAllNotifications();
-		Log.d(Consts.LOG_TAG, "onResume: msremote");
+		Notifications.clearAllNotifications(getApplicationContext());
+		Log.d(Consts.LOG_TAG, "onResume: rchip");
 	}
 
 	public void onRestart() {
 		super.onRestart();
-		Log.d(Consts.LOG_TAG, "onRestart: msremote");
+		Log.d(Consts.LOG_TAG, "onRestart: rchip");
 	}
 
 	public void onStop() {
 		super.onStop();
-		Log.d(Consts.LOG_TAG, "onStop: msremote");
+		Log.d(Consts.LOG_TAG, "onStop: rchip");
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		alarm.cancel(CheckMessagesPendingIntent);
-		Log.d(Consts.LOG_TAG, "onDestroy: msremote");
+		Log.d(Consts.LOG_TAG, "onDestroy: rchip");
 	}
 
 	/* Creates the menu items */
@@ -153,7 +160,7 @@ public class RemoteMain extends Activity {
 
 	/* Handles item selections */
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: msremote");
+		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
 			startActivity(new Intent(this, Preferences.class));

@@ -3,8 +3,6 @@ package com.nosideracing.rchipremote;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nosideracing.rchipremote.R;
-
 import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -40,27 +38,25 @@ public class VideoList extends ExpandableListActivity {
 	private static List<String> torLocation = new ArrayList<String>();
 	private static List<String> group = new ArrayList<String>();
 	ExpandableListAdapter mAdapter;
-	Database msdb;
+	Database rchipDB;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		JSON jSon = new JSON(getApplicationContext());
 		// Set up our adapter
-		msdb = new Database(getBaseContext());
+		rchipDB = new Database(getBaseContext());
 		mAdapter = new MyExpandableListAdapter(this);
 		setListAdapter(mAdapter);
 		registerForContextMenu(getExpandableListView());
 		try {
-			Soap.clearNotifications();
+			jSon.clearNotifications(getApplicationContext());
 		} catch (Exception e) {
-			Log
-					.e(
-							Consts.LOG_TAG,
-							"Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):"
-									+ e.getLocalizedMessage());
+			Log.e(Consts.LOG_TAG,
+					"Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):"
+							+ e.getLocalizedMessage());
 		}
-		Notifications.clearAllNotifications();
+		Notifications.clearAllNotifications(getApplicationContext());
 	}
 
 	public void onResume() {
@@ -87,7 +83,7 @@ public class VideoList extends ExpandableListActivity {
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		Log.v(Consts.LOG_TAG, "GOT TO CONTEXT MENU");
-		menu.setHeaderTitle("<3");
+		menu.setHeaderTitle("Show");
 		menu.add(0, v.getId(), 0, "Watch");
 		menu.add(0, v.getId(), 1, "Delete");
 		menu.add(0, v.getId(), 3, "Remove Show");
@@ -136,7 +132,7 @@ public class VideoList extends ExpandableListActivity {
 
 	/* Handles item selections */
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: msremote");
+		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
 			startActivity(new Intent(this, Preferences.class));
@@ -171,8 +167,9 @@ public class VideoList extends ExpandableListActivity {
 
 	private void watch(long id) {
 		Intent i = new Intent(this, VideoRemote.class);
-		i.putExtra("showString", torName.get((int) id) + " - "
-				+ torNumber.get((int) id) + " - " + torEpsName.get((int) id));
+		i.putExtra("showString",
+				torName.get((int) id) + " - " + torNumber.get((int) id) + " - "
+						+ torEpsName.get((int) id));
 		i.putExtra("Location", torLocation.get((int) id));
 		i.putExtra("showID", id);
 		VideoList.this.startActivityForResult(i, Consts.RC_WATCHMOVE);
@@ -180,21 +177,25 @@ public class VideoList extends ExpandableListActivity {
 	}
 
 	private void delete(long id) {
-		msdb.deleteOneSL(torID.get((int) id));
+		rchipDB.deleteOneSL(torID.get((int) id));
 		refreshList();
+		return;
+	}
+
+	private void deleteWithoutRefresh(long id) {
+		rchipDB.deleteOneSL(torID.get((int) id));
 		return;
 	}
 
 	private void deleteShow(long id) {
 		String show = torName.get((int) id);
 		new DeleteShow().execute(show);
-		refreshList();
 		return;
 	}
 
 	private void deleteall(long id) {
-		msdb.deleteAllSL();
-		refreshList();
+		rchipDB.deleteAllSL();
+		// refreshList();
 	}
 
 	private void refreshList() {
@@ -204,7 +205,7 @@ public class VideoList extends ExpandableListActivity {
 		torEpsName.clear();
 		torLocation.clear();
 		group.clear();
-		String[] showArray = msdb.getShows();
+		String[] showArray = rchipDB.getShows();
 		if ((showArray != null) && (showArray.length > 0)) {
 			for (int i = 0; i < showArray.length; i++) {
 				String[] temp = (showArray[i].split("\\|"));
@@ -224,7 +225,7 @@ public class VideoList extends ExpandableListActivity {
 						group.add(name);
 					}
 				} else {
-					msdb.deleteOneSL(id);
+					rchipDB.deleteOneSL(id);
 				}
 			}
 		}
@@ -365,19 +366,21 @@ public class VideoList extends ExpandableListActivity {
 			TextView text3;
 		}
 	}
-	class DeleteShow extends AsyncTask<String,Integer,Boolean> {
 
-	@Override
-	protected Boolean doInBackground(String... params) {
-		for (int i = 0; i < torName.size();) {
-			String curShow = torName.get(i);
-			if (curShow.equalsIgnoreCase(params[0])) {
-				delete(i);
-			} else {
-				i++;
+	class DeleteShow extends AsyncTask<String, Integer, Boolean> {
+		@Override
+		protected Boolean doInBackground(String... params) {
+			for (int i = 0; i < torName.size();) {
+				String curShow = torName.get(i);
+				if (curShow.equalsIgnoreCase(params[0])) {
+					deleteWithoutRefresh(i);
+					i++;
+				} else {
+					i++;
+				}
 			}
+			refreshList();
+			return true;
 		}
-		return true;
-	}
 	}
 }

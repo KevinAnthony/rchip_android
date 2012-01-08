@@ -15,12 +15,13 @@ public class Notifications {
 	private static int numberOfNotifications = 0;
 	static List<Integer> currentNotifcationIDs = new ArrayList<Integer>();
 
-	protected static void clearAllNotifications() {
+	protected static void clearAllNotifications(Context context) {
 		/* If currentNotificationIDs is has data */
+
 		if (currentNotifcationIDs != null) {
 			/**/
 			Iterator<Integer> stepValue = currentNotifcationIDs.iterator();
-			NotificationManager mNotificationManager = (NotificationManager) RemoteMain.f_context
+			NotificationManager mNotificationManager = (NotificationManager) context
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 			while (stepValue.hasNext()) {
 				/*
@@ -36,7 +37,7 @@ public class Notifications {
 	}
 
 	protected static String[] setStatusNotification(String tickerString,
-			String notificationTitle, String noticicationText) {
+			String notificationTitle, String noticicationText, Context context) {
 		/*
 		 * We get three String Varables representing the three Strings we need
 		 * to set to use Notification Manager
@@ -59,20 +60,26 @@ public class Notifications {
 				epsName = "";
 				epsNumber = "";
 				for (int i = 0; i < temp.length - 1; i++) {
-					Log.v("msremote", temp[i]);
+					Log.v("", temp[i]);
 					Name = Name + temp[i] + " ";
 				}
 				Name = Name.substring(0, Name.length() - 1);
-				Log.v("msremote", Name);
+				Log.v(Consts.LOG_TAG, Name);
 				epsNumber = temp[temp.length - 1];
 				epsName = filename[1].substring(0, filename[1].length() - 1);
 				epsName = epsName.substring(0, epsName.length() - 1);
 			}
 			String loc = notificationTitle;
-			NotificationManager mNotificationManager = (NotificationManager) RemoteMain.f_context
-					.getSystemService(Context.NOTIFICATION_SERVICE);
+			NotificationManager mNotificationManager;
+			if (context != null) {
+				mNotificationManager = (NotificationManager) context
+						.getSystemService(Context.NOTIFICATION_SERVICE);
+			} else {
+				String[] temp = { Name, epsNumber, epsName, loc };
+				return temp;
+			}
 			/* Here we set the notification icon equal to the program icon */
-			int icon = R.drawable.icon;
+			int icon = R.drawable.nicon;
 			/* Notification Manager uses CharSequence instead of Strings */
 			String[] tickerTextTemp = tickerString.split("\\/");
 			CharSequence tickerText = tickerTextTemp[tickerTextTemp.length - 1];
@@ -94,11 +101,10 @@ public class Notifications {
 			Notification notification = new Notification(icon, tickerText, when);
 
 			/**/
-			PendingIntent contentIntent = PendingIntent.getActivity(
-					RemoteMain.f_context, 0, new Intent(RemoteMain.f_context,
-							VideoList.class), 0);
-			notification.setLatestEventInfo(RemoteMain.f_context, contentTitle,
-					contentText, contentIntent);
+			PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+					new Intent(context, VideoList.class), 0);
+			notification.setLatestEventInfo(context, contentTitle, contentText,
+					contentIntent);
 			notification.defaults |= Notification.DEFAULT_ALL;
 			mNotificationManager.cancel(Consts.NOTIFICATION_ID);
 			try {

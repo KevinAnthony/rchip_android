@@ -1,6 +1,7 @@
 package com.nosideracing.rchipremote;
 
-import com.nosideracing.rchipremote.R;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -48,6 +49,8 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	PowerManager pm;
 	PowerManager.WakeLock wl;
 
+	JSON jSon;
+
 	Handler musicHandler = new Handler() {
 		/** Gets called on every message that is received */
 		public void handleMessage(Message msg) {
@@ -68,6 +71,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		super.onCreate(savedInstanceState);
 		Consts.LOG_TAG = this.getString(R.string.log_name);
 		setContentView(R.layout.music);
+		jSon = new JSON(getApplicationContext());
 		Log.d(Consts.LOG_TAG, "onCreate: Got to start");
 		// get the wakelock from the PowerManager
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -89,24 +93,24 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		button3.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on clicks
-				new runCmd().execute("BACKRB", null);
+				new runCmd().execute("BACKRB", "");
 			}
 		});
 		final Button button4 = (Button) findViewById(R.id.next);
 		button4.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on clicks
-				new runCmd().execute("NEXTRB", null);
+				new runCmd().execute("NEXTRB", "");
 			}
 		});
 		new Thread(new Runnable() {
 			public void run() {
 				while (update) {
-					Soap.UpdateSongInfo();
+					jSon.UpdateSongInfo();
 					try {
-						Thread.sleep(Soap.getDelay());
+						Thread.sleep(jSon.getDelay());
 					} catch (InterruptedException e) {
-						Log.w(Consts.LOG_TAG,e);
+						Log.w(Consts.LOG_TAG, e);
 					}
 				}
 			}
@@ -161,7 +165,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 
 	/* Handles item selections */
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: msremote");
+		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
 			startActivity(new Intent(this, Preferences.class));
@@ -251,18 +255,18 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	private void updateTags() {
 		try {
 			CompoundButton btn = (ToggleButton) findViewById(R.id.play);
-			String text = Soap.getArtest();
+			String text = jSon.getArtest();
 			ARTIST.setText(text == null ? " " : text);
-			text = Soap.getAlbum();
+			text = jSon.getAlbum();
 			ALBUM.setText(text == null ? " " : text);
-			text = Soap.getSongName();
+			text = jSon.getSongName();
 			TITLE.setText(text == null ? " " : text);
-			if (Soap.getTimeElapised() != null) {
-				ETIME.setText(formatIntoHHMMSS(Integer.parseInt(Soap
+			if (jSon.getTimeElapised() != null) {
+				ETIME.setText(formatIntoHHMMSS(Integer.parseInt(jSon
 						.getTimeElapised())));
 			}
-			if (Soap.getSongLength() != null) {
-				TOTTIME.setText(formatIntoHHMMSS(Integer.parseInt(Soap
+			if (jSon.getSongLength() != null) {
+				TOTTIME.setText(formatIntoHHMMSS(Integer.parseInt(jSon
 						.getSongLength())));
 			}
 
@@ -274,7 +278,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 			 * updateTags to automatically change the button state
 			 */
 			if (System.currentTimeMillis() > dontSwitch + 7000L) {
-				if (Soap.getIsPlaying() == 1) {
+				if (jSon.getIsPlaying() == 1) {
 					// turn button one
 					btn.setChecked(true);
 				} else {
@@ -307,10 +311,10 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	public void onClick(View v) {
 		CompoundButton btn = (ToggleButton) v;
 		if (btn.isChecked()) {
-			new runCmd().execute("PLAYRB", null);
+			new runCmd().execute("PLAYRB", "");
 			dontSwitch = System.currentTimeMillis();
 		} else {
-			new runCmd().execute("STOPRB", null);
+			new runCmd().execute("STOPRB", "");
 			dontSwitch = System.currentTimeMillis();
 			updateTags();
 		}
@@ -320,8 +324,15 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 
 		protected Boolean doInBackground(String... incoming) {
 			String cmd = incoming[0];
-			String txt = incoming[1];
-			Soap.sendCmd(cmd, txt);
+			String cmdTxt = incoming[1];
+			Log.i(Consts.LOG_TAG, cmdTxt);
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("command", cmd);
+			params.put("command_text", cmdTxt);
+			params.put("source_hostname", RemoteMain.phoneNumber);
+			params.put("destination_hostname", RemoteMain.msb_desthost);
+			Log.i(Consts.LOG_TAG, params.get("command_text"));
+			jSon.JSONSendCmd("sendcommand", params);
 			return true;
 		}
 	}
