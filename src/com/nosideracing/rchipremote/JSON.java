@@ -206,7 +206,7 @@ public class JSON {
 	}
 	
 	public void deauthenticate() {
-		String return_value = JSONSendCmd("deauthenticate",null);
+		String return_value = JSONSendCmd("deauthenticate");
 		Log.d(Consts.LOG_TAG,"Deauthenticate Return Value "+return_value);
 	}
 

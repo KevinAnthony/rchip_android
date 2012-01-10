@@ -157,8 +157,8 @@ public class RemoteMain extends Activity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		json.deauthenticate();
 		alarm.cancel(CheckMessagesPendingIntent);
+		json.deauthenticate();
 		Log.d(Consts.LOG_TAG, "onDestroy: rchip");
 	}
 
