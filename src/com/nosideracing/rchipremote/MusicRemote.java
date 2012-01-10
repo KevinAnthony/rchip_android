@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,8 +47,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	PowerManager pm;
 	PowerManager.WakeLock wl;
 
-	JSON jSon;
-
 	Handler musicHandler = new Handler() {
 		/** Gets called on every message that is received */
 		@Override
@@ -69,7 +68,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		super.onCreate(savedInstanceState);
 		Consts.LOG_TAG = this.getString(R.string.log_name);
 		setContentView(R.layout.music);
-		jSon = new JSON(getApplicationContext());
 		Log.d(Consts.LOG_TAG, "onCreate: Got to start");
 		// get the wakelock from the PowerManager
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -104,9 +102,12 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		new Thread(new Runnable() {
 			public void run() {
 				while (update) {
-					jSon.UpdateSongInfo();
+					RemoteMain.json.UpdateSongInfo();
 					try {
-						Thread.sleep(jSon.getDelay());
+						Thread.sleep(Integer.parseInt(PreferenceManager
+								.getDefaultSharedPreferences(
+										getApplicationContext()).getString(
+										"delay", "5000")));
 					} catch (InterruptedException e) {
 						Log.w(Consts.LOG_TAG, e);
 					}
@@ -217,8 +218,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		// connectivity
 		// also if we are not connected, we don't try and fail to get soap
 		// commands
-		Context f_context = getApplicationContext();
-		NetworkInfo info = ((ConnectivityManager) f_context
+		NetworkInfo info = ((ConnectivityManager) getApplicationContext()
 				.getSystemService(Context.CONNECTIVITY_SERVICE))
 				.getActiveNetworkInfo();
 		while ((Thread.currentThread() == updater) && (update)) {
@@ -249,18 +249,18 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	private void updateTags() {
 		try {
 			CompoundButton btn = (ToggleButton) findViewById(R.id.play);
-			String text = jSon.getArtest();
+			String text = RemoteMain.json.getArtest();
 			ARTIST.setText(text == null ? " " : text);
-			text = jSon.getAlbum();
+			text = RemoteMain.json.getAlbum();
 			ALBUM.setText(text == null ? " " : text);
-			text = jSon.getSongName();
+			text = RemoteMain.json.getSongName();
 			TITLE.setText(text == null ? " " : text);
-			if (jSon.getTimeElapised() != null) {
-				ETIME.setText(formatIntoHHMMSS(Integer.parseInt(jSon
+			if (RemoteMain.json.getTimeElapised() != null) {
+				ETIME.setText(formatIntoHHMMSS(Integer.parseInt(RemoteMain.json
 						.getTimeElapised())));
 			}
-			if (jSon.getSongLength() != null) {
-				TOTTIME.setText(formatIntoHHMMSS(Integer.parseInt(jSon
+			if (RemoteMain.json.getSongLength() != null) {
+				TOTTIME.setText(formatIntoHHMMSS(Integer.parseInt(RemoteMain.json
 						.getSongLength())));
 			}
 
@@ -272,7 +272,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 			 * updateTags to automatically change the button state
 			 */
 			if (System.currentTimeMillis() > dontSwitch + 7000L) {
-				if (jSon.getIsPlaying() == 1) {
+				if (RemoteMain.json.getIsPlaying() == 1) {
 					// turn button one
 					btn.setChecked(true);
 				} else {
@@ -327,7 +327,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 			params.put("source_hostname", RemoteMain.phoneNumber);
 			params.put("destination_hostname", RemoteMain.msb_desthost);
 			Log.i(Consts.LOG_TAG, params.get("command_text"));
-			jSon.JSONSendCmd("sendcommand", params);
+			RemoteMain.json.JSONSendCmd("sendcommand", params);
 			return true;
 		}
 	}

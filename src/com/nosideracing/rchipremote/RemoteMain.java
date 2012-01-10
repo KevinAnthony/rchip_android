@@ -34,6 +34,7 @@ public class RemoteMain extends Activity {
 	/* For the services the service then the actual connection */
 	public static String msb_desthost;
 	public static String phoneNumber;
+	public static JSON json;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,11 @@ public class RemoteMain extends Activity {
 		 * place not everyplace in our code
 		 */
 		Log.d(Consts.LOG_TAG, "onCreate: rchip");
+		/*
+		 * we have to authenticate json early
+		 */
+		json = new JSON(f_context);
+		json.authenticate();
 		/*
 		 * We pull the settings from the prefmanager, then we pull the telephone
 		 * number to use as a HOST_ID the reason i used the telephone number was
@@ -116,7 +122,7 @@ public class RemoteMain extends Activity {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("device_name", phoneNumber);
 		params.put("state", "true");
-		new JSON(f_context).JSONSendCmd("registerremotedevice", params);
+		json.JSONSendCmd("registerremotedevice", params);
 	}
 
 	@Override
@@ -151,6 +157,7 @@ public class RemoteMain extends Activity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		json.deauthenticate();
 		alarm.cancel(CheckMessagesPendingIntent);
 		Log.d(Consts.LOG_TAG, "onDestroy: rchip");
 	}

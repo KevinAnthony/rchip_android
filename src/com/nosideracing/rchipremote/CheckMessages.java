@@ -25,6 +25,7 @@ public class CheckMessages extends BroadcastReceiver {
 		JSON jSon = new JSON(f_context);
 		List<String[]> shows = new ArrayList<String[]>();
 		try {
+			jSon.authenticate();
 			JSONArray jsonArray = jSon.getCommands("7327943473");
 			for (int i = 0; i < jsonArray.length(); i++) {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);

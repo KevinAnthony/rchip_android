@@ -3,15 +3,22 @@ package com.nosideracing.rchipremote;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,18 +29,24 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 public class JSON {
 
 	public Hashtable<String, String> songinfo = new Hashtable<String, String>();
 	private String URL;
 	private String HOSTNAME;
-	private long DELAY;
 	private Context f_context;
+	
 	DefaultHttpClient httpClient;
+	CookieStore cookieStore;
+	HttpContext httpContext;
+
 	private String ret;
 
 	HttpResponse response = null;
+
 	HttpPost httpPost = null;
 	HttpGet httpGet = null;
 
@@ -47,6 +60,9 @@ public class JSON {
 		HttpConnectionParams.setConnectionTimeout(myParams, 10000);
 		HttpConnectionParams.setSoTimeout(myParams, 10000);
 		httpClient = new DefaultHttpClient(myParams);
+		cookieStore = new BasicCookieStore();
+		httpContext = new BasicHttpContext();
+		httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 	}
 
 	/* We set a notificaion, */
@@ -112,12 +128,6 @@ public class JSON {
 		}
 	}
 
-	// public String getRootValue(String hn) { return getRootValueJSON(hn); }
-
-	public long getDelay() {
-		return DELAY;
-	}
-
 	public Boolean UpdateSongInfo() {
 		return getSongInfo();
 	}
@@ -141,7 +151,6 @@ public class JSON {
 					}
 				}
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				Log.e(Consts.LOG_TAG, "Error in Get Hosts Name", e);
 			}
 		}
@@ -162,7 +171,6 @@ public class JSON {
 				}
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			Log.e(Consts.LOG_TAG, "Error in Get Hosts Name", e);
 		}
 		if (!retval.endsWith("/")) {
@@ -177,19 +185,37 @@ public class JSON {
 		params.put("host", host);
 		String response = JSONSendCmd("getcommand", params);
 		if (!response.equals("")) {
+			Log.d(Consts.LOG_TAG,"JSON Response: "+response);
+			if (response.equalsIgnoreCase("Not Authorized")){
+				authenticate();
+				return getCommands(host);
+			}
 			return new JSONArray(response);
 		} else {
 			return null;
 		}
 	}
 
-	public String JSONSendCmd(String methodName, Map<String, String> params) {
+	public void authenticate() {
+		Map<String, String> params = new HashMap<String, String>();
+		//TODO: This needs to be saved under preferences, not hardcoded
+		params.put("username", "kevin");
+		params.put("password", "Inverse81");
+		String return_value = JSONSendCmd("authenticate",params);
+		Log.d(Consts.LOG_TAG,"Authenticate Return Value "+return_value);		
+	}
+	
+	public void deauthenticate() {
+		String return_value = JSONSendCmd("deauthenticate",null);
+		Log.d(Consts.LOG_TAG,"Deauthenticate Return Value "+return_value);
+	}
 
+	public String JSONSendCmd(String methodName, Map<String, String> params) {
 		String getUrl = URL + "json/" + methodName;
 		int i = 0;
 		for (Map.Entry<String, String> param : params.entrySet()) {
 			if (i == 0) {
-				getUrl += "?";
+				getUrl += "/?";
 			} else {
 				getUrl += "&";
 			}
@@ -203,13 +229,12 @@ public class JSON {
 		}
 		Log.i(Consts.LOG_TAG, "getUrl:" + getUrl);
 		httpGet = new HttpGet(getUrl);
-
 		try {
-			response = httpClient.execute(httpGet);
+			response = httpClient.execute(httpGet,httpContext);			
 		} catch (Exception e) {
 			Log.w(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
-
+		process_cookies();
 		// we assume that the response body contains the error message
 		try {
 			ret = EntityUtils.toString(response.getEntity());
@@ -222,17 +247,17 @@ public class JSON {
 
 	public String JSONSendCmd(String methodName) {
 
-		String getUrl = URL + "json/" + methodName;
+		String getUrl = URL + "json/" + methodName+'/';
 
 		Log.i(Consts.LOG_TAG, "getUrl:" + getUrl);
 		httpGet = new HttpGet(getUrl);
 
 		try {
-			response = httpClient.execute(httpGet);
+			response = httpClient.execute(httpGet,httpContext);
 		} catch (Exception e) {
 			Log.w(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
-
+		process_cookies();
 		// we assume that the response body contains the error message
 		try {
 			ret = EntityUtils.toString(response.getEntity());
@@ -241,6 +266,27 @@ public class JSON {
 			ret = "";
 		}
 		return ret;
+	}
+
+	private void process_cookies() {
+		List<Cookie> cookies = httpClient.getCookieStore().getCookies();
+
+		if (!cookies.isEmpty())
+		{
+		    CookieSyncManager.createInstance(f_context);
+		    CookieManager cookieManager = CookieManager.getInstance();
+
+		    // sync all the cookies in the httpclient with the webview
+		    // by generating cookie string
+		    for (Cookie cookie : cookies)
+		    {
+		        Cookie sessionInfo = cookie;
+
+		        String cookieString = sessionInfo.getName() + "=" + sessionInfo.getValue() + ";    domain=" + sessionInfo.getDomain();
+		        cookieManager.setCookie("http://www.nosideracing.com", cookieString);
+		        CookieSyncManager.getInstance().sync();
+		    }
+		}
 	}
 
 	protected void updateSettings() {
@@ -254,7 +300,7 @@ public class JSON {
 		HOSTNAME = ((TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
 		// DESTHOSTNAME = settings.getString("serverhostname", "Tomoya");
-		DELAY = Integer.parseInt(settings.getString("delay", "5000"));
+		
 	}
 
 	private Boolean getSongInfo() {

@@ -42,15 +42,13 @@ public class VideoRemote extends Activity implements OnClickListener {
 	private String destHost;
 	private String phoneNumber;
 	private long ID = -1;
-	private JSON jSon;
 	PowerManager.WakeLock wl;
-
+	private AlertDialog alert;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.watch);
 		Log.d(Consts.LOG_TAG, "onCreate: VideoRemote");
-		jSon = new JSON(getApplicationContext());
 		Bundle incoming = getIntent().getExtras();
 		showString = incoming.getString("showString");
 		ID = incoming.getLong("showID");
@@ -146,16 +144,15 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 			if (btn.isChecked()) {
 				if (firstPlay) {
-					String rootPath = new JSON(getApplicationContext())
-							.getRootPath();
+					String rootPath = RemoteMain.json.getRootPath();
 					try {
-						// rootPath = jSon.getRootValue(destHost);
 						Log.d(Consts.LOG_TAG, "hostname:"
 								+ RemoteMain.msb_desthost);
 						Log.d(Consts.LOG_TAG, "rootpath:" + rootPath);
 						loc = loc.replace("/mnt/raid/", rootPath);
 						Log.d(Consts.LOG_TAG, "Location:" + loc);
 						new runCmd().execute("OPENSM", loc);
+						Thread.sleep(500);
 						firstPlay = false;
 					} catch (Exception e) {
 						Log.e(Consts.LOG_TAG, "Problem with playing", e);
@@ -163,10 +160,11 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 				}
 				try {
-					jSon.UpdateSongInfo();
-					if (jSon.getIsPlaying() == 1) {
+					RemoteMain.json.UpdateSongInfo();
+					if (RemoteMain.json.getIsPlaying() == 1) {
 						Log.v(Consts.LOG_TAG, "Stopping Music to play Video");
 						new runCmd().execute("STOPRB", "");
+						Thread.sleep(500);
 					}
 				} catch (Exception e) {
 				}
@@ -273,7 +271,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 									exit(0);
 								}
 							});
-			AlertDialog alert = alt_bld.create();
+			alert = alt_bld.create();
 			// Title for AlertDialog
 			alert.setTitle(showString);
 			// Icon for AlertDialog
@@ -291,6 +289,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 			i.putExtra("showID", ID);
 			setResult(Consts.REMOVESHOW, i);
 		}
+		alert.dismiss();
 		this.finish();
 	}
 
@@ -307,9 +306,9 @@ public class VideoRemote extends Activity implements OnClickListener {
 			params.put("source_hostname", phoneNumber);
 			params.put("destination_hostname", destHost);
 			Log.i(Consts.LOG_TAG, params.get("command_text"));
-			new JSON(getApplicationContext())
-					.JSONSendCmd("sendcommand", params);
+			RemoteMain.json.JSONSendCmd("sendcommand", params);
 			return true;
 		}
 	}
+
 }

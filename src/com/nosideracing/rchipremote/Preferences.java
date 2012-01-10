@@ -12,12 +12,11 @@ public class Preferences extends PreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		JSON jSon = new JSON(getApplicationContext());
 		Log.d(Consts.LOG_TAG, "OnCreate: Preferences");
 		addPreferencesFromResource(R.xml.preferences);
 		ListPreference hostnameList = (ListPreference) findPreference("serverhostname");
 		try {
-			hostsListEntryValues = jSon.getHostNames().split("\\|");
+			hostsListEntryValues = RemoteMain.json.getHostNames().split("\\|");
 			hostnameList.setEntries(hostsListEntryValues);
 			hostnameList.setEntryValues(hostsListEntryValues);
 		} catch (Exception e) {

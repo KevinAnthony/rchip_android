@@ -40,14 +40,13 @@ public class VideoList extends ExpandableListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		JSON jSon = new JSON(getApplicationContext());
 		// Set up our adapter
 		rchipDB = new Database(getBaseContext());
 		mAdapter = new MyExpandableListAdapter(this);
 		setListAdapter(mAdapter);
 		registerForContextMenu(getExpandableListView());
 		try {
-			jSon.clearNotifications(getApplicationContext());
+			RemoteMain.json.clearNotifications(getApplicationContext());
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG,
 					"Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):"
