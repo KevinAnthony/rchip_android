@@ -68,7 +68,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		super.onCreate(savedInstanceState);
 		Consts.LOG_TAG = this.getString(R.string.log_name);
 		setContentView(R.layout.music);
-		Log.d(Consts.LOG_TAG, "onCreate: Got to start");
 		// get the wakelock from the PowerManager
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
@@ -119,13 +118,11 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(Consts.LOG_TAG, "onPause: msmusic");
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.d(Consts.LOG_TAG, "onResume: msmusic");
 		/* if update is false (we are not updating) update and set to true) */
 		if (!update) {
 			updateTags();
@@ -146,8 +143,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		// updating the screen when we don't have to
 		wl.release();
 		update = false;
-		Log.d(Consts.LOG_TAG, "onStop: msmusic");
-		Log.d(Consts.LOG_TAG, "Stoping Thread");
 		// Finally we stop the thread
 		stopThread();
 	}
@@ -155,7 +150,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.d(Consts.LOG_TAG, "onDestroy msmusic");
 	}
 
 	@Override
@@ -168,7 +162,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	/* Handles item selections */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
 			startActivity(new Intent(this, Preferences.class));
@@ -190,18 +183,16 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 
 	/* If we don't already have a thread running, start it */
 	private synchronized void startThread() {
-		Log.i(Consts.LOG_TAG, "msMusic: Starting New Thread");
 		if (updater == null) {
 			updater = new Thread(this);
 			updater.start();
 		} else {
 			Log.w(Consts.LOG_TAG,
-					"We Tried to start a thread when one existed already");
+					"We Tried to start a thread when one existed already, MusicRemote->startThread()");
 		}
 	}
 
 	private synchronized void stopThread() {
-		Log.i(Consts.LOG_TAG, "msMusic: Stoping Old Thread");
 		if (updater != null) {
 			// moribund is being in the state of dieing
 			Thread moribund = updater;
@@ -233,9 +224,8 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 					m.what = Consts.UPDATEGUI;
 					musicHandler.sendMessage(m);
 					Thread.sleep(sleep);
-				} catch (Exception ex) {
-					Log.e(Consts.LOG_TAG, "ERROR in message sender, sleep");
-					Log.e(Consts.LOG_TAG, "error:" + ex.getMessage());
+				} catch (Exception e) {
+					Log.e(Consts.LOG_TAG, "ERROR in message sender, sleep",e);
 				}
 			}
 		}
@@ -280,8 +270,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 				}
 			}
 		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG, "Error Update Tags:" + e.getMessage());
-			Log.e(Consts.LOG_TAG, "", e);
+			Log.e(Consts.LOG_TAG, "Error Update Tags:",e);
 		}
 
 	}
@@ -296,7 +285,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	}
 
 	private void quit() {
-		Log.i(Consts.LOG_TAG, "Quitting");
 		/* Unbinds the service, and closes the program */
 		setResult(Consts.QUITREMOTE);
 		this.finish();
@@ -320,13 +308,11 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		protected Boolean doInBackground(String... incoming) {
 			String cmd = incoming[0];
 			String cmdTxt = incoming[1];
-			Log.i(Consts.LOG_TAG, cmdTxt);
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("command", cmd);
 			params.put("command_text", cmdTxt);
 			params.put("source_hostname", RemoteMain.phoneNumber);
 			params.put("destination_hostname", RemoteMain.msb_desthost);
-			Log.i(Consts.LOG_TAG, params.get("command_text"));
 			RemoteMain.json.JSONSendCmd("sendcommand", params);
 			return true;
 		}

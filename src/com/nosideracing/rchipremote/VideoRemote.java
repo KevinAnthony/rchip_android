@@ -48,7 +48,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.watch);
-		Log.d(Consts.LOG_TAG, "onCreate: VideoRemote");
 		Bundle incoming = getIntent().getExtras();
 		showString = incoming.getString("showString");
 		ID = incoming.getLong("showID");
@@ -74,13 +73,11 @@ public class VideoRemote extends Activity implements OnClickListener {
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(Consts.LOG_TAG, "onPause: MS_Watch_Movie");
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.d(Consts.LOG_TAG, "onResume: MS_Watch_Movie");
 		wl = ((PowerManager) getSystemService(Context.POWER_SERVICE))
 				.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
 						| PowerManager.ON_AFTER_RELEASE, "VideoRemote");
@@ -91,16 +88,13 @@ public class VideoRemote extends Activity implements OnClickListener {
 	@Override
 	public void onStop() {
 		super.onStop();
-		Log.d(Consts.LOG_TAG, "onStop: MS_Watch_Movie");
 		wl.release();
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
 		quit(false);
-		Log.d(Consts.LOG_TAG, "onDestroy msmusic");
 	}
 
 	@Override
@@ -112,7 +106,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
 			startActivity(new Intent(this, Preferences.class));
@@ -146,16 +139,12 @@ public class VideoRemote extends Activity implements OnClickListener {
 				if (firstPlay) {
 					String rootPath = RemoteMain.json.getRootPath();
 					try {
-						Log.d(Consts.LOG_TAG, "hostname:"
-								+ RemoteMain.msb_desthost);
-						Log.d(Consts.LOG_TAG, "rootpath:" + rootPath);
 						loc = loc.replace("/mnt/raid/", rootPath);
-						Log.d(Consts.LOG_TAG, "Location:" + loc);
 						new runCmd().execute("OPENSM", loc);
 						Thread.sleep(500);
 						firstPlay = false;
 					} catch (Exception e) {
-						Log.e(Consts.LOG_TAG, "Problem with playing", e);
+						Log.e(Consts.LOG_TAG, "Problem with playing "+ loc, e);
 					}
 
 				}
@@ -249,7 +238,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 	}
 
 	private void quit(Boolean quitProgram) {
-		Log.i(Consts.LOG_TAG, "Quitting");
 		if (quitProgram) {
 			exit(1);
 		} else {
@@ -299,13 +287,11 @@ public class VideoRemote extends Activity implements OnClickListener {
 		protected Boolean doInBackground(String... incoming) {
 			String cmd = incoming[0];
 			String cmdTxt = incoming[1];
-			Log.i(Consts.LOG_TAG, cmdTxt);
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("command", cmd);
 			params.put("command_text", cmdTxt);
 			params.put("source_hostname", phoneNumber);
 			params.put("destination_hostname", destHost);
-			Log.i(Consts.LOG_TAG, params.get("command_text"));
 			RemoteMain.json.JSONSendCmd("sendcommand", params);
 			return true;
 		}

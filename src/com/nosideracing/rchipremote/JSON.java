@@ -136,7 +136,6 @@ public class JSON {
 		String retval = "";
 		String response = JSONSendCmd("getdaemons");
 		if (!response.equals("")) {
-			Log.d(Consts.LOG_TAG, response);
 			JSONArray jsonArray;
 			try {
 				jsonArray = new JSONArray(response);
@@ -185,7 +184,6 @@ public class JSON {
 		params.put("host", host);
 		String response = JSONSendCmd("getcommand", params);
 		if (!response.equals("")) {
-			Log.d(Consts.LOG_TAG,"JSON Response: "+response);
 			if (response.equalsIgnoreCase("Not Authorized")){
 				authenticate();
 				return getCommands(host);
@@ -201,13 +199,11 @@ public class JSON {
 		//TODO: This needs to be saved under preferences, not hardcoded
 		params.put("username", "kevin");
 		params.put("password", "Inverse81");
-		String return_value = JSONSendCmd("authenticate",params);
-		Log.d(Consts.LOG_TAG,"Authenticate Return Value "+return_value);		
+		JSONSendCmd("authenticate",params);
 	}
 	
 	public void deauthenticate() {
-		String return_value = JSONSendCmd("deauthenticate");
-		Log.d(Consts.LOG_TAG,"Deauthenticate Return Value "+return_value);
+		JSONSendCmd("deauthenticate");
 	}
 
 	public String JSONSendCmd(String methodName, Map<String, String> params) {
@@ -227,19 +223,18 @@ public class JSON {
 			}
 			i++;
 		}
-		Log.i(Consts.LOG_TAG, "getUrl:" + getUrl);
 		httpGet = new HttpGet(getUrl);
 		try {
 			response = httpClient.execute(httpGet,httpContext);			
 		} catch (Exception e) {
-			Log.w(Consts.LOG_TAG, "Error in SendCmd sending command", e);
+			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
 		process_cookies();
 		// we assume that the response body contains the error message
 		try {
 			ret = EntityUtils.toString(response.getEntity());
 		} catch (Exception e) {
-			Log.w(Consts.LOG_TAG, "Error in SendCmd getting response", e);
+			Log.e(Consts.LOG_TAG, "Error in SendCmd getting response", e);
 			ret = "";
 		}
 		return ret;
@@ -249,20 +244,19 @@ public class JSON {
 
 		String getUrl = URL + "json/" + methodName+'/';
 
-		Log.i(Consts.LOG_TAG, "getUrl:" + getUrl);
 		httpGet = new HttpGet(getUrl);
 
 		try {
 			response = httpClient.execute(httpGet,httpContext);
 		} catch (Exception e) {
-			Log.w(Consts.LOG_TAG, "Error in SendCmd sending command", e);
+			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
 		process_cookies();
 		// we assume that the response body contains the error message
 		try {
 			ret = EntityUtils.toString(response.getEntity());
 		} catch (Exception e) {
-			Log.w(Consts.LOG_TAG, "Error in SendCmd getting response", e);
+			Log.e(Consts.LOG_TAG, "Error in SendCmd getting response", e);
 			ret = "";
 		}
 		return ret;
@@ -296,7 +290,6 @@ public class JSON {
 		if (URL.charAt(URL.length()-1) != '/'){
 			URL = URL+'/';
 		}
-		Log.d(Consts.LOG_TAG,"URL:"+URL);
 		HOSTNAME = ((TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
 		// DESTHOSTNAME = settings.getString("serverhostname", "Tomoya");
@@ -306,13 +299,10 @@ public class JSON {
 	private Boolean getSongInfo() {
 		try {
 			updateSettings();
-			Log.d(Consts.LOG_TAG, "JSON:SongInfo:Starting Song Info");
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("host", HOSTNAME);
-			Log.e(Consts.LOG_TAG, "hostname:" + HOSTNAME);
 			String response = JSONSendCmd("getsonginfo", params);
 			if (!response.equals("")) {
-				Log.d(Consts.LOG_TAG, response);
 				JSONArray jsonArray = new JSONArray(response);
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -329,9 +319,7 @@ public class JSON {
 			}
 			// songinfo.put(key, value);
 		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG, "SongInfo:Something Failed");
-			Log.e(Consts.LOG_TAG, "" + e.getMessage());
-			Log.e(Consts.LOG_TAG, "", e);
+			Log.e(Consts.LOG_TAG, "SongInfo:Something Failed",e);
 			return false;
 		}
 		return true;

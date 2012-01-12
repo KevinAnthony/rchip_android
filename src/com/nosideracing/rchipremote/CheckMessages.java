@@ -39,16 +39,12 @@ public class CheckMessages extends BroadcastReceiver {
 				String[] curShow = new String[4];
 				if (cmd.equals("TMSG")) {
 					String[] cmdTemp = cmdTxt.split("\\|");
-					Log.i(Consts.LOG_TAG, cmdTemp.toString());
-					Log.i(Consts.LOG_TAG, Integer.toString(cmdTemp.length));
 					if (cmdTemp.length == 3) {
 						curShow = Notifications.setStatusNotification(
 								cmdTemp[0], cmdTemp[1], cmdTemp[2], context);
-						Log.d(Consts.LOG_TAG, "curShow:" + curShow);
 					}
 				} else if (cmd.equals("ADDS")) {
 					String[] cmdTemp = cmdTxt.split("\\|");
-					Log.v(Consts.LOG_TAG, cmdTxt);
 					if (cmdTemp.length == 4) {
 						curShow[0] = cmdTemp[0];
 						curShow[1] = cmdTemp[1];
@@ -72,7 +68,6 @@ public class CheckMessages extends BroadcastReceiver {
 
 	class passDataToShowWindow extends
 			AsyncTask<List<String[]>, Integer, Boolean> {
-
 		@Override
 		protected Boolean doInBackground(List<String[]>... params) {
 			List<String[]> shows = params[0];
@@ -84,8 +79,7 @@ public class CheckMessages extends BroadcastReceiver {
 							curShow[3]);
 				}
 			} catch (Exception e) {
-				Log.e(Consts.LOG_TAG, "Could not insert " + e.getMessage());
-				Log.e(Consts.LOG_TAG, "", e);
+				Log.e(Consts.LOG_TAG, "Could not pass data to show window " + e);
 			}
 			return true;
 		}

@@ -20,14 +20,14 @@ public class Database extends SQLiteOpenHelper {
 	private SQLiteDatabase db;
 
 	public void deleteOneSL(int id) {
-		Log.i(Consts.LOG_TAG, "Deleting row #" + id + " from " + TABLE_NAME_SL);
+		Log.d(Consts.LOG_TAG, "Deleting row #" + id + " from " + TABLE_NAME_SL);
 		db = this.getWritableDatabase();
 		db.execSQL("Delete from " + TABLE_NAME_SL + " where id = " + id);
 		db.close();
 	}
 
 	public void deleteAllSL() {
-		Log.i(Consts.LOG_TAG, "Deleting all rows from " + TABLE_NAME_SL);
+		Log.d(Consts.LOG_TAG, "Deleting all rows from " + TABLE_NAME_SL);
 		db = this.getWritableDatabase();
 		db.execSQL("Delete from " + TABLE_NAME_SL);
 		db.close();
@@ -95,7 +95,6 @@ public class Database extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		Log.d(Consts.LOG_TAG, "Database: Got to On Upgrade");
 		// put new create tables, or changes here
 	}
 }

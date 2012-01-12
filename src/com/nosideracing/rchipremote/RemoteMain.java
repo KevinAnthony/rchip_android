@@ -40,16 +40,12 @@ public class RemoteMain extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState == null) {
-			Log.w(Consts.LOG_TAG, "Opps it's null!!");
+			Log.w(Consts.LOG_TAG,
+					"SaveInstantsState is NULL if the program isn't starting for the first time, this is a problem");
 		}
 		setContentView(R.layout.main);
 		f_context = getApplicationContext();
 
-		/*
-		 * We put the LOG_TAG in the string.xml file, so we can change it one
-		 * place not everyplace in our code
-		 */
-		Log.d(Consts.LOG_TAG, "onCreate: rchip");
 		/*
 		 * we have to authenticate json early
 		 */
@@ -65,7 +61,7 @@ public class RemoteMain extends Activity {
 		settings.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
 			public void onSharedPreferenceChanged(SharedPreferences prefs,
 					String key) {
-				Log.w(Consts.LOG_TAG, "SharePrefsChanged");
+					//TODO:Set somekind of flag here
 			}
 		});
 		TelephonyManager tManager = (TelephonyManager) f_context
@@ -81,7 +77,6 @@ public class RemoteMain extends Activity {
 		button_music.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				/* Perform action on clicks */
-				Log.d(Consts.LOG_TAG, "Music Pushed");
 				activity_music();
 			}
 		});
@@ -95,8 +90,7 @@ public class RemoteMain extends Activity {
 				}
 			});
 		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG, "Error:" + e.getMessage());
-			Log.e(Consts.LOG_TAG, "", e);
+			Log.e(Consts.LOG_TAG, "Error:",e);
 		}
 
 		SharedPreferences.Editor editor = settings.edit();
@@ -116,7 +110,8 @@ public class RemoteMain extends Activity {
 
 		// Get the AlarmManager service
 		alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-		int delay = Integer.parseInt(settings.getString("networkdelay", "300000"));
+		int delay = Integer.parseInt(settings.getString("networkdelay",
+				"300000"));
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 				delay, CheckMessagesPendingIntent);
 		Map<String, String> params = new HashMap<String, String>();
@@ -128,7 +123,6 @@ public class RemoteMain extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(Consts.LOG_TAG, "onPause: rchip");
 	}
 
 	@Override
@@ -139,19 +133,16 @@ public class RemoteMain extends Activity {
 		 * doing this in any other activity that potentialy could be called.
 		 */
 		Notifications.clearAllNotifications(getApplicationContext());
-		Log.d(Consts.LOG_TAG, "onResume: rchip");
 	}
 
 	@Override
 	public void onRestart() {
 		super.onRestart();
-		Log.d(Consts.LOG_TAG, "onRestart: rchip");
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		Log.d(Consts.LOG_TAG, "onStop: rchip");
 	}
 
 	@Override
@@ -159,7 +150,6 @@ public class RemoteMain extends Activity {
 		super.onDestroy();
 		alarm.cancel(CheckMessagesPendingIntent);
 		json.deauthenticate();
-		Log.d(Consts.LOG_TAG, "onDestroy: rchip");
 	}
 
 	/* Creates the menu items */
@@ -173,7 +163,6 @@ public class RemoteMain extends Activity {
 	/* Handles item selections */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
 			startActivity(new Intent(this, Preferences.class));
@@ -204,7 +193,6 @@ public class RemoteMain extends Activity {
 	}
 
 	private void quit() {
-		Log.i(Consts.LOG_TAG, "Quitting");
 		alarm.cancel(CheckMessagesPendingIntent);
 		setResult(Consts.QUITREMOTE);
 		this.finish();

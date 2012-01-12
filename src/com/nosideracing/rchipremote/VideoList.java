@@ -49,8 +49,8 @@ public class VideoList extends ExpandableListActivity {
 			RemoteMain.json.clearNotifications(getApplicationContext());
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG,
-					"Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):"
-							+ e.getLocalizedMessage());
+					"Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):",
+							e);
 		}
 		Notifications.clearAllNotifications(getApplicationContext());
 	}
@@ -58,20 +58,17 @@ public class VideoList extends ExpandableListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.d(Consts.LOG_TAG, "onResume: VideoList");
 		refreshList();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(Consts.LOG_TAG, "onPause: VideoList");
 	}
 
 	@Override
 	public boolean onChildClick(ExpandableListView info, View v, int groupPos,
 			int childPos, long id) {
-		Log.d(Consts.LOG_TAG, "Got to OnChildClick");
 		int Listid = ((MyExpandableListAdapter) mAdapter).getlongID(groupPos,
 				childPos);
 		watch(Listid);
@@ -82,7 +79,6 @@ public class VideoList extends ExpandableListActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		Log.v(Consts.LOG_TAG, "GOT TO CONTEXT MENU");
 		menu.setHeaderTitle("Show");
 		menu.add(0, v.getId(), 0, "Watch");
 		menu.add(0, v.getId(), 1, "Delete");
@@ -135,7 +131,6 @@ public class VideoList extends ExpandableListActivity {
 	/* Handles item selections */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.d(Consts.LOG_TAG, "onOptionsItemSelected: rchip");
 		int calledMenuItem = item.getItemId();
 		if (calledMenuItem == R.id.settings) {
 			startActivity(new Intent(this, Preferences.class));
@@ -154,8 +149,6 @@ public class VideoList extends ExpandableListActivity {
 			quit();
 		} else if (resultCode == Consts.REMOVESHOW) {
 			long id = data.getLongExtra("showID", -1L);
-			Log.d(Consts.LOG_TAG, "Returned REMOVESHOW");
-			Log.d(Consts.LOG_TAG, "Deleting ID :" + id);
 			delete(id);
 		}
 	}
@@ -229,7 +222,6 @@ public class VideoList extends ExpandableListActivity {
 	}
 
 	private void quit() {
-		Log.i(Consts.LOG_TAG, "Quitting");
 		setResult(Consts.QUITREMOTE);
 		this.finish();
 	}

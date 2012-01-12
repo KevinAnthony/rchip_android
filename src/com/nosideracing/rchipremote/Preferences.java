@@ -12,7 +12,6 @@ public class Preferences extends PreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		Log.d(Consts.LOG_TAG, "OnCreate: Preferences");
 		addPreferencesFromResource(R.xml.preferences);
 		ListPreference hostnameList = (ListPreference) findPreference("serverhostname");
 		try {

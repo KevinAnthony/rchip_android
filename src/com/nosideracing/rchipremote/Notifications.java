@@ -60,11 +60,9 @@ public class Notifications {
 				epsName = "";
 				epsNumber = "";
 				for (int i = 0; i < temp.length - 1; i++) {
-					Log.v("", temp[i]);
 					Name = Name + temp[i] + " ";
 				}
 				Name = Name.substring(0, Name.length() - 1);
-				Log.v(Consts.LOG_TAG, Name);
 				epsNumber = temp[temp.length - 1];
 				epsName = filename[1].substring(0, filename[1].length() - 1);
 				epsName = epsName.substring(0, epsName.length() - 1);
@@ -119,8 +117,7 @@ public class Notifications {
 			String[] temp = { Name, epsNumber, epsName, loc };
 			return temp;
 		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG, "SetStatusNotification:" + e.getMessage());
-			Log.e(Consts.LOG_TAG, "", e);
+			Log.e(Consts.LOG_TAG, "SetStatusNotification:",e);
 			return null;
 		}
 	}
