@@ -14,8 +14,8 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	private static final String DATABASE_NAME = "msdb.db";
-	private static final int DATABASE_VERSION = 1;
-	private static final String TABLE_NAME_SL = "ms_show_list";
+	private static final int DATABASE_VERSION = 2;
+	private static final String TABLE_NAME_SL = "show_list";
 
 	private SQLiteDatabase db;
 
@@ -89,12 +89,14 @@ public class Database extends SQLiteOpenHelper {
 				+ "  `ShowName` VARCHAR( 64 ) NOT NULL , `EpisodeNumber` VARCHAR( 10 ) NOT NULL ,  "
 				+ "`EpisodeName` VARCHAR( 128 ) NOT NULL , `Location` VARCHAR( 1024 ) NOT NULL ,  "
 				+ "`Updated` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP);");
-		Log.d(Consts.LOG_TAG, "Database: Got to On Create");
-
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// put new create tables, or changes here
+		Log.d(Consts.LOG_TAG,"Upgrading Databased oldVersion:"+oldVersion+"-> newVersion:"+newVersion);
+		if (newVersion > 1){
+			Log.v(Consts.LOG_TAG,"Renaming Table ms_show_list -> " + TABLE_NAME_SL);
+			db.execSQL("ALTER TABLE ms_show_list RENAME TO "+ TABLE_NAME_SL +";");
+		}
 	}
 }
