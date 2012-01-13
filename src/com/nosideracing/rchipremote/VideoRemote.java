@@ -43,7 +43,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 	private String phoneNumber;
 	private long ID = -1;
 	PowerManager.WakeLock wl;
-	private AlertDialog alert;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -94,7 +94,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		quit(false);
 	}
 
 	@Override
@@ -144,7 +143,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 						Thread.sleep(500);
 						firstPlay = false;
 					} catch (Exception e) {
-						Log.e(Consts.LOG_TAG, "Problem with playing "+ loc, e);
+						Log.e(Consts.LOG_TAG, "Problem with playing " + loc, e);
 					}
 
 				}
@@ -241,6 +240,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 		if (quitProgram) {
 			exit(1);
 		} else {
+			AlertDialog alert;
 			AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
 			alt_bld.setMessage("Have you finished Watching this Show?")
 					.setCancelable(false)
@@ -248,14 +248,15 @@ public class VideoRemote extends Activity implements OnClickListener {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									exit(2);
 
+									exit(2);
 								}
 							})
 					.setNegativeButton("No",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
+
 									exit(0);
 								}
 							});
@@ -277,7 +278,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 			i.putExtra("showID", ID);
 			setResult(Consts.REMOVESHOW, i);
 		}
-		alert.dismiss();
 		this.finish();
 	}
 
