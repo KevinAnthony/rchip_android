@@ -6,6 +6,7 @@ public class Consts {
 	protected static final int RC_MUSIC = 0x0031;
 	protected static final int RC_SHOW = 0x0032;
 	protected static final int RC_WATCHMOVE = 0x0033;
+	protected static final int RC_SHOW_LIST = 0x0034; 
 
 	protected static final int PREFS_UPDATED = 0x0041;
 	protected static final int UPDATEGUI = 0x0042;

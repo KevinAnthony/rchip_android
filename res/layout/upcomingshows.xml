@@ -3,7 +3,7 @@
  android:orientation="vertical" android:layout_width="fill_parent"
  android:layout_height="fill_parent">
 
-<TextView android:id="@+id/TextView01" android:layout_height="wrap_content" android:text="Torrents Downloaded" android:textStyle="normal|bold" android:gravity="center_vertical|center_horizontal" android:layout_width="fill_parent"></TextView>
+<TextView android:id="@+id/TextView01" android:layout_height="wrap_content" android:text="Upcoming Shows" android:textStyle="normal|bold" android:gravity="center_vertical|center_horizontal" android:layout_width="fill_parent"></TextView>
  <ListView android:id="@+id/ListView01" android:layout_height="wrap_content"
  android:layout_width="fill_parent">
  </ListView>

@@ -286,7 +286,7 @@ public class VideoList extends ExpandableListActivity {
 
 			ViewHolder holder;
 			if (convertView == null) {
-				convertView = mInflater.inflate(R.layout.listview, null);
+				convertView = mInflater.inflate(R.layout.playlist_listview, null);
 				holder = new ViewHolder();
 				holder.text = (TextView) convertView
 						.findViewById(R.id.TextView01);

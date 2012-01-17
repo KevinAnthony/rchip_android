@@ -61,7 +61,7 @@ public class RemoteMain extends Activity {
 		settings.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
 			public void onSharedPreferenceChanged(SharedPreferences prefs,
 					String key) {
-					//TODO:Set somekind of flag here
+				// TODO:Set somekind of flag here
 			}
 		});
 		TelephonyManager tManager = (TelephonyManager) f_context
@@ -81,24 +81,27 @@ public class RemoteMain extends Activity {
 			}
 		});
 		/* creates the Torrent Button */
-		try {
-			Button button_tor = (Button) findViewById(R.id.torrent);
-			button_tor.setOnClickListener(new OnClickListener() {
-				public void onClick(View v) {
-					/* Perform action on clicks */
-					activity_torrent();
-				}
-			});
-		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG, "Error:",e);
-		}
+		Button button_tor = (Button) findViewById(R.id.torrent);
+		button_tor.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				/* Perform action on clicks */
+				activity_torrent();
+			}
+		});
+		/* creates the Torrent Button */
+		Button button_shows = (Button) findViewById(R.id.shows);
+		button_shows.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				/* Perform action on clicks */
+				activity_show_list();
+			}
+		});
 
 		SharedPreferences.Editor editor = settings.edit();
 
 		/* Pulls the URL, and Destination Host Name from the settings */
 		if (settings.getBoolean("firstRun", true)) {
 			startActivity(new Intent(this, Preferences.class));
-
 			editor.putBoolean("firstRun", false);
 			editor.commit();
 		}
@@ -192,6 +195,10 @@ public class RemoteMain extends Activity {
 		startActivityForResult(i, Consts.RC_SHOW);
 	}
 
+	private void activity_show_list() {
+		Intent i = new Intent(this, UpcomingShowList.class);
+		startActivityForResult(i, Consts.RC_SHOW_LIST);
+	}
 	private void quit() {
 		alarm.cancel(CheckMessagesPendingIntent);
 		setResult(Consts.QUITREMOTE);

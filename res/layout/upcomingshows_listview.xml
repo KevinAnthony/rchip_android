@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="left|center"
+    android:orientation="vertical"
+    android:paddingBottom="25px"
+    android:paddingLeft="25px"
+    android:paddingTop="25px" >
+
+    <TextView
+        android:id="@+id/episode_name"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="Episode Name"
+        android:textSize="24px"
+        android:textStyle="bold" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/episode_number"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="Episode Number"
+        android:textSize="24px"
+        android:textStyle="bold" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/show_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5px"
+        android:text="show_date" >
+    </TextView>
+
+</LinearLayout>

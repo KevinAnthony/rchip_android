@@ -1,6 +1,8 @@
 package com.nosideracing.rchipremote;
 
+
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -23,6 +25,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.nosideracing.rchipremote.UpcomingShowList.UpcomingShowInfo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -262,6 +266,11 @@ public class JSON {
 		return ret;
 	}
 
+	public ArrayList<UpcomingShowInfo> getUpcomingShows(){
+		ArrayList<UpcomingShowInfo> upcoming = new ArrayList<UpcomingShowInfo>();
+		return upcoming;
+		
+	}
 	private void process_cookies() {
 		List<Cookie> cookies = httpClient.getCookieStore().getCookies();
 

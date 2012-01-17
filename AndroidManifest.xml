@@ -41,6 +41,9 @@
             android:name="VideoList"
             android:alwaysRetainTaskState="true" />
         <activity
+            android:name="UpcomingShowList"
+            android:alwaysRetainTaskState="true" />
+        <activity
             android:name="Preferences"
             android:alwaysRetainTaskState="true" />
         <activity

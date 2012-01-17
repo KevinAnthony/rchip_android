@@ -66,7 +66,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Consts.LOG_TAG = this.getString(R.string.log_name);
 		setContentView(R.layout.music);
 		// get the wakelock from the PowerManager
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
