@@ -5,8 +5,10 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -50,7 +52,9 @@ public class RemoteMain extends Activity {
 		 * we have to authenticate json early
 		 */
 		json = new JSON(f_context);
-		json.authenticate();
+		if (!json.authenticate()) {
+			bad_password();
+		}
 		/*
 		 * We pull the settings from the prefmanager, then we pull the telephone
 		 * number to use as a HOST_ID the reason i used the telephone number was
@@ -72,30 +76,24 @@ public class RemoteMain extends Activity {
 			phoneNumber = "1111111111";
 		}
 		msb_desthost = settings.getString("serverhostname", "Tomoya");
-		/* creates the music button */
 		final Button button_music = (Button) findViewById(R.id.music);
 		button_music.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				/* Perform action on clicks */
 				activity_music();
 			}
 		});
-		/* creates the Torrent Button */
 		Button button_tor = (Button) findViewById(R.id.torrent);
 		button_tor.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				/* Perform action on clicks */
 				activity_torrent();
 			}
 		});
-		/* creates the Torrent Button */
-		Button button_shows = (Button) findViewById(R.id.shows);
+		/*Button button_shows = (Button) findViewById(R.id.shows);
 		button_shows.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				/* Perform action on clicks */
 				activity_show_list();
 			}
-		});
+		});*/
 
 		SharedPreferences.Editor editor = settings.edit();
 
@@ -195,10 +193,37 @@ public class RemoteMain extends Activity {
 		startActivityForResult(i, Consts.RC_SHOW);
 	}
 
-	private void activity_show_list() {
+	/*private void activity_show_list() {
 		Intent i = new Intent(this, UpcomingShowList.class);
 		startActivityForResult(i, Consts.RC_SHOW_LIST);
+	}*/
+
+	private void bad_password() {
+		AlertDialog alert;
+		AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
+		alt_bld.setMessage("Bad Password")
+				.setCancelable(false)
+				.setPositiveButton("Fix",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+
+							}
+						})
+				.setNegativeButton("Exit",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								quit();
+							}
+						});
+		alert = alt_bld.create();
+		// Title for AlertDialog
+		alert.setTitle("ERROR");
+		// Icon for AlertDialog
+		alert.setIcon(R.drawable.icon);
+		alert.show();
+		startActivity(new Intent(this, Preferences.class));
 	}
+
 	private void quit() {
 		alarm.cancel(CheckMessagesPendingIntent);
 		setResult(Consts.QUITREMOTE);

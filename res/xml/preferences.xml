@@ -1,30 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-  xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
     <ListPreference
-    	android:key="serverhostname" 
-    	android:title="Server Host Name" 
-    	android:summary="The host name of the Server which msDaemon runs" 
-    	android:defaultValue="Tomoya" />
-  	<EditTextPreference 
-  		android:key="serverurl" 
-  		android:title="Server URL"
-  		android:summary="The URL of the Server which the rchip webservice is running"
-  		android:defaultValue="http://www.nosideholdings.com" />
-  	<CheckBoxPreference 
-  		android:title="Notifications" 
-  		android:summary="Turn On/Off Notifications" 
-  		android:key="notificationsCheck" />
+        android:defaultValue="Tomoya"
+        android:key="serverhostname"
+        android:summary="The host name of the Server which msDaemon runs"
+        android:title="Server Host Name" />
+
+    <EditTextPreference
+        android:defaultValue="http://www.nosideholdings.com"
+        android:key="serverurl"
+        android:summary="The URL of the Server which the rchip webservice is running"
+        android:title="Server URL" />
+
+    <EditTextPreference
+        android:key="username"
+        android:summary="Username For JSON"
+        android:title="Username" />
+
+    <EditTextPreference
+        android:key="password"
+        android:summary="Password For JSON"
+        android:title="Password" />
+
+    <CheckBoxPreference
+        android:key="notificationsCheck"
+        android:summary="Turn On/Off Notifications"
+        android:title="Notifications" />
+
     <ListPreference
-     	android:title="Network Delay"
-        android:summary="The delay between updates"
-        android:key="networkdelay"
         android:defaultValue="300000"
         android:entries="@array/DelayArray"
-        android:entryValues="@array/DelayValues" />
-	<EditTextPreference
-     	android:title="Video Path"
-        android:summary="The Path the the root of the NFS server"
+        android:entryValues="@array/DelayValues"
+        android:key="networkdelay"
+        android:summary="The delay between updates"
+        android:title="Network Delay" />
+
+    <EditTextPreference
+        android:defaultValue="/mnt/raid/"
         android:key="videopath"
-        android:defaultValue="/mnt/raid/" />
+        android:summary="The Path the the root of the NFS server"
+        android:title="Video Path" />
+
 </PreferenceScreen>

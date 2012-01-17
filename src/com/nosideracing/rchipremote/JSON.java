@@ -198,12 +198,16 @@ public class JSON {
 		}
 	}
 
-	public void authenticate() {
+	public boolean authenticate() {
 		Map<String, String> params = new HashMap<String, String>();
-		//TODO: This needs to be saved under preferences, not hardcoded
-		params.put("username", "kevin");
-		params.put("password", "Inverse81");
+		String uname = PreferenceManager.getDefaultSharedPreferences(f_context).getString("username", "");
+		String pword = PreferenceManager.getDefaultSharedPreferences(f_context).getString("password", "");
+		if ((uname.equals("")) || (pword.equals(""))){
+			return false;
+		}
+		Log.v(Consts.LOG_TAG,"username & password both set");
 		JSONSendCmd("authenticate",params);
+		return true;
 	}
 	
 	public void deauthenticate() {

@@ -1,11 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_height="wrap_content" android:layout_width="fill_parent" android:orientation="vertical">
-<TextView android:layout_height="wrap_content" android:textStyle="bold" android:layout_width="fill_parent" android:layout_marginLeft="25px" android:layout_marginBottom="10px" android:layout_marginTop="15px" android:id="@+id/Control" android:text="Control:"></TextView>
-<Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/music" android:text="Music"></Button>
-<Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/torrent" android:text="Show List"></Button>
-<Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/shows" android:text="Upcoming Shows"></Button>
-    
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/Control"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10px"
+        android:layout_marginLeft="25px"
+        android:layout_marginTop="15px"
+        android:text="Control:"
+        android:textStyle="bold" >
+    </TextView>
+
+    <Button
+        android:id="@+id/music"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Music" >
+    </Button>
+
+    <Button
+        android:id="@+id/torrent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show List" >
+    </Button>
+
+    <Button
+        android:id="@+id/shows"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Upcoming Shows" >
+    </Button>
 
 </LinearLayout>

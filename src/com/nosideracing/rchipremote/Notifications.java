@@ -104,6 +104,7 @@ public class Notifications {
 			notification.setLatestEventInfo(context, contentTitle, contentText,
 					contentIntent);
 			notification.defaults |= Notification.DEFAULT_ALL;
+
 			mNotificationManager.cancel(Consts.NOTIFICATION_ID);
 			try {
 				Thread.sleep(100);
@@ -117,7 +118,7 @@ public class Notifications {
 			String[] temp = { Name, epsNumber, epsName, loc };
 			return temp;
 		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG, "SetStatusNotification:",e);
+			Log.e(Consts.LOG_TAG, "SetStatusNotification:", e);
 			return null;
 		}
 	}
