@@ -206,6 +206,8 @@ public class JSON {
 			return false;
 		}
 		Log.v(Consts.LOG_TAG,"username & password both set");
+		params.put("username", uname);
+		params.put("password", pword);
 		JSONSendCmd("authenticate",params);
 		return true;
 	}
