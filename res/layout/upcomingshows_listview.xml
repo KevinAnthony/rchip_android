@@ -9,11 +9,16 @@
     android:paddingTop="25px" >
 
     <TextView
+        android:id="@+id/show_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Name" />
+
+    <TextView
         android:id="@+id/episode_name"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:text="Episode Name"
-        android:textSize="24px"
         android:textStyle="bold" >
     </TextView>
 
@@ -22,7 +27,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:text="Episode Number"
-        android:textSize="24px"
         android:textStyle="bold" >
     </TextView>
 

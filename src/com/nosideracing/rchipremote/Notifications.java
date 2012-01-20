@@ -47,6 +47,9 @@ public class Notifications {
 			String epsName = "";
 			String epsNumber = "";
 			try {
+				Log.v(Consts.LOG_TAG,"Ticker String:"+tickerString);
+				Log.v(Consts.LOG_TAG,"Not Title:"+notificationTitle);
+				Log.v(Consts.LOG_TAG,"Not Text:"+noticicationText);
 				String[] filename = notificationTitle.split("\\/")[notificationTitle
 						.split("\\/").length - 1].split("\\.");
 				Name = filename[0].replace("_", " ");

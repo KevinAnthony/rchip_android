@@ -1,7 +1,7 @@
 package com.nosideracing.rchipremote;
 
-
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -25,8 +25,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.nosideracing.rchipremote.UpcomingShowList.UpcomingShowInfo;
+import java.util.Date;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -42,7 +41,7 @@ public class JSON {
 	private String URL;
 	private String HOSTNAME;
 	private Context f_context;
-	
+
 	DefaultHttpClient httpClient;
 	CookieStore cookieStore;
 	HttpContext httpContext;
@@ -188,7 +187,7 @@ public class JSON {
 		params.put("host", host);
 		String response = JSONSendCmd("getcommand", params);
 		if (!response.equals("")) {
-			if (response.equalsIgnoreCase("Not Authorized")){
+			if (response.equalsIgnoreCase("Not Authorized")) {
 				authenticate();
 				return getCommands(host);
 			}
@@ -200,18 +199,20 @@ public class JSON {
 
 	public boolean authenticate() {
 		Map<String, String> params = new HashMap<String, String>();
-		String uname = PreferenceManager.getDefaultSharedPreferences(f_context).getString("username", "");
-		String pword = PreferenceManager.getDefaultSharedPreferences(f_context).getString("password", "");
-		if ((uname.equals("")) || (pword.equals(""))){
+		String uname = PreferenceManager.getDefaultSharedPreferences(f_context)
+				.getString("username", "");
+		String pword = PreferenceManager.getDefaultSharedPreferences(f_context)
+				.getString("password", "");
+		if ((uname.equals("")) || (pword.equals(""))) {
 			return false;
 		}
-		Log.v(Consts.LOG_TAG,"username & password both set");
+		Log.v(Consts.LOG_TAG, "username & password both set");
 		params.put("username", uname);
 		params.put("password", pword);
-		JSONSendCmd("authenticate",params);
+		JSONSendCmd("authenticate", params);
 		return true;
 	}
-	
+
 	public void deauthenticate() {
 		JSONSendCmd("deauthenticate");
 	}
@@ -235,7 +236,7 @@ public class JSON {
 		}
 		httpGet = new HttpGet(getUrl);
 		try {
-			response = httpClient.execute(httpGet,httpContext);			
+			response = httpClient.execute(httpGet, httpContext);
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
@@ -252,12 +253,12 @@ public class JSON {
 
 	public String JSONSendCmd(String methodName) {
 
-		String getUrl = URL + "json/" + methodName+'/';
+		String getUrl = URL + "json/" + methodName + '/';
 
 		httpGet = new HttpGet(getUrl);
 
 		try {
-			response = httpClient.execute(httpGet,httpContext);
+			response = httpClient.execute(httpGet, httpContext);
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
@@ -272,29 +273,47 @@ public class JSON {
 		return ret;
 	}
 
-	public ArrayList<UpcomingShowInfo> getUpcomingShows(){
-		ArrayList<UpcomingShowInfo> upcoming = new ArrayList<UpcomingShowInfo>();
-		return upcoming;
-		
+	public ArrayList<UpcomingShowInfo> getUpcomingShows() {
+		try {
+			ArrayList<UpcomingShowInfo> upcoming = new ArrayList<UpcomingShowInfo>();
+			String json_array = JSONSendCmd("getupcomingshows");
+			if (!json_array.equals("")) {
+				JSONArray jsonArray = new JSONArray(json_array);
+				for (int i = 0; i < jsonArray.length(); i++) {
+					UpcomingShowInfo show = new UpcomingShowInfo();
+					JSONObject jsonObject = jsonArray.getJSONObject(i);
+					show.EpisodeName = jsonObject.getString("eps_name");
+					show.EpisodeNumber = jsonObject.getString("eps_number");
+					show.ShowName = jsonObject.getString("show__name");
+					show.AirDate = (Date)new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse((jsonObject.getString("air_date")));
+					upcoming.add(show);
+				}
+			}
+			return upcoming;
+		} catch (Exception e) {
+			Log.e(Consts.LOG_TAG,"Error in getUpcommingShows",e);
+		}
+		return null;
 	}
+
 	private void process_cookies() {
 		List<Cookie> cookies = httpClient.getCookieStore().getCookies();
 
-		if (!cookies.isEmpty())
-		{
-		    CookieSyncManager.createInstance(f_context);
-		    CookieManager cookieManager = CookieManager.getInstance();
+		if (!cookies.isEmpty()) {
+			CookieSyncManager.createInstance(f_context);
+			CookieManager cookieManager = CookieManager.getInstance();
 
-		    // sync all the cookies in the httpclient with the webview
-		    // by generating cookie string
-		    for (Cookie cookie : cookies)
-		    {
-		        Cookie sessionInfo = cookie;
-
-		        String cookieString = sessionInfo.getName() + "=" + sessionInfo.getValue() + ";    domain=" + sessionInfo.getDomain();
-		        cookieManager.setCookie("http://www.nosideracing.com", cookieString);
-		        CookieSyncManager.getInstance().sync();
-		    }
+			// sync all the cookies in the httpclient with the webview
+			// by generating cookie string
+			for (Cookie cookie : cookies) {
+				Cookie sessionInfo = cookie;
+				String cookieString = sessionInfo.getName() + "="
+						+ sessionInfo.getValue() + ";    domain="
+						+ sessionInfo.getDomain();
+				cookieManager.setCookie("http://www.nosideracing.com",
+						cookieString);
+				CookieSyncManager.getInstance().sync();
+			}
 		}
 	}
 
@@ -302,13 +321,13 @@ public class JSON {
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(f_context);
 		URL = settings.getString("serverurl", "http://www.nosideholdings.com/");
-		if (URL.charAt(URL.length()-1) != '/'){
-			URL = URL+'/';
+		if (URL.charAt(URL.length() - 1) != '/') {
+			URL = URL + '/';
 		}
 		HOSTNAME = ((TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
 		// DESTHOSTNAME = settings.getString("serverhostname", "Tomoya");
-		
+
 	}
 
 	private Boolean getSongInfo() {
@@ -322,19 +341,19 @@ public class JSON {
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObject = jsonArray.getJSONObject(i);
 					songinfo.put("album", (String) jsonObject.get("album"));
-					songinfo.put("total_time",
-							jsonObject.get("total_time").toString());
+					songinfo.put("total_time", jsonObject.get("total_time")
+							.toString());
 					songinfo.put("song", (String) jsonObject.get("song"));
 					songinfo.put("artist", (String) jsonObject.get("artist"));
-					songinfo.put("elapsed_time",
-							jsonObject.get("elapsed_time").toString());
+					songinfo.put("elapsed_time", jsonObject.get("elapsed_time")
+							.toString());
 					songinfo.put("is_playing", (jsonObject.get("is_playing")
 							.equals("false")) ? "0" : "1");
 				}
 			}
 			// songinfo.put(key, value);
 		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG, "SongInfo:Something Failed",e);
+			Log.e(Consts.LOG_TAG, "SongInfo:Something Failed", e);
 			return false;
 		}
 		return true;

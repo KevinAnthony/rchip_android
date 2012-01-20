@@ -57,7 +57,7 @@ public class RemoteMain extends Activity {
 		}
 		/*
 		 * We pull the settings from the prefmanager, then we pull the telephone
-		 * number to use as a HOST_ID the reason i used the telephone number was
+		 * number to use as a HOST_trying ID the reason i used the telephone number was
 		 * so that if we ever use registration it doesn't change if you get a
 		 * new phone
 		 */
@@ -88,12 +88,12 @@ public class RemoteMain extends Activity {
 				activity_torrent();
 			}
 		});
-		/*Button button_shows = (Button) findViewById(R.id.shows);
+		Button button_shows = (Button) findViewById(R.id.shows);
 		button_shows.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				activity_show_list();
 			}
-		});*/
+		});
 
 		SharedPreferences.Editor editor = settings.edit();
 
@@ -193,10 +193,10 @@ public class RemoteMain extends Activity {
 		startActivityForResult(i, Consts.RC_SHOW);
 	}
 
-	/*private void activity_show_list() {
+	private void activity_show_list() {
 		Intent i = new Intent(this, UpcomingShowList.class);
 		startActivityForResult(i, Consts.RC_SHOW_LIST);
-	}*/
+	}
 
 	private void bad_password() {
 		AlertDialog alert;

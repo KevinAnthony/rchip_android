@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class CheckMessages extends BroadcastReceiver {
@@ -26,7 +27,10 @@ public class CheckMessages extends BroadcastReceiver {
 		List<String[]> shows = new ArrayList<String[]>();
 		try {
 			jSon.authenticate();
-			JSONArray jsonArray = jSon.getCommands("7327943473");
+			TelephonyManager tManager = (TelephonyManager) f_context
+					.getSystemService(Context.TELEPHONY_SERVICE);
+			Log.v(Consts.LOG_TAG,"Devices phonenumber:"+tManager.getLine1Number());
+			JSONArray jsonArray = jSon.getCommands(tManager.getLine1Number());
 			for (int i = 0; i < jsonArray.length(); i++) {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String cmd = (String) jsonObject.get("command");
