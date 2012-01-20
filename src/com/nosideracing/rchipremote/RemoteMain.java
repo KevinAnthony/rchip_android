@@ -22,18 +22,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-/*
- * NOTE: Starts MSREMOTE when icon clicked, exit doesn't close
- * duplicate-> start rchip, Music home, rchip,Music(two instances of window now)
- *
- */
 public class RemoteMain extends Activity {
 	PendingIntent CheckMessagesPendingIntent;
 	AlarmManager alarm;
-	/* This is the Pref window from MENU->Settings */
 	SharedPreferences settings;
 	private static Context f_context;
-	/* For the services the service then the actual connection */
 	public static String msb_desthost;
 	public static String phoneNumber;
 	public static JSON json;
@@ -47,20 +40,10 @@ public class RemoteMain extends Activity {
 		}
 		setContentView(R.layout.main);
 		f_context = getApplicationContext();
-
-		/*
-		 * we have to authenticate json early
-		 */
 		json = new JSON(f_context);
 		if (!json.authenticate()) {
 			bad_password();
 		}
-		/*
-		 * We pull the settings from the prefmanager, then we pull the telephone
-		 * number to use as a HOST_trying ID the reason i used the telephone number was
-		 * so that if we ever use registration it doesn't change if you get a
-		 * new phone
-		 */
 		settings = PreferenceManager.getDefaultSharedPreferences(f_context);
 		settings.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
 			public void onSharedPreferenceChanged(SharedPreferences prefs,
@@ -71,7 +54,6 @@ public class RemoteMain extends Activity {
 		TelephonyManager tManager = (TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		phoneNumber = tManager.getLine1Number();
-		/* If there is no phone number, we use (111) 111-1111 */
 		if (phoneNumber == null) {
 			phoneNumber = "1111111111";
 		}
@@ -96,20 +78,14 @@ public class RemoteMain extends Activity {
 		});
 
 		SharedPreferences.Editor editor = settings.edit();
-
-		/* Pulls the URL, and Destination Host Name from the settings */
 		if (settings.getBoolean("firstRun", true)) {
 			startActivity(new Intent(this, Preferences.class));
 			editor.putBoolean("firstRun", false);
 			editor.commit();
 		}
 		Intent intent = new Intent(f_context, CheckMessages.class);
-		// In reality, you would want to have a static variable for the request
-		// code instead of 192837
 		CheckMessagesPendingIntent = PendingIntent.getBroadcast(this, 192837,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		// Get the AlarmManager service
 		alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 		int delay = Integer.parseInt(settings.getString("networkdelay",
 				"300000"));
@@ -129,10 +105,6 @@ public class RemoteMain extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		/*
-		 * if we get to this spot, we clear the notifications, we should also be
-		 * doing this in any other activity that potentialy could be called.
-		 */
 		Notifications.clearAllNotifications(getApplicationContext());
 	}
 
@@ -153,7 +125,6 @@ public class RemoteMain extends Activity {
 		json.deauthenticate();
 	}
 
-	/* Creates the menu items */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -161,7 +132,6 @@ public class RemoteMain extends Activity {
 		return true;
 	}
 
-	/* Handles item selections */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int calledMenuItem = item.getItemId();
@@ -177,7 +147,6 @@ public class RemoteMain extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// See which child activity is calling us back.
 		if (resultCode == Consts.QUITREMOTE) {
 			quit();
 		}
@@ -216,9 +185,7 @@ public class RemoteMain extends Activity {
 							}
 						});
 		alert = alt_bld.create();
-		// Title for AlertDialog
 		alert.setTitle("ERROR");
-		// Icon for AlertDialog
 		alert.setIcon(R.drawable.icon);
 		alert.show();
 		startActivity(new Intent(this, Preferences.class));

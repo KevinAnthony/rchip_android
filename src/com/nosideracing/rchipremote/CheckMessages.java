@@ -17,8 +17,6 @@ public class CheckMessages extends BroadcastReceiver {
 
 	Context f_context = null;
 
-	/* We use this to set the ID number of the current notification */
-
 	@Override
 	@SuppressWarnings("unchecked")
 	public void onReceive(Context context, Intent intent) {
@@ -35,11 +33,6 @@ public class CheckMessages extends BroadcastReceiver {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String cmd = (String) jsonObject.get("command");
 				String cmdTxt = (String) jsonObject.get("command_text");
-				/*
-				 * TMSG is Torrent Message(the only kind of message right now
-				 * Since the cmdTxt acually equals all three Status Notification
-				 * Fields
-				 */
 				String[] curShow = new String[4];
 				if (cmd.equals("TMSG")) {
 					String[] cmdTemp = cmdTxt.split("\\|");

@@ -16,18 +16,11 @@ public class Notifications {
 	static List<Integer> currentNotifcationIDs = new ArrayList<Integer>();
 
 	protected static void clearAllNotifications(Context context) {
-		/* If currentNotificationIDs is has data */
-
 		if (currentNotifcationIDs != null) {
-			/**/
 			Iterator<Integer> stepValue = currentNotifcationIDs.iterator();
 			NotificationManager mNotificationManager = (NotificationManager) context
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 			while (stepValue.hasNext()) {
-				/*
-				 * Here we clear all Notifications that are posted, and then
-				 * remove them from currentNotifcation
-				 */
 				int id = stepValue.next();
 				mNotificationManager.cancel(id);
 			}
@@ -38,18 +31,14 @@ public class Notifications {
 
 	protected static String[] setStatusNotification(String tickerString,
 			String notificationTitle, String noticicationText, Context context) {
-		/*
-		 * We get three String Varables representing the three Strings we need
-		 * to set to use Notification Manager
-		 */
 		try {
 			String Name = "";
 			String epsName = "";
 			String epsNumber = "";
 			try {
-				Log.v(Consts.LOG_TAG,"Ticker String:"+tickerString);
-				Log.v(Consts.LOG_TAG,"Not Title:"+notificationTitle);
-				Log.v(Consts.LOG_TAG,"Not Text:"+noticicationText);
+				Log.v(Consts.LOG_TAG, "Ticker String:" + tickerString);
+				Log.v(Consts.LOG_TAG, "Not Title:" + notificationTitle);
+				Log.v(Consts.LOG_TAG, "Not Text:" + noticicationText);
 				String[] filename = notificationTitle.split("\\/")[notificationTitle
 						.split("\\/").length - 1].split("\\.");
 				Name = filename[0].replace("_", " ");
@@ -79,15 +68,12 @@ public class Notifications {
 				String[] temp = { Name, epsNumber, epsName, loc };
 				return temp;
 			}
-			/* Here we set the notification icon equal to the program icon */
 			int icon = R.drawable.nicon;
-			/* Notification Manager uses CharSequence instead of Strings */
 			String[] tickerTextTemp = tickerString.split("\\/");
 			CharSequence tickerText = tickerTextTemp[tickerTextTemp.length - 1];
 			CharSequence contentTitle = notificationTitle.split("\\/")[notificationTitle
 					.split("\\/").length - 1];
 			CharSequence contentText = noticicationText;
-			/* we need to know the current time to set the notification time */
 			long when = System.currentTimeMillis();
 			if (currentNotifcationIDs.isEmpty()) {
 				numberOfNotifications = 0;
@@ -96,18 +82,12 @@ public class Notifications {
 				contentTitle = "Torrents Done";
 				contentText = numberOfNotifications + " torrents done";
 			}
-			/*
-			 * We declare notifications then the current application Context
-			 */
 			Notification notification = new Notification(icon, tickerText, when);
-
-			/**/
 			PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
 					new Intent(context, VideoList.class), 0);
 			notification.setLatestEventInfo(context, contentTitle, contentText,
 					contentIntent);
 			notification.defaults |= Notification.DEFAULT_ALL;
-
 			mNotificationManager.cancel(Consts.NOTIFICATION_ID);
 			try {
 				Thread.sleep(100);
@@ -116,7 +96,6 @@ public class Notifications {
 			}
 			mNotificationManager.notify(Consts.NOTIFICATION_ID, notification);
 			currentNotifcationIDs.add(Consts.NOTIFICATION_ID);
-			// NOTIFICATION_ID++;
 			numberOfNotifications++;
 			String[] temp = { Name, epsNumber, epsName, loc };
 			return temp;

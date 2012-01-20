@@ -57,7 +57,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 		TelephonyManager tManager = (TelephonyManager) getApplicationContext()
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		phoneNumber = tManager.getLine1Number();
-		/* If there is no phone number, we use (111) 111-1111 */
 		if (phoneNumber == null) {
 			phoneNumber = "1111111111";
 		}
@@ -66,8 +65,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 		topText.setSelected(true);
 		firstPlay = true;
 		createButtons();
-		// bind to the service
-
 	}
 
 	@Override
@@ -118,7 +115,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// See which child activity is calling us back.
 		if (resultCode == Consts.QUITREMOTE) {
 			quit(true);
 		}
@@ -172,23 +168,19 @@ public class VideoRemote extends Activity implements OnClickListener {
 		button_rewind = (Button) findViewById(R.id.MSWMrewind);
 		button_rewind.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				/* Perform action on clicks */
 				new runCmd().execute("SKIPBSM", "");
 			}
 		});
 		button_foward = (Button) findViewById(R.id.MSWMfoward);
 		button_foward.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				/* Perform action on clicks */
 				new runCmd().execute("SKIPFSM", "");
 			}
 		});
 		button_pause = (Button) findViewById(R.id.MSWMstop);
 		button_pause.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				/* Perform action on clicks */
 				new runCmd().execute("STOPSM", "");
-				// TODO: click play and fullscreen button off
 				CompoundButton btn = (ToggleButton) findViewById(R.id.MSWMfullscreen);
 				if (btn.isChecked()) {
 					btn.setChecked(false);
@@ -202,14 +194,12 @@ public class VideoRemote extends Activity implements OnClickListener {
 		button_mute = (Button) findViewById(R.id.MSWMmute);
 		button_mute.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				/* Perform action on clicks */
 				new runCmd().execute("MUTESM", "");
 			}
 		});
 		button_quit = (Button) findViewById(R.id.MSWMquit);
 		button_quit.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				/* Perform action on clicks */
 				new runCmd().execute("QUITSM", "");
 				quit(false);
 			}
@@ -261,9 +251,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 								}
 							});
 			alert = alt_bld.create();
-			// Title for AlertDialog
 			alert.setTitle(showString);
-			// Icon for AlertDialog
 			alert.setIcon(R.drawable.icon);
 			alert.show();
 		}

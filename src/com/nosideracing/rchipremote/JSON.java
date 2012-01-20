@@ -53,9 +53,6 @@ public class JSON {
 	HttpPost httpPost = null;
 	HttpGet httpGet = null;
 
-	/*
-	 * protected String getHostNames() { return getHostNamesJSON(); }
-	 */
 	public JSON(Context context) {
 		f_context = context;
 		updateSettings();
@@ -68,7 +65,6 @@ public class JSON {
 		httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 	}
 
-	/* We set a notificaion, */
 	public boolean setNotification(String tickerString,
 			String notificationTitle, String noticicationText, Context context) {
 		if (Notifications.setStatusNotification(tickerString,
@@ -82,7 +78,6 @@ public class JSON {
 		Notifications.clearAllNotifications(context);
 	}
 
-	/* The following only return a value from SongInfo */
 	public String getArtest() {
 		try {
 			return songinfo.get("artist").toString();
@@ -241,7 +236,6 @@ public class JSON {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
 		process_cookies();
-		// we assume that the response body contains the error message
 		try {
 			ret = EntityUtils.toString(response.getEntity());
 		} catch (Exception e) {
@@ -252,18 +246,14 @@ public class JSON {
 	}
 
 	public String JSONSendCmd(String methodName) {
-
 		String getUrl = URL + "json/" + methodName + '/';
-
 		httpGet = new HttpGet(getUrl);
-
 		try {
 			response = httpClient.execute(httpGet, httpContext);
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
 		process_cookies();
-		// we assume that the response body contains the error message
 		try {
 			ret = EntityUtils.toString(response.getEntity());
 		} catch (Exception e) {
@@ -302,9 +292,6 @@ public class JSON {
 		if (!cookies.isEmpty()) {
 			CookieSyncManager.createInstance(f_context);
 			CookieManager cookieManager = CookieManager.getInstance();
-
-			// sync all the cookies in the httpclient with the webview
-			// by generating cookie string
 			for (Cookie cookie : cookies) {
 				Cookie sessionInfo = cookie;
 				String cookieString = sessionInfo.getName() + "="
@@ -326,8 +313,6 @@ public class JSON {
 		}
 		HOSTNAME = ((TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-		// DESTHOSTNAME = settings.getString("serverhostname", "Tomoya");
-
 	}
 
 	private Boolean getSongInfo() {
@@ -351,7 +336,6 @@ public class JSON {
 							.equals("false")) ? "0" : "1");
 				}
 			}
-			// songinfo.put(key, value);
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "SongInfo:Something Failed", e);
 			return false;

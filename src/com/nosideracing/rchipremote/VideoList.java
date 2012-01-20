@@ -40,7 +40,6 @@ public class VideoList extends ExpandableListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// Set up our adapter
 		rchipDB = new Database(getBaseContext());
 		mAdapter = new MyExpandableListAdapter(this);
 		setListAdapter(mAdapter);
@@ -128,7 +127,6 @@ public class VideoList extends ExpandableListActivity {
 		return true;
 	}
 
-	/* Handles item selections */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int calledMenuItem = item.getItemId();
@@ -144,7 +142,6 @@ public class VideoList extends ExpandableListActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// See which child activity is calling us back.
 		if (resultCode == Consts.QUITREMOTE) {
 			quit();
 		} else if (resultCode == Consts.REMOVESHOW) {
@@ -183,7 +180,6 @@ public class VideoList extends ExpandableListActivity {
 
 	private void deleteall(long id) {
 		rchipDB.deleteAllSL();
-		// refreshList();
 	}
 
 	private void refreshList() {
@@ -268,15 +264,11 @@ public class VideoList extends ExpandableListActivity {
 		}
 
 		public TextView getGenericView() {
-			// Layout parameters for the ExpandableListView
 			AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
 					ViewGroup.LayoutParams.FILL_PARENT, 64);
-
 			TextView textView = new TextView(VideoList.this);
 			textView.setLayoutParams(lp);
-			// Center the text vertically
 			textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
-			// Set the text starting position
 			textView.setPadding(86, 0, 0, 0);
 			return textView;
 		}
