@@ -1,0 +1,20 @@
+INSTALL file for RCHIP Android Application
+==========================================
+
+From TARBALL
+============
+
+adb install rchip_android.apk
+ADB is part of the android platform tools
+get ADB from:
+http://developer.android.com/sdk/index.html 
+and follow the steps at the bottom
+
+From Source
+===========
+
+If you plan on building from scratch and hacking this application
+you need to have installed Eclipse(http://www.eclipse.org/) with ADT installed
+(http://developer.android.com/sdk/eclipse-adt.html)
+
+
