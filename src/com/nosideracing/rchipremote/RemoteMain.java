@@ -66,13 +66,13 @@ public class RemoteMain extends ListActivity {
 		}
 		setContentView(R.layout.main);
 		lists = new ArrayList<Main_List_Object>();
-		lists.add(new Main_List_Object("Music Remote",
-				"Remote Cobntrol for Music Player", R.drawable.music_remote,
-				0x0051));
-		lists.add(new Main_List_Object("Show List", "A List of Shows to watch",
-				R.drawable.video_remote, 0x0052));
-		lists.add(new Main_List_Object("Upcoming Show List",
-				"All Your Upcoming Shows", R.drawable.upcoming_show, 0x0053));
+		lists.add(new Main_List_Object(getString(R.string.music_title),
+				getString(R.string.music_subtitle), R.drawable.music_remote,
+				Consts.START_MUSIC));
+		lists.add(new Main_List_Object(getString(R.string.show_list_title), getString(R.string.show_list_subtitle),
+				R.drawable.video_remote, Consts.START_SHOW_LIST));
+		lists.add(new Main_List_Object(getString(R.string.upcoming_title),
+				getString(R.string.upcoming_subtitle), R.drawable.upcoming_show, Consts.START_UPCOMING_SHOW_LIST));
 
 		mAdapter = new MyListAdapter(this);
 		setListAdapter(mAdapter);

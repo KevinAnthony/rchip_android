@@ -97,7 +97,7 @@ public class Notifications {
 				numberOfNotifications = 0;
 			}
 			if (numberOfNotifications > 1) {
-				contentTitle = "Torrents Done";
+				contentTitle = context.getString(R.string.show_downloaded);
 				contentText = numberOfNotifications + " torrents done";
 			}
 			Notification notification = new Notification(icon, tickerText, when);

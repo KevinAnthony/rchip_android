@@ -4,21 +4,21 @@
     android:layout_height="wrap_content"
     android:gravity="left|center"
     android:orientation="vertical"
-    android:paddingBottom="25px"
-    android:paddingLeft="25px"
-    android:paddingTop="25px" >
+    android:paddingBottom="25dp"
+    android:paddingLeft="25dp"
+    android:paddingTop="25dp" >
 
     <TextView
         android:id="@+id/show_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Name" />
+        android:text="@+string/blank" />
 
     <TextView
         android:id="@+id/episode_name"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:text="Episode Name"
+        android:text="@+string/blank"
         android:textStyle="bold" >
     </TextView>
 
@@ -26,7 +26,7 @@
         android:id="@+id/episode_number"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:text="Episode Number"
+        android:text="@+string/blank"
         android:textStyle="bold" >
     </TextView>
 
@@ -34,8 +34,7 @@
         android:id="@+id/show_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="5px"
-        android:text="show_date" >
+        android:text="@+string/blank" >
     </TextView>
 
 </LinearLayout>

@@ -1,7 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Home Remote Control</string>
     <string name="blank"></string>
-    <string name="showstowatch">Shows To Watch</string>
-    <string name="upcomingshows">Upcoming Shows</string>
+    <string name="shows_to_watch">Shows To Watch</string>
+    <string name="upcoming_shows">Upcoming Shows</string>
+    <string name="music_title">Music Remote</string>
+    <string name="music_subtitle">Remote Control for Music Player</string>
+    <string name="show_list_title">Show List</string>
+    <string name="show_list_subtitle">Shows to Watch</string>
+    <string name="upcoming_title">Upcoming Show Lists</string>
+    <string name="upcoming_subtitle">All Your Upcoming Shows</string>
+    <string name="show_downloaded">Show Downloaded</string>
+    <string name="watch">Watch</string>
+    <string name="delete">Delete</string>
+    <string name="remove_show">Remove Show</string>
+    <string name="delete_all">Delete Everything</string>
+    <string name="select_valid_show">Please Select a Valid Show</string>
+    <string name="episode_info">Episode Info</string>
+    <string name="rewind">Rewind</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="fastf">Fast Forward</string>
+    <string name="stop">Stop</string>
+    <string name="fullscreen">Fullscreen</string>
+    <string name="normalscreen">Normal Screen</string>
+    <string name="mute">Mute</string>
+    <string name="quit">Quit</string>
+    <string name="by">by</string>
+    <string name="from">from</string>
+    <string name="of">of</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="server_host_name_title">Server Host Name</string>
+    <string name="server_host_name_summary">The host name of the Server which the rchip daemon runs</string>
+    <string name="server_url_title">Server URL</string>
+    <string name="server_url_summary">The URL of the Server which the rchip webservice is running</string>
+    <string name="username">Username</string>
+    <string name="username_summary">Username for JSON</string>
+    <string name="password">Password</string>
+    <string name="password_summary">Password for JSON</string>
+    <string name="network_delay">Network Delay</string>
+    <string name="network_delay_summary">The delay between updates</string>
+    <string name="video_path_title">Video Path</string>
+    <string name="video_path_summary">The Path the the root of the NFS server</string>
+    
 </resources>

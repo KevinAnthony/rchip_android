@@ -9,7 +9,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
-        android:text="@+string/showstowatch"
+        android:text="@+string/shows_to_watch"
         android:textStyle="normal|bold" >
     </TextView>
 

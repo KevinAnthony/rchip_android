@@ -96,10 +96,10 @@ public class VideoList extends ExpandableListActivity {
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle("Show");
-		menu.add(0, v.getId(), 0, "Watch");
-		menu.add(0, v.getId(), 1, "Delete");
-		menu.add(0, v.getId(), 3, "Remove Show");
-		menu.add(0, v.getId(), 2, "Delete All");
+		menu.add(0, v.getId(), 0, getString(R.string.watch));
+		menu.add(0, v.getId(), 1, getString(R.string.delete));
+		menu.add(0, v.getId(), 3, getString(R.string.remove_show));
+		menu.add(0, v.getId(), 2, getString(R.string.delete_all));
 
 	}
 
@@ -118,18 +118,18 @@ public class VideoList extends ExpandableListActivity {
 			id = ((MyExpandableListAdapter) mAdapter).getlongID(groupPos,
 					childPos);
 		} else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-			Toast.makeText(this, "Please Select a Valid Show",
+			Toast.makeText(this, getString(R.string.select_valid_show),
 					Toast.LENGTH_SHORT).show();
 			return true;
 		}
 
-		if (item.getTitle() == "Watch") {
+		if (item.getOrder() == 0) {
 			watch(id);
-		} else if (item.getTitle() == "Delete") {
+		} else if (item.getOrder() == 1) {
 			delete(id);
-		} else if (item.getTitle() == "Delete All") {
+		} else if (item.getOrder() == 2) {
 			deleteall(id);
-		} else if (item.getTitle() == "Remove Show") {
+		} else if (item.getOrder() == 3) {
 			deleteShow(id);
 		} else
 			return false;
