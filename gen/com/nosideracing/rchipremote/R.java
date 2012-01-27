@@ -15,8 +15,11 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int icon=0x7f020000;
-        public static final int nicon=0x7f020001;
+        public static final int application_icon=0x7f020000;
+        public static final int music_remote=0x7f020001;
+        public static final int notification_icon=0x7f020002;
+        public static final int upcoming_show=0x7f020003;
+        public static final int video_remote=0x7f020004;
     }
     public static final class id {
         public static final int Control=0x7f080000;

@@ -203,7 +203,7 @@ public class RemoteMain extends Activity {
 						});
 		alert = alt_bld.create();
 		alert.setTitle("ERROR");
-		alert.setIcon(R.drawable.icon);
+		alert.setIcon(R.drawable.application_icon);
 		alert.show();
 		startActivity(new Intent(this, Preferences.class));
 	}

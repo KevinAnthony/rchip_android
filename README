@@ -1,4 +1,10 @@
 General Information
 ===================
 
-rchip stands for Remote Controlled Home automation Integration Program.  Using a list of JSON commands, it allows for a media options to be remotly controlled over from any device that can access the internet.  This program is made for an android phone, allowing for control of a music and movie player, and for aquiring a list of upcoming tvshows.
+rchip stands for Remote
+Controlled Home automation Integration Program.  Using a list of JSON
+commands, it allows for a media options to be remotly controlled over
+from any device that can access the internet.  This program is made
+for an android phone, allowing for control of a music and movie player,
+and for aquiring a list of upcoming tvshows.
+

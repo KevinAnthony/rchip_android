@@ -269,7 +269,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 							});
 			alert = alt_bld.create();
 			alert.setTitle(showString);
-			alert.setIcon(R.drawable.icon);
+			alert.setIcon(R.drawable.application_icon);
 			alert.show();
 		}
 
