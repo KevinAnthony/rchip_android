@@ -17,12 +17,13 @@
  */
 package com.nosideracing.rchipremote;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,14 +33,20 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
-public class RemoteMain extends Activity {
+public class RemoteMain extends ListActivity {
+
 	PendingIntent CheckMessagesPendingIntent;
 	AlarmManager alarm;
 	SharedPreferences settings;
@@ -47,6 +54,8 @@ public class RemoteMain extends Activity {
 	public static String msb_desthost;
 	public static String phoneNumber;
 	public static JSON json;
+	private ListAdapter mAdapter;
+	private ArrayList<Main_List_Object> lists;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -56,6 +65,17 @@ public class RemoteMain extends Activity {
 					"SaveInstantsState is NULL if the program isn't starting for the first time, this is a problem");
 		}
 		setContentView(R.layout.main);
+		lists = new ArrayList<Main_List_Object>();
+		lists.add(new Main_List_Object("Music Remote",
+				"Remote Cobntrol for Music Player", R.drawable.music_remote,
+				0x0051));
+		lists.add(new Main_List_Object("Show List", "A List of Shows to watch",
+				R.drawable.video_remote, 0x0052));
+		lists.add(new Main_List_Object("Upcoming Show List",
+				"All Your Upcoming Shows", R.drawable.upcoming_show, 0x0053));
+
+		mAdapter = new MyListAdapter(this);
+		setListAdapter(mAdapter);
 		f_context = getApplicationContext();
 		json = new JSON(f_context);
 		if (!json.authenticate()) {
@@ -75,24 +95,6 @@ public class RemoteMain extends Activity {
 			phoneNumber = "1111111111";
 		}
 		msb_desthost = settings.getString("serverhostname", "Tomoya");
-		final Button button_music = (Button) findViewById(R.id.music);
-		button_music.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				activity_music();
-			}
-		});
-		Button button_tor = (Button) findViewById(R.id.torrent);
-		button_tor.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				activity_torrent();
-			}
-		});
-		Button button_shows = (Button) findViewById(R.id.shows);
-		button_shows.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				activity_show_list();
-			}
-		});
 
 		SharedPreferences.Editor editor = settings.edit();
 		if (settings.getBoolean("firstRun", true)) {
@@ -161,7 +163,10 @@ public class RemoteMain extends Activity {
 		}
 		return false;
 	}
-
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		start_activty(lists.get(position).CallbackName);
+	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Consts.QUITREMOTE) {
@@ -169,19 +174,21 @@ public class RemoteMain extends Activity {
 		}
 	}
 
-	private void activity_music() {
-		Intent i = new Intent(this, MusicRemote.class);
-		startActivityForResult(i, Consts.RC_MUSIC);
-	}
-
-	private void activity_torrent() {
-		Intent i = new Intent(this, VideoList.class);
-		startActivityForResult(i, Consts.RC_SHOW);
-	}
-
-	private void activity_show_list() {
-		Intent i = new Intent(this, UpcomingShowList.class);
-		startActivityForResult(i, Consts.RC_SHOW_LIST);
+	private void start_activty(int FLAG) {
+		switch (FLAG) {
+		case Consts.START_MUSIC:
+			Intent ism = new Intent(this, MusicRemote.class);
+			startActivityForResult(ism, Consts.RC_MUSIC);
+			break;
+		case Consts.START_SHOW_LIST:
+			Intent isl = new Intent(this, VideoList.class);
+			startActivityForResult(isl, Consts.RC_SHOW);
+			break;
+		case Consts.START_UPCOMING_SHOW_LIST:
+			Intent iusl = new Intent(this, UpcomingShowList.class);
+			startActivityForResult(iusl, Consts.RC_SHOW_LIST);
+			break;
+		}
 	}
 
 	private void bad_password() {
@@ -214,4 +221,68 @@ public class RemoteMain extends Activity {
 		this.finish();
 	}
 
+	public class MyListAdapter extends BaseAdapter {
+
+		private Context fContext;
+		private LayoutInflater mInflater;
+
+		public MyListAdapter(Context context) {
+			fContext = context;
+			mInflater = LayoutInflater.from(fContext);
+		}
+
+		public int getCount() {
+			return lists.size();
+		}
+
+		public Object getItem(int position) {
+			return lists.get(position);
+		}
+
+		public long getItemId(int position) {
+			return position;
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder info;
+			convertView = mInflater.inflate(R.layout.main_listview, null);
+			info = new ViewHolder();
+			info.Title = (TextView) convertView
+					.findViewById(R.id.main_list_title);
+			info.SubTitle = (TextView) convertView
+					.findViewById(R.id.main_list_subtitle);
+			info.Icon = (ImageView) convertView
+					.findViewById(R.id.main_list_icon);
+
+			convertView.setTag(info);
+
+			info.Title.setText(lists.get(position).Title);
+			info.SubTitle.setText(lists.get(position).SubTitle);
+			info.Icon.setImageResource(lists.get(position).Icon);
+			return convertView;
+
+		}
+
+		class ViewHolder {
+			TextView Title;
+			TextView SubTitle;
+			ImageView Icon;
+		}
+
+	}
+
+	private class Main_List_Object {
+		public Main_List_Object(String title, String subtitle, int icon,
+				int callback) {
+			Title = title;
+			SubTitle = subtitle;
+			Icon = icon;
+			CallbackName = callback;
+		}
+
+		public int Icon;
+		public String Title;
+		public String SubTitle;
+		public int CallbackName;
+	}
 }

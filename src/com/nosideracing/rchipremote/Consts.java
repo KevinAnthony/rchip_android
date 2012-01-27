@@ -23,13 +23,17 @@ public class Consts {
 	protected static final int RC_MUSIC = 0x0031;
 	protected static final int RC_SHOW = 0x0032;
 	protected static final int RC_WATCHMOVE = 0x0033;
-	protected static final int RC_SHOW_LIST = 0x0034; 
+	protected static final int RC_SHOW_LIST = 0x0034;
 
 	protected static final int PREFS_UPDATED = 0x0041;
 	protected static final int UPDATEGUI = 0x0042;
 	protected static final int QUITREMOTE = 0x0043;
 	protected static final int REMOVESHOW = 0x0044;
 	protected static final int NOTIFICATION_ID = 0x0081;
+
+	protected static final int START_MUSIC = 0x0051;
+	protected static final int START_SHOW_LIST = 0x0052;
+	protected static final int START_UPCOMING_SHOW_LIST = 0x0053;
 
 	protected static final String SOAP_ACTION = "getSongInfo";
 	protected static final String METHOD_NAME_GETINFO = "getSongInfo";
