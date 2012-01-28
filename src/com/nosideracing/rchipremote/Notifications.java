@@ -85,7 +85,7 @@ public class Notifications {
 				String[] temp = { Name, epsNumber, epsName, loc };
 				return temp;
 			}
-			
+
 			int icon = R.drawable.notification_icon;
 			String[] tickerTextTemp = tickerString.split("\\/");
 			CharSequence tickerText = tickerTextTemp[tickerTextTemp.length - 1];

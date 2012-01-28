@@ -110,10 +110,13 @@ public class Database extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		Log.d(Consts.LOG_TAG,"Upgrading Databased oldVersion:"+oldVersion+"-> newVersion:"+newVersion);
-		if (newVersion > 1){
-			Log.v(Consts.LOG_TAG,"Renaming Table ms_show_list -> " + TABLE_NAME_SL);
-			db.execSQL("ALTER TABLE ms_show_list RENAME TO "+ TABLE_NAME_SL +";");
+		Log.d(Consts.LOG_TAG, "Upgrading Databased oldVersion:" + oldVersion
+				+ "-> newVersion:" + newVersion);
+		if (newVersion > 1) {
+			Log.v(Consts.LOG_TAG, "Renaming Table ms_show_list -> "
+					+ TABLE_NAME_SL);
+			db.execSQL("ALTER TABLE ms_show_list RENAME TO " + TABLE_NAME_SL
+					+ ";");
 		}
 	}
 }

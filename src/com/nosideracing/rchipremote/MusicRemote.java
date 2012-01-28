@@ -196,7 +196,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 				.getActiveNetworkInfo();
 		while ((Thread.currentThread() == updater) && (update)) {
 			if (info.isConnected()) {
-				//TODO: Replace this with preferences 
+				// TODO: Replace this with preferences
 				int itype = info.getType();
 				int sleep = 5000;
 				if (itype == 1) {
@@ -208,7 +208,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 					musicHandler.sendMessage(m);
 					Thread.sleep(sleep);
 				} catch (Exception e) {
-					Log.e(Consts.LOG_TAG, "ERROR in message sender, sleep",e);
+					Log.e(Consts.LOG_TAG, "ERROR in message sender, sleep", e);
 				}
 			}
 		}
@@ -228,8 +228,8 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 						.getTimeElapised())));
 			}
 			if (RemoteMain.json.getSongLength() != null) {
-				TOTTIME.setText(formatIntoHHMMSS(Integer.parseInt(RemoteMain.json
-						.getSongLength())));
+				TOTTIME.setText(formatIntoHHMMSS(Integer
+						.parseInt(RemoteMain.json.getSongLength())));
 			}
 
 			if (System.currentTimeMillis() > dontSwitch + 7000L) {
@@ -240,7 +240,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 				}
 			}
 		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG, "Error Update Tags:",e);
+			Log.e(Consts.LOG_TAG, "Error Update Tags:", e);
 		}
 
 	}

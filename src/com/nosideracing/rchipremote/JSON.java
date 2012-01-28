@@ -218,7 +218,6 @@ public class JSON {
 		if ((uname.equals("")) || (pword.equals(""))) {
 			return false;
 		}
-		Log.v(Consts.LOG_TAG, "username & password both set");
 		params.put("username", uname);
 		params.put("password", pword);
 		JSONSendCmd("authenticate", params);
@@ -292,13 +291,15 @@ public class JSON {
 					show.EpisodeName = jsonObject.getString("eps_name");
 					show.EpisodeNumber = jsonObject.getString("eps_number");
 					show.ShowName = jsonObject.getString("show__name");
-					show.AirDate = (Date)new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse((jsonObject.getString("air_date")));
+					show.AirDate = (Date) new SimpleDateFormat(
+							"yyyy-MM-dd HH:mm:ss").parse((jsonObject
+							.getString("air_date")));
 					upcoming.add(show);
 				}
 			}
 			return upcoming;
 		} catch (Exception e) {
-			Log.e(Consts.LOG_TAG,"Error in getUpcommingShows",e);
+			Log.e(Consts.LOG_TAG, "Error in getUpcommingShows", e);
 		}
 		return null;
 	}

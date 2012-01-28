@@ -66,7 +66,7 @@ public class VideoList extends ExpandableListActivity {
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG,
 					"Error Clearing Notifications(We get this on startup sometimes, because the service hasn't get been started):",
-							e);
+					e);
 		}
 		Notifications.clearAllNotifications(getApplicationContext());
 	}
@@ -295,7 +295,8 @@ public class VideoList extends ExpandableListActivity {
 
 			ViewHolder holder;
 			if (convertView == null) {
-				convertView = mInflater.inflate(R.layout.playlist_listview, null);
+				convertView = mInflater.inflate(R.layout.playlist_listview,
+						null);
 				holder = new ViewHolder();
 				holder.text = (TextView) convertView
 						.findViewById(R.id.TextView01);

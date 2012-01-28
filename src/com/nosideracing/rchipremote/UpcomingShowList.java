@@ -141,7 +141,8 @@ public class UpcomingShowList extends ListActivity {
 			info.EpisodeNumberView
 					.setText(upcoming.get(position).EpisodeNumber);
 			Date date = upcoming.get(position).AirDate;
-			String date_str = new SimpleDateFormat("hh:mm aa  LLL dd yyyy", Locale.US).format(date);
+			String date_str = new SimpleDateFormat("hh:mm aa  LLL dd yyyy",
+					Locale.US).format(date);
 			info.AirDateView.setText(date_str);
 			return convertView;
 

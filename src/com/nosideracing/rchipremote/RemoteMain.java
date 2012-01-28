@@ -69,10 +69,12 @@ public class RemoteMain extends ListActivity {
 		lists.add(new Main_List_Object(getString(R.string.music_title),
 				getString(R.string.music_subtitle), R.drawable.music_remote,
 				Consts.START_MUSIC));
-		lists.add(new Main_List_Object(getString(R.string.show_list_title), getString(R.string.show_list_subtitle),
+		lists.add(new Main_List_Object(getString(R.string.show_list_title),
+				getString(R.string.show_list_subtitle),
 				R.drawable.video_remote, Consts.START_SHOW_LIST));
 		lists.add(new Main_List_Object(getString(R.string.upcoming_title),
-				getString(R.string.upcoming_subtitle), R.drawable.upcoming_show, Consts.START_UPCOMING_SHOW_LIST));
+				getString(R.string.upcoming_subtitle),
+				R.drawable.upcoming_show, Consts.START_UPCOMING_SHOW_LIST));
 
 		mAdapter = new MyListAdapter(this);
 		setListAdapter(mAdapter);
@@ -163,10 +165,12 @@ public class RemoteMain extends ListActivity {
 		}
 		return false;
 	}
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		start_activty(lists.get(position).CallbackName);
 	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Consts.QUITREMOTE) {

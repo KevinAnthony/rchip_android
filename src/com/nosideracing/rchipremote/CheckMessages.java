@@ -44,7 +44,8 @@ public class CheckMessages extends BroadcastReceiver {
 			jSon.authenticate();
 			TelephonyManager tManager = (TelephonyManager) f_context
 					.getSystemService(Context.TELEPHONY_SERVICE);
-			Log.v(Consts.LOG_TAG,"Devices phonenumber:"+tManager.getLine1Number());
+			Log.v(Consts.LOG_TAG,
+					"Devices phonenumber:" + tManager.getLine1Number());
 			JSONArray jsonArray = jSon.getCommands(tManager.getLine1Number());
 			for (int i = 0; i < jsonArray.length(); i++) {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
