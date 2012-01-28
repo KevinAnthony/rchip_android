@@ -194,22 +194,22 @@ public class RemoteMain extends ListActivity {
 	private void bad_password() {
 		AlertDialog alert;
 		AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
-		alt_bld.setMessage("Bad Password")
+		alt_bld.setMessage(getString(R.string.bad_password))
 				.setCancelable(false)
-				.setPositiveButton("Fix",
+				.setPositiveButton(getString(R.string.fix),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 
 							}
 						})
-				.setNegativeButton("Exit",
+				.setNegativeButton(getString(R.string.exit),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								quit();
 							}
 						});
 		alert = alt_bld.create();
-		alert.setTitle("ERROR");
+		alert.setTitle(getString(R.string.error));
 		alert.setIcon(R.drawable.application_icon);
 		alert.show();
 		startActivity(new Intent(this, Preferences.class));

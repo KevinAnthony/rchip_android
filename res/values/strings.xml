@@ -2,6 +2,11 @@
 <resources>
 
     <string name="app_name">Home Remote Control</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="fix">Fix</string>
+    <string name="exit">Exit</string>
+    <string name="error">ERROR</string>
     <string name="blank"></string>
     <string name="shows_to_watch">Shows To Watch</string>
     <string name="upcoming_shows">Upcoming Shows</string>
@@ -44,5 +49,7 @@
     <string name="network_delay_summary">The delay between updates</string>
     <string name="video_path_title">Video Path</string>
     <string name="video_path_summary">The Path the the root of the NFS server</string>
+    <string name="done_watching_show">Have you finished Watching this Show?</string>
+    <string name="bad_password">Bad Password</string>
     
 </resources>

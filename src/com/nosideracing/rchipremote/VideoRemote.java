@@ -249,9 +249,9 @@ public class VideoRemote extends Activity implements OnClickListener {
 		} else {
 			AlertDialog alert;
 			AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
-			alt_bld.setMessage("Have you finished Watching this Show?")
+			alt_bld.setMessage(getString(R.string.done_watching_show))
 					.setCancelable(false)
-					.setPositiveButton("Yes",
+					.setPositiveButton(getString(R.string.yes),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -259,7 +259,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 									exit(2);
 								}
 							})
-					.setNegativeButton("No",
+					.setNegativeButton(getString(R.string.no),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
