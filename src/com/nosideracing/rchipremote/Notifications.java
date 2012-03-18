@@ -29,7 +29,7 @@ import android.content.Intent;
 import android.util.Log;
 
 public class Notifications {
-	private static int numberOfNotifications = 0;
+	private static int nextNotificationID = 1;
 	static List<Integer> currentNotifcationIDs = new ArrayList<Integer>();
 
 	protected static void clearAllNotifications(Context context) {
@@ -43,7 +43,7 @@ public class Notifications {
 			}
 			currentNotifcationIDs.clear();
 		}
-		numberOfNotifications = 0;
+		nextNotificationID = 1;
 	}
 
 	protected static String[] setStatusNotification(String tickerString,
@@ -85,36 +85,25 @@ public class Notifications {
 				String[] temp = { Name, epsNumber, epsName, loc };
 				return temp;
 			}
-
-			int icon = R.drawable.notification_icon;
 			String[] tickerTextTemp = tickerString.split("\\/");
-			CharSequence tickerText = tickerTextTemp[tickerTextTemp.length - 1];
-			CharSequence contentTitle = notificationTitle.split("\\/")[notificationTitle
-					.split("\\/").length - 1];
-			CharSequence contentText = noticicationText;
-			long when = System.currentTimeMillis();
-			if (currentNotifcationIDs.isEmpty()) {
-				numberOfNotifications = 0;
-			}
-			if (numberOfNotifications > 1) {
-				contentTitle = context.getString(R.string.show_downloaded);
-				contentText = numberOfNotifications + " torrents done";
-			}
-			Notification notification = new Notification(icon, tickerText, when);
+			Notification notification = new Notification(
+					R.drawable.notification_icon,
+					tickerTextTemp[tickerTextTemp.length - 1],
+					System.currentTimeMillis());
 			PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
 					new Intent(context, VideoList.class), 0);
-			notification.setLatestEventInfo(context, contentTitle, contentText,
-					contentIntent);
+			notification.setLatestEventInfo(context, notificationTitle
+					.split("\\/")[notificationTitle.split("\\/").length - 1],
+					noticicationText, contentIntent);
 			notification.defaults |= Notification.DEFAULT_ALL;
-			mNotificationManager.cancel(Consts.NOTIFICATION_ID);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-			mNotificationManager.notify(Consts.NOTIFICATION_ID, notification);
-			currentNotifcationIDs.add(Consts.NOTIFICATION_ID);
-			numberOfNotifications++;
+			mNotificationManager.notify(nextNotificationID, notification);
+			currentNotifcationIDs.add(nextNotificationID);
+			nextNotificationID++;
 			String[] temp = { Name, epsNumber, epsName, loc };
 			return temp;
 		} catch (Exception e) {
