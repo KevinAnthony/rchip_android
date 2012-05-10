@@ -41,16 +41,27 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class VideoList extends ExpandableListActivity {
+	class ShowList {
+		public int ShowID;
+		public String ShowName;
+		public String ShowEpisodeNumber;
+		public String ShowEpisodeName;
+		public String ShowPath;
 
-	private static List<Integer> torID = new ArrayList<Integer>();
-	private static List<String> torName = new ArrayList<String>();
-	private static List<String> torNumber = new ArrayList<String>();
-	private static List<String> torEpsName = new ArrayList<String>();
-	private static List<String> torLocation = new ArrayList<String>();
-	private static List<String> group = new ArrayList<String>();
+		ShowList(int ShowID, String ShowName, String ShowEpisodeNumber,
+				String ShowEpisodeName, String ShowPath) {
+			this.ShowID = ShowID;
+			this.ShowName = ShowName;
+			this.ShowEpisodeNumber = ShowEpisodeNumber;
+			this.ShowEpisodeName = ShowEpisodeName;
+			this.ShowPath = ShowPath;
+		}
+	}
+
+	private static List<ShowList> showlist = new ArrayList<ShowList>();
+	private static List<String> showGroupNames = new ArrayList<String>();
 	ExpandableListAdapter mAdapter;
 	Database rchipDB;
 
@@ -95,11 +106,24 @@ public class VideoList extends ExpandableListActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		menu.setHeaderTitle("Show");
-		menu.add(0, v.getId(), 0, getString(R.string.watch));
-		menu.add(0, v.getId(), 1, getString(R.string.delete));
-		menu.add(0, v.getId(), 3, getString(R.string.remove_show));
-		menu.add(0, v.getId(), 2, getString(R.string.delete_all));
+		ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+		if (ExpandableListView.getPackedPositionType(info.packedPosition) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+			menu.setHeaderTitle(showGroupNames.get(ExpandableListView.getPackedPositionGroup(info.packedPosition)));
+			menu.add(0, v.getId(), 4, getString(R.string.watch_next));
+			menu.add(0, v.getId(), 3, getString(R.string.remove_show));
+		} else {
+			ShowList show = showlist
+					.get((int) ((MyExpandableListAdapter) mAdapter).getlongID(
+							ExpandableListView
+									.getPackedPositionGroup(info.packedPosition),
+							ExpandableListView
+									.getPackedPositionChild(info.packedPosition)));
+			menu.setHeaderTitle(show.ShowName + " - " + show.ShowEpisodeName);
+			menu.add(0, v.getId(), 0, getString(R.string.watch));
+			menu.add(0, v.getId(), 1, getString(R.string.delete));
+			menu.add(0, v.getId(), 3, getString(R.string.remove_show));
+			menu.add(0, v.getId(), 2, getString(R.string.delete_all));
+		}
 
 	}
 
@@ -118,18 +142,17 @@ public class VideoList extends ExpandableListActivity {
 			id = ((MyExpandableListAdapter) mAdapter).getlongID(groupPos,
 					childPos);
 		} else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-			Toast.makeText(this, getString(R.string.select_valid_show),
-					Toast.LENGTH_SHORT).show();
-			return true;
+			id = ((MyExpandableListAdapter) mAdapter).getlongID(ExpandableListView.getPackedPositionGroup(info.packedPosition),
+					0);
 		}
-
-		if (item.getOrder() == 0) {
+		int order = item.getOrder();
+		if ((order == 0) || (order == 4)) {
 			watch(id);
-		} else if (item.getOrder() == 1) {
+		} else if (order == 1) {
 			delete(id);
-		} else if (item.getOrder() == 2) {
+		} else if (order == 2) {
 			deleteall(id);
-		} else if (item.getOrder() == 3) {
+		} else if (order == 3) {
 			deleteShow(id);
 		} else
 			return false;
@@ -167,31 +190,43 @@ public class VideoList extends ExpandableListActivity {
 		}
 	}
 
+	private boolean ShowInShowlist(String name, String number) {
+		for (int i = 0; i < showlist.size(); i++) {
+			if ((showlist.get(i).ShowName.equalsIgnoreCase(name))
+					&& (showlist.get(i).ShowName.equalsIgnoreCase(name))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void watch(long id) {
 		Intent i = new Intent(this, VideoRemote.class);
-		i.putExtra("showString",
-				torName.get((int) id) + " - " + torNumber.get((int) id) + " - "
-						+ torEpsName.get((int) id));
-		i.putExtra("Location", torLocation.get((int) id));
+
+		i.putExtra(
+				"showString",
+				showlist.get((int) id).ShowName + " - "
+						+ showlist.get((int) id).ShowEpisodeNumber + " - "
+						+ showlist.get((int) id).ShowEpisodeName);
+		i.putExtra("Location", showlist.get((int) id).ShowPath);
 		i.putExtra("showID", id);
 		VideoList.this.startActivityForResult(i, Consts.RC_WATCHMOVE);
 		return;
 	}
 
 	private void delete(long id) {
-		rchipDB.deleteOneSL(torID.get((int) id));
+		rchipDB.deleteOneSL(showlist.get((int) id).ShowID);
 		refreshList();
 		return;
 	}
 
 	private void deleteWithoutRefresh(long id) {
-		rchipDB.deleteOneSL(torID.get((int) id));
+		rchipDB.deleteOneSL(showlist.get((int) id).ShowID);
 		return;
 	}
 
 	private void deleteShow(long id) {
-		String show = torName.get((int) id);
-		new DeleteShow().execute(show);
+		new DeleteShow().execute(showlist.get((int) id).ShowName);
 		return;
 	}
 
@@ -200,13 +235,10 @@ public class VideoList extends ExpandableListActivity {
 	}
 
 	private void refreshList() {
-		torID.clear();
-		torName.clear();
-		torNumber.clear();
-		torEpsName.clear();
-		torLocation.clear();
-		group.clear();
+		showlist.clear();
+		showGroupNames.clear();
 		String[] showArray = rchipDB.getShows();
+
 		if ((showArray != null) && (showArray.length > 0)) {
 			for (int i = 0; i < showArray.length; i++) {
 				String[] temp = (showArray[i].split("\\|"));
@@ -215,19 +247,18 @@ public class VideoList extends ExpandableListActivity {
 				String SeasonInfo = temp[2];
 				String EpsName = temp[3].replace('_', ' ');
 				String location = temp[4];
-				if (!((torEpsName.contains(EpsName)) && (torNumber
-						.contains(SeasonInfo)))) {
-					torID.add(id);
-					torName.add(name);
-					torNumber.add(SeasonInfo);
-					torEpsName.add(EpsName);
-					torLocation.add(location);
-					if (!(group.contains(name))) {
-						group.add(name);
+
+				if (!(ShowInShowlist(EpsName, SeasonInfo))) {
+					ShowList show = new ShowList(id, name, SeasonInfo, EpsName,
+							location);
+					showlist.add(show);
+					if (!(showGroupNames.contains(name))) {
+						showGroupNames.add(name);
 					}
 				} else {
 					rchipDB.deleteOneSL(id);
 				}
+
 			}
 		}
 		mAdapter = new MyExpandableListAdapter(this);
@@ -241,35 +272,28 @@ public class VideoList extends ExpandableListActivity {
 
 	public class MyExpandableListAdapter extends BaseExpandableListAdapter {
 
-		private ArrayList<String> groups = new ArrayList<String>();
-		private ArrayList<ArrayList<ArrayList<String>>> children = new ArrayList<ArrayList<ArrayList<String>>>();
+		private ArrayList<String> ShowNamesParent = new ArrayList<String>();
+		private ArrayList<ArrayList<ShowList>> ShowsGroup_ShowEpisodes = new ArrayList<ArrayList<ShowList>>();
 		private LayoutInflater mInflater;
 
 		public MyExpandableListAdapter(Context context) {
-			groups.clear();
+			ShowNamesParent.clear();
 			mInflater = LayoutInflater.from(context);
-			for (int i = 0; i < group.size(); i++) {
-				groups.add(group.get(i));
+			for (int i = 0; i < showGroupNames.size(); i++) {
+				ShowNamesParent.add(showGroupNames.get(i));
 			}
-			int k = 0;
-			for (int i = 0; i < group.size(); i++) {
-				ArrayList<ArrayList<String>> temp = new ArrayList<ArrayList<String>>();
-				while ((k < torName.size())
-						&& (torName.get(k).equals(groups.get(i)))) {
-					ArrayList<String> temp2 = new ArrayList<String>();
-					temp2.add(torName.get(k));
-					temp2.add(torNumber.get(k));
-					temp2.add(torEpsName.get(k));
-					temp2.add(torLocation.get(k));
-					temp.add(temp2);
-					k++;
-				}
-				children.add(temp);
+			for (int i = 0; i < showGroupNames.size(); i++) {
+				ShowsGroup_ShowEpisodes.add(new ArrayList<ShowList>());
 			}
+			for (int i = 0; i < showlist.size(); i++) {
+				ShowList show = showlist.get(i);
+				ShowsGroup_ShowEpisodes.get(showGroupNames.indexOf(show.ShowName)).add(show);
+			}
+
 		}
 
 		public Object getChild(int groupPosition, int childPosition) {
-			return children.get(groupPosition).get(childPosition);
+			return ShowsGroup_ShowEpisodes.get(groupPosition).get(childPosition);
 		}
 
 		public long getChildId(int groupPosition, int childPosition) {
@@ -277,7 +301,7 @@ public class VideoList extends ExpandableListActivity {
 		}
 
 		public int getChildrenCount(int groupPosition) {
-			return children.get(groupPosition).size();
+			return ShowsGroup_ShowEpisodes.get(groupPosition).size();
 		}
 
 		public TextView getGenericView() {
@@ -298,11 +322,11 @@ public class VideoList extends ExpandableListActivity {
 				convertView = mInflater.inflate(R.layout.playlist_listview,
 						null);
 				holder = new ViewHolder();
-				holder.text = (TextView) convertView
+				holder.ShowName = (TextView) convertView
 						.findViewById(R.id.TextView01);
-				holder.text2 = (TextView) convertView
+				holder.EpisodeNumber = (TextView) convertView
 						.findViewById(R.id.TextView02);
-				holder.text3 = (TextView) convertView
+				holder.EpisodeName = (TextView) convertView
 						.findViewById(R.id.TextView03);
 				convertView.setTag(holder);
 			} else {
@@ -310,22 +334,22 @@ public class VideoList extends ExpandableListActivity {
 				holder = (ViewHolder) convertView.getTag();
 			}
 
-			holder.text.setText(children.get(groupPosition).get(childPosition)
-					.get(0));
-			holder.text2.setText(children.get(groupPosition).get(childPosition)
-					.get(1));
-			holder.text3.setText(children.get(groupPosition).get(childPosition)
-					.get(2));
+			holder.ShowName.setText(ShowsGroup_ShowEpisodes.get(groupPosition).get(
+					childPosition).ShowName);
+			holder.EpisodeNumber.setText(ShowsGroup_ShowEpisodes.get(groupPosition).get(
+					childPosition).ShowEpisodeNumber);
+			holder.EpisodeName.setText(ShowsGroup_ShowEpisodes.get(groupPosition).get(
+					childPosition).ShowEpisodeName);
 
 			return convertView;
 		}
 
 		public Object getGroup(int groupPosition) {
-			return groups.get(groupPosition);
+			return ShowNamesParent.get(groupPosition);
 		}
 
 		public int getGroupCount() {
-			return groups.size();
+			return ShowNamesParent.size();
 		}
 
 		public long getGroupId(int groupPosition) {
@@ -350,7 +374,7 @@ public class VideoList extends ExpandableListActivity {
 		public int getlongID(int groupPosition, int childPosition) {
 			int retval = 0;
 			for (int i = 0; i < groupPosition; i++) {
-				retval += children.get(i).size();
+				retval += ShowsGroup_ShowEpisodes.get(i).size();
 			}
 			retval += childPosition;
 
@@ -358,18 +382,19 @@ public class VideoList extends ExpandableListActivity {
 		}
 
 		class ViewHolder {
-			TextView text;
-			TextView text2;
-			TextView text3;
+			TextView ShowName;
+			TextView EpisodeNumber;
+			TextView EpisodeName;
 		}
+
 	}
 
 	class DeleteShow extends AsyncTask<String, Integer, Boolean> {
 		@Override
 		protected Boolean doInBackground(String... params) {
-			for (int i = 0; i < torName.size();) {
-				String curShow = torName.get(i);
-				if (curShow.equalsIgnoreCase(params[0])) {
+			for (int i = 0; i < showlist.size();) {
+				ShowList curShow = showlist.get(i);
+				if (curShow.ShowName.equalsIgnoreCase(params[0])) {
 					deleteWithoutRefresh(i);
 					i++;
 				} else {

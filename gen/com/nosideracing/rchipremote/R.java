@@ -140,6 +140,7 @@ public final class R {
         public static final int video_path_summary=0x7f06002f;
         public static final int video_path_title=0x7f06002e;
         public static final int watch=0x7f060010;
+        public static final int watch_next=0x7f060032;
         public static final int yes=0x7f060001;
     }
     public static final class xml {
