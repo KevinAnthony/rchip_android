@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.nosideracing.rchipremote.Consts;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

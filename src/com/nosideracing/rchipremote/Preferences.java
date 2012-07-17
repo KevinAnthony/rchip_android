@@ -17,6 +17,8 @@
  */
 package com.nosideracing.rchipremote;
 
+import com.nosideracing.rchipremote.Consts;
+
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;

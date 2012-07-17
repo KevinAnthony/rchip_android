@@ -1,5 +1,5 @@
 /*
- * rchip remote - android application for RCHIP interface
+\ * rchip remote - android application for RCHIP interface
  * Copyright (C) 2012  Kevin Anthony
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,8 @@ package com.nosideracing.rchipremote;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.nosideracing.rchipremote.Consts;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -255,7 +257,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-
 									exit(2);
 								}
 							})
@@ -263,7 +264,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-
 									exit(0);
 								}
 							});

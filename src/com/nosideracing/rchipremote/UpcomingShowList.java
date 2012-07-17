@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
+import com.nosideracing.rchipremote.Consts;
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;

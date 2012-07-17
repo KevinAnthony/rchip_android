@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.nosideracing.rchipremote.Consts;
+
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.ListActivity;

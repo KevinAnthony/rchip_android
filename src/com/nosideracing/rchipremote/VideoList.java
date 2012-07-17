@@ -20,6 +20,8 @@ package com.nosideracing.rchipremote;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nosideracing.rchipremote.Consts;
+
 import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.content.Intent;

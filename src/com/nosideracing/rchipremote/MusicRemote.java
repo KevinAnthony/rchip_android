@@ -20,6 +20,8 @@ package com.nosideracing.rchipremote;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.nosideracing.rchipremote.Consts;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;

@@ -23,6 +23,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.nosideracing.rchipremote.Consts;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
