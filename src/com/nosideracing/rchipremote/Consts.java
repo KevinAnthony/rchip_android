@@ -34,15 +34,8 @@ public class Consts {
 	protected static final int START_SHOW_LIST = 0x0052;
 	protected static final int START_UPCOMING_SHOW_LIST = 0x0053;
 
-	protected static final String SOAP_ACTION = "getSongInfo";
-	protected static final String METHOD_NAME_GETINFO = "getSongInfo";
-	protected static final String METHOD_NAME_SENDCMD = "sendCmd";
-	protected static final String METHOD_NAME_GETCMD = "getCmd";
-	protected static final String METHOD_NAME_REGISTERACTIVEDEVICE = "registerActiveDevice";
-	protected static final String METHOD_NAME_REGISTERMESSAGES = "registerMessages";
-	protected static final String METHOD_NAME_GETVIDEOPATH = "getVideoPath";
-	protected static final String METHOD_NAME_GETDAEMONS = "getDaemons";
+	protected static final int http_timeout = 3000;
 
-	protected static String LOG_TAG = "rchip";
+	protected static final String LOG_TAG = "rchip";
 
 }
