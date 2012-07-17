@@ -324,7 +324,7 @@ public class JSON {
 		String json_string;
 		String getUrl = URL + "json/" + methodName + '/';
 		httpGet = new HttpGet(getUrl);
-		if (Authenticate_timeout > System.currentTimeMillis()) {
+		if (Authenticate_timeout < System.currentTimeMillis()) {
 			authenticate();
 		}
 		try {

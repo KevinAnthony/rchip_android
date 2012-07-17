@@ -1,56 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/LinearLayout01"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-	<TextView android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:id="@+id/title"
-		android:text="Title" android:textStyle="bold"
-		android:layout_marginTop="10px" android:layout_marginLeft="45px">
-	</TextView>
-	<LinearLayout android:id="@+id/LinearLayout02"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:layout_marginTop="10px">
-		<TextView android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_marginLeft="25px"
-			android:id="@+id/by" android:text="by">
-		</TextView>
-		<TextView android:layout_height="wrap_content"
-			android:layout_width="fill_parent" android:id="@+id/artest"
-			android:text="artest" android:textStyle="bold"
-			android:layout_marginLeft="25px"></TextView>
-		<TextView android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_marginLeft="25px"
-			android:id="@+id/from" android:text="from">
-		</TextView>
-		<TextView android:layout_height="wrap_content"
-			android:layout_marginLeft="10px" android:layout_width="fill_parent"
-			android:id="@+id/album" android:text="album" android:textStyle="bold"></TextView>
-	</LinearLayout>
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="10dp"
+        android:text="@+string/blank"
+        android:textStyle="bold" >
+    </TextView>
 
+    <LinearLayout
+        android:id="@+id/LinearLayout02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" >
 
+        <TextView
+            android:id="@+id/by"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:text="@+string/by" >
+        </TextView>
 
-	<LinearLayout android:id="@+id/LinearLayout04"
-		android:layout_height="wrap_content" android:layout_width="wrap_content"
-		android:layout_gravity="right">
-		<TextView android:text="00:00" android:id="@+id/etime"
-			android:layout_width="wrap_content" android:layout_height="wrap_content">
-		</TextView>
-		<TextView android:text="Of" android:id="@+id/of"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_marginLeft="5px" android:layout_marginRight="5px"
-			android:textStyle="bold">
-		</TextView>
-		<TextView android:text="99:99" android:id="@+id/tottime"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+        <TextView
+            android:id="@+id/artest"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:text="@+string/blank"
+            android:textStyle="bold" >
+        </TextView>
 
-	</LinearLayout>
-	<ToggleButton android:textOn="Stop" android:textOff="Play" android:id="@+id/play"
-		android:layout_height="wrap_content" android:layout_width="fill_parent"></ToggleButton>
+        <TextView
+            android:id="@+id/from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:text="@+string/from" >
+        </TextView>
 
+        <TextView
+            android:id="@+id/album"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@+string/blank"
+            android:textStyle="bold" >
+        </TextView>
+    </LinearLayout>
 
-<Button android:text="Next" android:id="@+id/next" android:layout_height="wrap_content" android:layout_width="fill_parent"></Button>
-	<Button android:text="Previous" android:id="@+id/back"
-		android:layout_height="wrap_content" android:layout_width="fill_parent"></Button>
+    <LinearLayout
+        android:id="@+id/LinearLayout04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right" >
+
+        <TextView
+            android:id="@+id/etime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@+string/blank" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/of"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:text="@+string/of"
+            android:textStyle="bold" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tottime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@+string/blank" >
+        </TextView>
+    </LinearLayout>
+
+    <ToggleButton
+        android:id="@+id/play"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textOff="Play"
+        android:textOn="Stop" >
+    </ToggleButton>
+
+    <Button
+        android:id="@+id/next"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@+string/next" >
+    </Button>
+
+    <Button
+        android:id="@+id/back"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@+string/previous" >
+    </Button>
+
 </LinearLayout>
