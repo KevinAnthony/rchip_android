@@ -17,6 +17,7 @@
  */
 package com.nosideracing.rchipremote;
 
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -42,6 +43,10 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import com.nosideracing.rchipremote.Consts;
+
 import java.util.Date;
 
 import android.content.Context;
@@ -51,31 +56,30 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.widget.Toast;
 
 public class JSON {
 
 	public Hashtable<String, String> songinfo = new Hashtable<String, String>();
 	private String URL;
 	private String HOSTNAME;
+
 	private Context f_context;
 
-	DefaultHttpClient httpClient;
-	CookieStore cookieStore;
-	HttpContext httpContext;
+	private DefaultHttpClient httpClient;
+	private CookieStore cookieStore;
+	private HttpContext httpContext;
 
-	private String ret;
-
-	HttpResponse response = null;
-
-	HttpPost httpPost = null;
-	HttpGet httpGet = null;
+	protected boolean Authenticated = false;
+	protected long Authenticate_timeout = 0;
 
 	public JSON(Context context) {
 		f_context = context;
 		updateSettings();
 		HttpParams myParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(myParams, 10000);
-		HttpConnectionParams.setSoTimeout(myParams, 10000);
+		HttpConnectionParams
+				.setConnectionTimeout(myParams, Consts.http_timeout);
+		HttpConnectionParams.setSoTimeout(myParams, Consts.http_timeout);
 		httpClient = new DefaultHttpClient(myParams);
 		cookieStore = new BasicCookieStore();
 		httpContext = new BasicHttpContext();
@@ -210,6 +214,27 @@ public class JSON {
 	}
 
 	public boolean authenticate() {
+		long temp_timeout = Authenticate_timeout + 60000;
+		if (Authenticated) {
+			String data = JSONSendCmd("checkauthentication");
+			if (data != null) {
+				try {
+					JSONObject json_object = (JSONObject) new JSONTokener(data)
+							.nextValue();
+					if (json_object.getBoolean("authenticated")) {
+						/* timeout in one hour */
+						Authenticate_timeout = System.currentTimeMillis() + 3600000;
+						return true;
+					} else {
+						Authenticated = false;
+						Authenticate_timeout = 0;
+					}
+				} catch (JSONException e) {
+					Log.e(Consts.LOG_TAG, "Error in SendCmd getting response",
+							e);
+				}
+			}
+		}
 		Map<String, String> params = new HashMap<String, String>();
 		String uname = PreferenceManager.getDefaultSharedPreferences(f_context)
 				.getString("username", "");
@@ -220,20 +245,33 @@ public class JSON {
 		}
 		params.put("username", uname);
 		params.put("password", pword);
-		JSONSendCmd("authenticate", params);
+		if (JSONSendCmd("authenticate", params) != null) {
+			Authenticated = true;
+			/* timeout in one hour */
+			Authenticate_timeout = System.currentTimeMillis() + 3600000;
+		} else {
+			Authenticate_timeout = temp_timeout - 60000;
+		}
 		return true;
 	}
 
 	public void deauthenticate() {
+		Authenticated = false;
+		Authenticate_timeout = 0;
 		JSONSendCmd("deauthenticate");
 	}
 
 	public String JSONSendCmd(String methodName, Map<String, String> params) {
 		String getUrl = URL + "json/" + methodName;
-		int i = 0;
+		HttpResponse response = null;
+		HttpGet httpGet = null;
+		String json_string;
+		boolean first_param = true;
+
 		for (Map.Entry<String, String> param : params.entrySet()) {
-			if (i == 0) {
+			if (first_param) {
 				getUrl += "/?";
+				first_param = false;
 			} else {
 				getUrl += "&";
 			}
@@ -243,40 +281,82 @@ public class JSON {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			i++;
 		}
 		httpGet = new HttpGet(getUrl);
 		try {
 			response = httpClient.execute(httpGet, httpContext);
+		} catch (ConnectTimeoutException e) {
+			Toast.makeText(f_context, "Connection Timeout on " + methodName,
+					Toast.LENGTH_SHORT).show();
+			Log.e(Consts.LOG_TAG,
+					"Connection timeout in command " + methodName, e);
+		} catch (SocketTimeoutException e) {
+			Toast.makeText(f_context, "Socket Timeout on " + methodName,
+					Toast.LENGTH_SHORT).show();
+			Log.e(Consts.LOG_TAG, "Socket timeout in command " + methodName, e);
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
 		process_cookies();
 		try {
-			ret = EntityUtils.toString(response.getEntity());
+			json_string = EntityUtils.toString(response.getEntity());
+			Log.d(Consts.LOG_TAG, new JSONTokener(json_string).nextValue()
+					.toString());
+			if (json_string != null) {
+				JSONObject json_object = (JSONObject) new JSONTokener(
+						json_string).nextValue();
+				if (json_object.getBoolean("success")) {
+					return json_object.getString("data");
+				}
+			} else {
+				return null;
+			}
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd getting response", e);
-			ret = "";
+			return null;
 		}
-		return ret;
+		return null;
 	}
 
 	public String JSONSendCmd(String methodName) {
+		HttpResponse response = null;
+		HttpGet httpGet = null;
+		String json_string;
 		String getUrl = URL + "json/" + methodName + '/';
 		httpGet = new HttpGet(getUrl);
+		if (Authenticate_timeout > System.currentTimeMillis()) {
+			authenticate();
+		}
 		try {
 			response = httpClient.execute(httpGet, httpContext);
+		} catch (ConnectTimeoutException e) {
+			Toast.makeText(f_context, "Connection Timeout on " + methodName,
+					Toast.LENGTH_SHORT).show();
+			Log.e(Consts.LOG_TAG,
+					"Connection timeout in command " + methodName, e);
+		} catch (SocketTimeoutException e) {
+			Toast.makeText(f_context, "Socket Timeout on " + methodName,
+					Toast.LENGTH_SHORT).show();
+			Log.e(Consts.LOG_TAG, "Socket timeout in command " + methodName, e);
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
 		process_cookies();
 		try {
-			ret = EntityUtils.toString(response.getEntity());
+			json_string = EntityUtils.toString(response.getEntity());
+			Log.d(Consts.LOG_TAG, new JSONTokener(json_string).nextValue()
+					.toString());
+			JSONObject json_object = (JSONObject) new JSONTokener(json_string)
+					.nextValue();
+			if (json_object.getBoolean("success")) {
+				return json_object.getString("data");
+			} else {
+				return null;
+			}
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd getting response", e);
-			ret = "";
+			return null;
 		}
-		return ret;
 	}
 
 	public ArrayList<UpcomingShowInfo> getUpcomingShows() {
