@@ -202,7 +202,7 @@ public class JSON {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("host", host);
 		String response = JSONSendCmd("getcommand", params);
-		if (!response.equals("")) {
+		if ((response != null) && (response.equals(""))) {
 			if (response.equalsIgnoreCase("Not Authorized")) {
 				authenticate();
 				return getCommands(host);
@@ -299,17 +299,17 @@ public class JSON {
 		}
 		process_cookies();
 		try {
-			json_string = EntityUtils.toString(response.getEntity());
-			Log.d(Consts.LOG_TAG, new JSONTokener(json_string).nextValue()
-					.toString());
-			if (json_string != null) {
-				JSONObject json_object = (JSONObject) new JSONTokener(
-						json_string).nextValue();
-				if (json_object.getBoolean("success")) {
-					return json_object.getString("data");
+			if (response != null) {
+				json_string = EntityUtils.toString(response.getEntity());
+				Log.d(Consts.LOG_TAG, new JSONTokener(json_string).nextValue()
+						.toString());
+				if (json_string != null) {
+					JSONObject json_object = (JSONObject) new JSONTokener(
+							json_string).nextValue();
+					if (json_object.getBoolean("success")) {
+						return json_object.getString("data");
+					}
 				}
-			} else {
-				return null;
 			}
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd getting response", e);

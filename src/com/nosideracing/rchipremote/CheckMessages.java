@@ -49,32 +49,36 @@ public class CheckMessages extends BroadcastReceiver {
 			Log.v(Consts.LOG_TAG,
 					"Devices phonenumber:" + tManager.getLine1Number());
 			JSONArray jsonArray = jSon.getCommands(tManager.getLine1Number());
-			for (int i = 0; i < jsonArray.length(); i++) {
-				JSONObject jsonObject = jsonArray.getJSONObject(i);
-				String cmd = (String) jsonObject.get("command");
-				String cmdTxt = (String) jsonObject.get("command_text");
-				String[] curShow = new String[4];
-				if (cmd.equals("TMSG")) {
-					String[] cmdTemp = cmdTxt.split("\\|");
-					if (cmdTemp.length == 3) {
-						curShow = Notifications.setStatusNotification(
-								cmdTemp[0], cmdTemp[1], cmdTemp[2], context);
+			if (jsonArray != null) {
+				for (int i = 0; i < jsonArray.length(); i++) {
+					JSONObject jsonObject = jsonArray.getJSONObject(i);
+					String cmd = (String) jsonObject.get("command");
+					String cmdTxt = (String) jsonObject.get("command_text");
+					String[] curShow = new String[4];
+					if (cmd.equals("TMSG")) {
+						String[] cmdTemp = cmdTxt.split("\\|");
+						if (cmdTemp.length == 3) {
+							curShow = Notifications
+									.setStatusNotification(cmdTemp[0],
+											cmdTemp[1], cmdTemp[2], context);
+						}
+					} else if (cmd.equals("ADDS")) {
+						String[] cmdTemp = cmdTxt.split("\\|");
+						if (cmdTemp.length == 4) {
+							curShow[0] = cmdTemp[0];
+							curShow[1] = cmdTemp[1];
+							curShow[2] = cmdTemp[2];
+							curShow[3] = cmdTemp[3];
+						}
+					} else {
+						Log.w(Consts.LOG_TAG, "Commad:" + cmd
+								+ " Not supported");
 					}
-				} else if (cmd.equals("ADDS")) {
-					String[] cmdTemp = cmdTxt.split("\\|");
-					if (cmdTemp.length == 4) {
-						curShow[0] = cmdTemp[0];
-						curShow[1] = cmdTemp[1];
-						curShow[2] = cmdTemp[2];
-						curShow[3] = cmdTemp[3];
+					if (curShow != null) {
+						shows.add(curShow);
 					}
-				} else {
-					Log.w(Consts.LOG_TAG, "Commad:" + cmd + " Not supported");
-				}
-				if (curShow != null) {
-					shows.add(curShow);
-				}
 
+				}
 			}
 			new passDataToShowWindow().execute(shows);
 		} catch (Exception e) {

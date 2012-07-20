@@ -118,6 +118,7 @@ public class RemoteMain extends ListActivity {
 		params.put("device_name", phoneNumber);
 		params.put("state", "true");
 		json.JSONSendCmd("registerremotedevice", params);
+		Notifications.clearAllNotifications(f_context);
 	}
 
 	@Override

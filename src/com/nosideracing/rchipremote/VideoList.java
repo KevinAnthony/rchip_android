@@ -403,7 +403,6 @@ public class VideoList extends ExpandableListActivity {
 					i++;
 				}
 			}
-			refreshList();
 			return true;
 		}
 	}

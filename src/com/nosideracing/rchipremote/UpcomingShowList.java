@@ -52,6 +52,7 @@ public class UpcomingShowList extends ListActivity {
 		Collections.sort(upcoming);
 		mAdapter = new MyListAdapter(this);
 		setListAdapter(mAdapter);
+		Notifications.clearAllNotifications(getApplicationContext());
 	}
 
 	@Override
