@@ -68,16 +68,22 @@ public class RemoteMain extends ListActivity {
 		}
 		setContentView(R.layout.main);
 		lists = new ArrayList<Main_List_Object>();
+		lists.add(new Main_List_Object(getString(R.string.home_automation_title),
+				getString(R.string.home_automation_subtitle),
+				R.drawable.home_auto, Consts.START_AUTOMATION));
+		
 		lists.add(new Main_List_Object(getString(R.string.music_title),
 				getString(R.string.music_subtitle), R.drawable.music_remote,
 				Consts.START_MUSIC));
+		
 		lists.add(new Main_List_Object(getString(R.string.show_list_title),
 				getString(R.string.show_list_subtitle),
 				R.drawable.video_remote, Consts.START_SHOW_LIST));
+		
 		lists.add(new Main_List_Object(getString(R.string.upcoming_title),
 				getString(R.string.upcoming_subtitle),
 				R.drawable.upcoming_show, Consts.START_UPCOMING_SHOW_LIST));
-
+		
 		mAdapter = new MyListAdapter(this);
 		setListAdapter(mAdapter);
 		f_context = getApplicationContext();
@@ -183,6 +189,10 @@ public class RemoteMain extends ListActivity {
 
 	private void start_activty(int FLAG) {
 		switch (FLAG) {
+		case Consts.START_AUTOMATION:
+			Intent isa = new Intent(this, HomeAutomation.class);
+			startActivityForResult(isa, Consts.RC_AUTOMATION);
+			break;
 		case Consts.START_MUSIC:
 			Intent ism = new Intent(this, MusicRemote.class);
 			startActivityForResult(ism, Consts.RC_MUSIC);

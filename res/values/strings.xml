@@ -14,6 +14,8 @@
     <string name="music_subtitle">Remote Control for Music Player</string>
     <string name="show_list_title">Show List</string>
     <string name="show_list_subtitle">Shows to Watch</string>
+    <string name="home_automation_title">Home Automation</string>
+    <string name="home_automation_subtitle">Control aspects of your House</string>
     <string name="upcoming_title">Upcoming Show Lists</string>
     <string name="upcoming_subtitle">All Your Upcoming Shows</string>
     <string name="show_downloaded">Show Downloaded</string>

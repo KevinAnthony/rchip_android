@@ -24,6 +24,7 @@ public class Consts {
 	protected static final int RC_SHOW = 0x0032;
 	protected static final int RC_WATCHMOVE = 0x0033;
 	protected static final int RC_SHOW_LIST = 0x0034;
+	protected static final int RC_AUTOMATION = 0x0035;
 
 	protected static final int PREFS_UPDATED = 0x0041;
 	protected static final int UPDATEGUI = 0x0042;
@@ -33,6 +34,7 @@ public class Consts {
 	protected static final int START_MUSIC = 0x0051;
 	protected static final int START_SHOW_LIST = 0x0052;
 	protected static final int START_UPCOMING_SHOW_LIST = 0x0053;
+	protected static final int START_AUTOMATION = 0x0054;
 
 	protected static final int http_timeout = 3000;
 
