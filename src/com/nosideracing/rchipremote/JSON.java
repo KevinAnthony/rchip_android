@@ -202,7 +202,7 @@ public class JSON {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("host", host);
 		String response = JSONSendCmd("getcommand", params);
-		if ((response != null) && (response.equals(""))) {
+		if ((response != null) && (!response.equals(""))) {
 			if (response.equalsIgnoreCase("Not Authorized")) {
 				authenticate();
 				return getCommands(host);
