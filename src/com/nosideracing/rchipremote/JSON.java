@@ -301,8 +301,6 @@ public class JSON {
 		try {
 			if (response != null) {
 				json_string = EntityUtils.toString(response.getEntity());
-				Log.d(Consts.LOG_TAG, new JSONTokener(json_string).nextValue()
-						.toString());
 				if (json_string != null) {
 					JSONObject json_object = (JSONObject) new JSONTokener(
 							json_string).nextValue();
@@ -374,6 +372,7 @@ public class JSON {
 					show.AirDate = (Date) new SimpleDateFormat(
 							"yyyy-MM-dd HH:mm:ss").parse((jsonObject
 							.getString("air_date")));
+					show.AirTime = jsonObject.getInt("show__air_time");
 					upcoming.add(show);
 				}
 			}

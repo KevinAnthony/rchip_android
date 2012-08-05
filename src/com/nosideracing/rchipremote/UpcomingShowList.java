@@ -74,11 +74,11 @@ public class UpcomingShowList extends ListActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		int calledMenuItem = item.getItemId();
-		if (calledMenuItem == R.id.settings) {
+		switch(item.getItemId()){
+		case R.id.settings:
 			startActivity(new Intent(this, Preferences.class));
 			return true;
-		} else if (calledMenuItem == R.id.quit) {
+		case R.id.quit:
 			quit();
 			return true;
 		}
@@ -108,7 +108,6 @@ public class UpcomingShowList extends ListActivity {
 		public MyListAdapter(Context context) {
 			fContext = context;
 			mInflater = LayoutInflater.from(fContext);
-			Log.v(Consts.LOG_TAG, "Got Here");
 		}
 
 		public int getCount() {
@@ -125,7 +124,6 @@ public class UpcomingShowList extends ListActivity {
 
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder info;
-			Log.v(Consts.LOG_TAG, "Got Here " + position);
 			convertView = mInflater.inflate(R.layout.upcomingshows_listview,
 					null);
 			info = new ViewHolder();
@@ -144,6 +142,15 @@ public class UpcomingShowList extends ListActivity {
 			info.EpisodeNumberView
 					.setText(upcoming.get(position).EpisodeNumber);
 			Date date = upcoming.get(position).AirDate;
+			int air_time = upcoming.get(position).AirTime - (date.getTimezoneOffset()/60*100);
+			Log.d(Consts.LOG_TAG,upcoming.get(position).ShowName);
+			Log.d(Consts.LOG_TAG,"offset = "+date.getTimezoneOffset()/60*100);
+			Log.d(Consts.LOG_TAG,"Air_time " + air_time/100);
+			Log.e(Consts.LOG_TAG,"Date:"+date);
+			int hours = date.getHours()+(air_time/100);
+			int minutes = date.getMinutes()+(air_time%100);
+			date.setHours(hours);
+			date.setMinutes(minutes);
 			String date_str = new SimpleDateFormat("hh:mm aa  LLL dd yyyy",
 					Locale.US).format(date);
 			info.AirDateView.setText(date_str);
@@ -166,6 +173,7 @@ class UpcomingShowInfo implements Comparable<Object> {
 	public String EpisodeName;
 	public String EpisodeNumber;
 	public Date AirDate;
+	public int AirTime; 
 
 	public int compareTo(Object incomingObject) {
 		if (!(incomingObject instanceof UpcomingShowInfo))
