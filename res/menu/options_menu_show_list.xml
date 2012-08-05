@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/settings"
-          android:title="Settings" 
-          android:icon="@android:drawable/ic_menu_preferences" android:visible="false" android:enabled="false"/>
-    <item android:id="@+id/refresh" android:title="Refresh" android:icon="@android:drawable/ic_popup_sync"></item><item android:id="@+id/quit"
-          android:title="Quit" 
+          android:title="Settings"
+          android:icon="@android:drawable/ic_menu_preferences" android:visible="false" android:enabled="false"/><item android:id="@+id/backup" android:title="Backup List" android:icon="@android:drawable/ic_menu_save"></item><item android:id="@+id/restore" android:title="Restore List" android:icon="@android:drawable/ic_menu_set_as"></item><item android:id="@+id/quit"
+          android:title="Quit"
           android:icon="@android:drawable/ic_menu_close_clear_cancel"></item>
+
+
 </menu>
