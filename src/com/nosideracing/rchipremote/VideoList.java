@@ -17,6 +17,7 @@
  */
 package com.nosideracing.rchipremote;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -171,11 +172,27 @@ public class VideoList extends ExpandableListActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		int calledMenuItem = item.getItemId();
-		if (calledMenuItem == R.id.settings) {
+		switch(item.getItemId()){
+		case R.id.settings:
 			startActivity(new Intent(this, Preferences.class));
 			return true;
-		} else if (calledMenuItem == R.id.quit) {
+		case R.id.backup:
+			try {
+				rchipDB.backupDatabase();
+				return true;
+			} catch (IOException e) {
+				Log.d(Consts.LOG_TAG, "Problem Back Up Database", e);
+			}
+			return false;
+		case R.id.restore:
+			try {
+				rchipDB.restoreDatabase();
+				return true;
+			} catch (IOException e) {
+				Log.d(Consts.LOG_TAG, "Problem Restoring Database", e);
+			}
+			return false;
+		case R.id.quit:
 			quit();
 			return true;
 		}

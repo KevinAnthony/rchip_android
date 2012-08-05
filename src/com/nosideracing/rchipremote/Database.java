@@ -17,6 +17,12 @@
  */
 package com.nosideracing.rchipremote;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import com.nosideracing.rchipremote.Consts;
 
 import android.content.ContentValues;
@@ -24,6 +30,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 public class Database extends SQLiteOpenHelper {
@@ -121,4 +128,71 @@ public class Database extends SQLiteOpenHelper {
 					+ ";");
 		}
 	}
+
+	public void backupDatabase() throws IOException {
+		db = this.getReadableDatabase();
+		File root = new File(Environment.getExternalStorageDirectory(), "rchip");
+		if (!root.exists()) {
+			root.mkdirs();
+		}
+		File gpxfile = new File(root, "database_Backip.gpx");
+		if (gpxfile.exists()) {
+			gpxfile.delete();
+			gpxfile.createNewFile();
+		}
+		FileWriter writer = new FileWriter(gpxfile);
+		Cursor C = db.query(TABLE_NAME_SL, new String[] { "ShowName",
+				"EpisodeNumber", "EpisodeName", "Location", "Updated" }, null,
+				null, null, null, null);
+		Log.v(Consts.LOG_TAG, "Got " + C.getCount() + " Rows from table "
+				+ TABLE_NAME_SL);
+		if (C.moveToFirst()) {
+			do {
+				writer.append(C.getString(0) + "|" + C.getString(1) + "|"
+						+ C.getString(2) + "|" + C.getString(3) + "|"
+						+ C.getString(4)+"\n");
+				writer.flush();
+
+			} while (C.moveToNext());
+		}
+		writer.flush();
+		writer.close();
+		if (C != null && !C.isClosed()) {
+			C.close();
+		}
+		db.close();
+	}
+
+	public void restoreDatabase() throws IOException {
+		db = this.getWritableDatabase();
+		File root = new File(Environment.getExternalStorageDirectory(), "rchip");
+		if (!root.exists()) {
+			// TODO toast here
+			return;
+		}
+		File gpxfile = new File(root, "database_Backip.gpx");
+		if (!gpxfile.exists()) {
+			// TODO toast here
+			return;
+		}
+		FileReader reader = new FileReader(gpxfile);
+		BufferedReader in = new BufferedReader(reader);
+		db.delete(TABLE_NAME_SL, null, null);
+		String line;
+		while ((line = in.readLine()) != null) {
+			ContentValues values = new ContentValues();
+			Log.d(Consts.LOG_TAG,line);
+			String[] line_parsed = line.split("\\|");
+			values.put("ShowName", line_parsed[0]);
+			values.put("EpisodeNumber", line_parsed[1]);
+			values.put("EpisodeName", line_parsed[2]);
+			values.put("Location", line_parsed[3]);
+			values.put("Updated", line_parsed[4]);
+			db.insert(TABLE_NAME_SL, null, values);
+		}
+		in.close();
+		reader.close();
+		db.close();
+	}
+
 }
