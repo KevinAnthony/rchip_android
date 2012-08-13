@@ -54,5 +54,7 @@
     <string name="done_watching_show">Have you finished Watching this Show?</string>
     <string name="bad_password">Bad Password</string>
     <string name="watch_next">Watch Next Episode</string>
+    <string name="about_main">Written by Kevin Anthony</string>
+    <string name="about_version">Version:</string>
     
 </resources>

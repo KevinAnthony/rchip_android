@@ -68,7 +68,8 @@ public class RemoteMain extends ListActivity {
 		}
 		setContentView(R.layout.main);
 		lists = new ArrayList<Main_List_Object>();
-		lists.add(new Main_List_Object(getString(R.string.home_automation_title),
+		lists.add(new Main_List_Object(
+				getString(R.string.home_automation_title),
 				getString(R.string.home_automation_subtitle),
 				R.drawable.home_auto, Consts.START_AUTOMATION));
 
@@ -83,6 +84,18 @@ public class RemoteMain extends ListActivity {
 		lists.add(new Main_List_Object(getString(R.string.upcoming_title),
 				getString(R.string.upcoming_subtitle),
 				R.drawable.upcoming_show, Consts.START_UPCOMING_SHOW_LIST));
+		lists.add(new Main_List_Object("", "", -1, -1));
+		try {
+			lists.add(new Main_List_Object(getString(R.string.about_main),
+					getString(R.string.about_version)
+							+ getPackageManager().getPackageInfo(
+									getPackageName(), 0).versionName,
+					android.R.drawable.ic_menu_info_details, -1));
+		} catch (Exception e) {
+			lists.add(new Main_List_Object(getString(R.string.about_main),
+					getString(R.string.about_version) + "0.0.0.0",
+					android.R.drawable.ic_menu_info_details, -1));
+		}
 
 		mAdapter = new MyListAdapter(this);
 		setListAdapter(mAdapter);
@@ -265,18 +278,25 @@ public class RemoteMain extends ListActivity {
 			ViewHolder info;
 			convertView = mInflater.inflate(R.layout.main_listview, null);
 			info = new ViewHolder();
-			info.Title = (TextView) convertView
-					.findViewById(R.id.main_list_title);
-			info.SubTitle = (TextView) convertView
-					.findViewById(R.id.main_list_subtitle);
-			info.Icon = (ImageView) convertView
-					.findViewById(R.id.main_list_icon);
+			if (lists.get(position).Icon != -1) {
+				info.Title = (TextView) convertView
+						.findViewById(R.id.main_list_title);
+				info.SubTitle = (TextView) convertView
+						.findViewById(R.id.main_list_subtitle);
+				info.Icon = (ImageView) convertView
+						.findViewById(R.id.main_list_icon);
 
-			convertView.setTag(info);
+				convertView.setTag(info);
 
-			info.Title.setText(lists.get(position).Title);
-			info.SubTitle.setText(lists.get(position).SubTitle);
-			info.Icon.setImageResource(lists.get(position).Icon);
+				info.Title.setText(lists.get(position).Title);
+				info.SubTitle.setText(lists.get(position).SubTitle);
+				info.Icon.setImageResource(lists.get(position).Icon);
+			} else {
+				info.Title = null;
+				info.SubTitle = null;
+				info.Icon = null;
+				convertView.setTag(info);
+			}
 			return convertView;
 
 		}
