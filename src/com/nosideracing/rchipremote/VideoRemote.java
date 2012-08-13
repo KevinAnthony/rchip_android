@@ -62,10 +62,16 @@ public class VideoRemote extends Activity implements OnClickListener {
 	private String phoneNumber;
 	private long ID = -1;
 	PowerManager.WakeLock wl;
+	JSON json;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		json = JSON.getInstance();
+		if (json == null){
+			JSON.initInstance(getApplicationContext());
+			json = JSON.getInstance();
+		}
 		setContentView(R.layout.watch);
 		Bundle incoming = getIntent().getExtras();
 		showString = incoming.getString("showString");
@@ -151,7 +157,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 			if (btn.isChecked()) {
 				if (firstPlay) {
-					String rootPath = RemoteMain.json.getRootPath();
+					String rootPath = json.getRootPath();
 					try {
 						loc = loc.replace("/mnt/raid/", rootPath);
 						new runCmd().execute("OPENSM", loc);
@@ -163,8 +169,8 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 				}
 				try {
-					RemoteMain.json.UpdateSongInfo();
-					if (RemoteMain.json.getIsPlaying() == 1) {
+					json.UpdateSongInfo();
+					if (json.getIsPlaying() == 1) {
 						Log.v(Consts.LOG_TAG, "Stopping Music to play Video");
 						new runCmd().execute("STOPRB", "");
 						Thread.sleep(500);
@@ -297,7 +303,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 			params.put("command_text", cmdTxt);
 			params.put("source_hostname", phoneNumber);
 			params.put("destination_hostname", destHost);
-			RemoteMain.json.JSONSendCmd("sendcommand", params);
+			json.JSONSendCmd("sendcommand", params);
 			return true;
 		}
 	}

@@ -49,6 +49,7 @@ import com.nosideracing.rchipremote.Consts;
 
 import java.util.Date;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -58,20 +59,23 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.Toast;
 
-public class JSON {
+public class JSON extends Application {
 
-	public Hashtable<String, String> songinfo = new Hashtable<String, String>();
-	private String URL;
-	private String HOSTNAME;
 
-	private Context f_context;
+	public static Hashtable<String, String> songinfo = new Hashtable<String, String>();
+	private static String URL;
+	private static String HOSTNAME;
 
-	private DefaultHttpClient httpClient;
-	private CookieStore cookieStore;
-	private HttpContext httpContext;
+	private static Context f_context;
 
-	protected boolean Authenticated = false;
-	protected long Authenticate_timeout = 0;
+	private static DefaultHttpClient httpClient;
+	private static CookieStore cookieStore;
+	private static HttpContext httpContext;
+
+	protected static boolean Authenticated = false;
+	protected static long Authenticate_timeout = 0;
+	private static JSON instance = null;
+
 
 	public JSON(Context context) {
 		f_context = context;
@@ -85,6 +89,14 @@ public class JSON {
 		httpContext = new BasicHttpContext();
 		httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 	}
+
+	public static void initInstance(Context context) {
+		instance = new JSON(context);
+	}
+	public static JSON getInstance() {
+	    return instance;
+	  }
+
 
 	public boolean setNotification(String tickerString,
 			String notificationTitle, String noticicationText, Context context) {
@@ -440,5 +452,7 @@ public class JSON {
 		return true;
 
 	}
+
+
 
 }

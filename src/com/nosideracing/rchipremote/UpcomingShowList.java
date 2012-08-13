@@ -48,7 +48,7 @@ public class UpcomingShowList extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.upcomingshows);
-		upcoming = RemoteMain.json.getUpcomingShows();
+		upcoming = JSON.getInstance().getUpcomingShows();
 		Collections.sort(upcoming);
 		mAdapter = new MyListAdapter(this);
 		setListAdapter(mAdapter);
@@ -173,7 +173,7 @@ class UpcomingShowInfo implements Comparable<Object> {
 	public String EpisodeName;
 	public String EpisodeNumber;
 	public Date AirDate;
-	public int AirTime; 
+	public int AirTime;
 
 	public int compareTo(Object incomingObject) {
 		if (!(incomingObject instanceof UpcomingShowInfo))

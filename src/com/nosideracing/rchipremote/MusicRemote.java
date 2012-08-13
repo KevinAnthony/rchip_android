@@ -56,7 +56,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	private volatile Thread updater;
 	PowerManager pm;
 	PowerManager.WakeLock wl;
-
+	JSON json;
 	Handler musicHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -75,6 +75,11 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.music);
+		json = JSON.getInstance();
+		if (json == null){
+			JSON.initInstance(getApplicationContext());
+			json = JSON.getInstance();
+		}
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
 				| PowerManager.ON_AFTER_RELEASE, "msmusic");
@@ -101,7 +106,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		new Thread(new Runnable() {
 			public void run() {
 				while (update) {
-					RemoteMain.json.UpdateSongInfo();
+					json.UpdateSongInfo();
 					try {
 						Thread.sleep(Integer.parseInt(PreferenceManager
 								.getDefaultSharedPreferences(
@@ -219,23 +224,23 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 	private void updateTags() {
 		try {
 			CompoundButton btn = (ToggleButton) findViewById(R.id.play);
-			String text = RemoteMain.json.getArtest();
+			String text = json.getArtest();
 			ARTIST.setText(text == null ? " " : text);
-			text = RemoteMain.json.getAlbum();
+			text = json.getAlbum();
 			ALBUM.setText(text == null ? " " : text);
-			text = RemoteMain.json.getSongName();
+			text = json.getSongName();
 			TITLE.setText(text == null ? " " : text);
-			if (RemoteMain.json.getTimeElapised() != null) {
-				ETIME.setText(formatIntoHHMMSS(Integer.parseInt(RemoteMain.json
+			if (json.getTimeElapised() != null) {
+				ETIME.setText(formatIntoHHMMSS(Integer.parseInt(json
 						.getTimeElapised())));
 			}
-			if (RemoteMain.json.getSongLength() != null) {
+			if (json.getSongLength() != null) {
 				TOTTIME.setText(formatIntoHHMMSS(Integer
-						.parseInt(RemoteMain.json.getSongLength())));
+						.parseInt(json.getSongLength())));
 			}
 
 			if (System.currentTimeMillis() > dontSwitch + 7000L) {
-				if (RemoteMain.json.getIsPlaying() == 1) {
+				if (json.getIsPlaying() == 1) {
 					btn.setChecked(true);
 				} else {
 					btn.setChecked(false);
@@ -283,7 +288,7 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 			params.put("command_text", cmdTxt);
 			params.put("source_hostname", RemoteMain.phoneNumber);
 			params.put("destination_hostname", RemoteMain.msb_desthost);
-			RemoteMain.json.JSONSendCmd("sendcommand", params);
+			json.JSONSendCmd("sendcommand", params);
 			return true;
 		}
 	}

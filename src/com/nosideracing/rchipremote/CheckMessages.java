@@ -63,7 +63,7 @@ public class CheckMessages extends BroadcastReceiver {
 											cmdTemp[1], cmdTemp[2], context);
 						}
 					} else if (cmd.equals("ADDS")) {
-						
+
 						String[] cmdTemp = cmdTxt.split("\\|");
 						if (cmdTemp.length == 4) {
 							curShow[0] = cmdTemp[0];

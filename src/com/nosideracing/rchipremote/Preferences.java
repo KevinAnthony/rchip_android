@@ -34,7 +34,7 @@ public class Preferences extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.preferences);
 		ListPreference hostnameList = (ListPreference) findPreference("serverhostname");
 		try {
-			hostsListEntryValues = RemoteMain.json.getHostNames().split("\\|");
+			hostsListEntryValues = JSON.getInstance().getHostNames().split("\\|");
 			hostnameList.setEntries(hostsListEntryValues);
 			hostnameList.setEntryValues(hostsListEntryValues);
 		} catch (Exception e) {

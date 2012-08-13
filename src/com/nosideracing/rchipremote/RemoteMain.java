@@ -55,7 +55,7 @@ public class RemoteMain extends ListActivity {
 	private static Context f_context;
 	public static String msb_desthost;
 	public static String phoneNumber;
-	public static JSON json;
+	private JSON json;
 	private ListAdapter mAdapter;
 	private ArrayList<Main_List_Object> lists;
 
@@ -71,23 +71,24 @@ public class RemoteMain extends ListActivity {
 		lists.add(new Main_List_Object(getString(R.string.home_automation_title),
 				getString(R.string.home_automation_subtitle),
 				R.drawable.home_auto, Consts.START_AUTOMATION));
-		
+
 		lists.add(new Main_List_Object(getString(R.string.music_title),
 				getString(R.string.music_subtitle), R.drawable.music_remote,
 				Consts.START_MUSIC));
-		
+
 		lists.add(new Main_List_Object(getString(R.string.show_list_title),
 				getString(R.string.show_list_subtitle),
 				R.drawable.video_remote, Consts.START_SHOW_LIST));
-		
+
 		lists.add(new Main_List_Object(getString(R.string.upcoming_title),
 				getString(R.string.upcoming_subtitle),
 				R.drawable.upcoming_show, Consts.START_UPCOMING_SHOW_LIST));
-		
+
 		mAdapter = new MyListAdapter(this);
 		setListAdapter(mAdapter);
 		f_context = getApplicationContext();
-		json = new JSON(f_context);
+		JSON.initInstance(f_context);
+		json = JSON.getInstance();
 		if (!json.authenticate()) {
 			bad_password();
 		}
