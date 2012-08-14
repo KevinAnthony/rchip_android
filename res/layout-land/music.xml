@@ -63,19 +63,12 @@
         android:layout_gravity="right" >
 
         <TextView
-            android:id="@+id/etime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@+string/blank" >
-        </TextView>
-
-        <TextView
             android:id="@+id/of"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:text="@+string/of"
+            android:text="@+string/duration"
             android:textStyle="bold" >
         </TextView>
 

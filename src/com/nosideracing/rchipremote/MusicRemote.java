@@ -46,7 +46,6 @@ public class MusicRemote extends Activity implements OnClickListener {
 	private TextView ARTIST;
 	private TextView ALBUM;
 	private TextView TITLE;
-	private TextView ETIME;
 	private TextView TOTTIME;
 	private long dont_switch_play_button_timer;
 	private Boolean update = false;
@@ -67,7 +66,6 @@ public class MusicRemote extends Activity implements OnClickListener {
 		ARTIST = (TextView) findViewById(R.id.artest);
 		ALBUM = (TextView) findViewById(R.id.album);
 		TITLE = (TextView) findViewById(R.id.title);
-		ETIME = (TextView) findViewById(R.id.etime);
 		TOTTIME = (TextView) findViewById(R.id.tottime);
 		CompoundButton btn = (ToggleButton) findViewById(R.id.play);
 		btn.setOnClickListener(this);
@@ -75,13 +73,13 @@ public class MusicRemote extends Activity implements OnClickListener {
 		final Button button3 = (Button) findViewById(R.id.back);
 		button3.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("BACKRB", "");
+				new runCmd().execute("BACK", "");
 			}
 		});
 		final Button button4 = (Button) findViewById(R.id.next);
 		button4.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("NEXTRB", "");
+				new runCmd().execute("NEXT", "");
 			}
 		});
 
@@ -165,10 +163,6 @@ public class MusicRemote extends Activity implements OnClickListener {
 			ALBUM.setText(text == null ? " " : text);
 			text = json.getSongName();
 			TITLE.setText(text == null ? " " : text);
-			if (json.getTimeElapised() != null) {
-				ETIME.setText(formatIntoHHMMSS(Integer.parseInt(json
-						.getTimeElapised())));
-			}
 			if (json.getSongLength() != null) {
 				TOTTIME.setText(formatIntoHHMMSS(Integer.parseInt(json
 						.getSongLength())));
@@ -203,10 +197,10 @@ public class MusicRemote extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		CompoundButton btn = (ToggleButton) v;
 		if (btn.isChecked()) {
-			new runCmd().execute("PLAYRB", "");
+			new runCmd().execute("PLAY", "");
 			dont_switch_play_button_timer = System.currentTimeMillis();
 		} else {
-			new runCmd().execute("STOPRB", "");
+			new runCmd().execute("STOP", "");
 			dont_switch_play_button_timer = System.currentTimeMillis();
 			updateTags();
 		}

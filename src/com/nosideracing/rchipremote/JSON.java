@@ -146,14 +146,6 @@ public class JSON {
 		}
 	}
 
-	public String getTimeElapised() {
-		try {
-			return songinfo.get("elapsed_time").toString();
-		} catch (Exception e) {
-			return "0000";
-		}
-	}
-
 	public String getSongLength() {
 		try {
 			return songinfo.get("total_time").toString();
@@ -456,8 +448,6 @@ public class JSON {
 							.toString());
 					songinfo.put("song", (String) jsonObject.get("song"));
 					songinfo.put("artist", (String) jsonObject.get("artist"));
-					songinfo.put("elapsed_time", jsonObject.get("elapsed_time")
-							.toString());
 					songinfo.put("is_playing", (jsonObject.get("is_playing")
 							.equals("false")) ? "0" : "1");
 				}
