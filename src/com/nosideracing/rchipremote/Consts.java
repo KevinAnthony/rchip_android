@@ -36,7 +36,7 @@ public class Consts {
 	protected static final int START_UPCOMING_SHOW_LIST = 0x0053;
 	protected static final int START_AUTOMATION = 0x0054;
 
-	protected static final int http_timeout = 3000;
+	protected static final int http_timeout = 10000;
 
 	protected static final String LOG_TAG = "rchip";
 
