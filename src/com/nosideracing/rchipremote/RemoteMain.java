@@ -96,7 +96,7 @@ public class RemoteMain extends ListActivity {
 		setListAdapter(mAdapter);
 		f_context = getApplicationContext();
 		json = JSON.getInstance();
-		JSON.set_context(f_context);
+		json.set_context(f_context);
 		if (!json.authenticate()) {
 			bad_password();
 		}
