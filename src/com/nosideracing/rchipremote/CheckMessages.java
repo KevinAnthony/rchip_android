@@ -36,19 +36,17 @@ public class CheckMessages extends BroadcastReceiver {
 
 	Context f_context = null;
 
-	@Override
 	@SuppressWarnings("unchecked")
+	@Override
 	public void onReceive(Context context, Intent intent) {
 		f_context = context;
-		JSON jSon = new JSON(f_context);
+		Log.v(Consts.LOG_TAG,"Checking Messages");
+		JSON json = new JSON(context);
 		List<String[]> shows = new ArrayList<String[]>();
 		try {
-			jSon.authenticate();
 			TelephonyManager tManager = (TelephonyManager) f_context
 					.getSystemService(Context.TELEPHONY_SERVICE);
-			Log.v(Consts.LOG_TAG,
-					"Devices phonenumber:" + tManager.getLine1Number());
-			JSONArray jsonArray = jSon.getCommands(tManager.getLine1Number());
+			JSONArray jsonArray = json.getCommands(tManager.getLine1Number());
 			if (jsonArray != null) {
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -79,12 +77,12 @@ public class CheckMessages extends BroadcastReceiver {
 						shows.add(curShow);
 					}
 				}
+				new passDataToShowWindow().execute(shows);
 			}
-			new passDataToShowWindow().execute(shows);
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Problem With Check Message", e);
 		}
-		return;
+		json.finalize();
 	}
 
 	class passDataToShowWindow extends
