@@ -22,7 +22,6 @@
 
     <application
         android:name="com.nosideracing.rchipremote.Singleton"
-        android:debuggable="true"
         android:icon="@drawable/application_icon"
         android:label="@string/app_name" >
         <activity

@@ -56,7 +56,6 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.widget.Toast;
 
 public class JSON {
 
@@ -105,9 +104,11 @@ public class JSON {
 	public static JSON getInstance() {
 		return instance;
 	}
-	public void set_context(Context context){
+
+	public void set_context(Context context) {
 		f_context = context;
 	}
+
 	public boolean setNotification(String tickerString,
 			String notificationTitle, String noticicationText, Context context) {
 		if (Notifications.setStatusNotification(tickerString,
@@ -278,14 +279,14 @@ public class JSON {
 	}
 
 	public void deauthenticate() {
-		Log.i(Consts.LOG_TAG,"Deauthenicating");
+		Log.i(Consts.LOG_TAG, "Deauthenicating");
 		Authenticated = false;
 		Authenticate_timeout = 0;
 		JSONSendCmd("deauthenticate");
 	}
 
 	public String JSONSendCmd(String methodName, Map<String, String> params) {
-		if ((URL == null) || (HOSTNAME == null)){
+		if ((URL == null) || (HOSTNAME == null)) {
 			updateSettings();
 		}
 		String getUrl = URL + "json/" + methodName;
@@ -312,14 +313,10 @@ public class JSON {
 		try {
 			response = httpClient.execute(httpGet, httpContext);
 		} catch (ConnectTimeoutException e) {
-			Toast.makeText(f_context, "Connection Timeout on " + methodName,
-					Toast.LENGTH_SHORT).show();
 			Log.e(Consts.LOG_TAG,
 					"Connection timeout in command " + methodName, e);
 			return null;
 		} catch (SocketTimeoutException e) {
-			Toast.makeText(f_context, "Socket Timeout on " + methodName,
-					Toast.LENGTH_SHORT).show();
 			Log.e(Consts.LOG_TAG, "Socket timeout in command " + methodName, e);
 			return null;
 		} catch (Exception e) {
@@ -346,7 +343,7 @@ public class JSON {
 	}
 
 	public String JSONSendCmd(String methodName) {
-		if ((URL == null) || (HOSTNAME == null)){
+		if ((URL == null) || (HOSTNAME == null)) {
 			updateSettings();
 		}
 		HttpResponse response = null;
@@ -360,18 +357,14 @@ public class JSON {
 		try {
 			response = httpClient.execute(httpGet, httpContext);
 		} catch (ConnectTimeoutException e) {
-			Toast.makeText(f_context, "Connection Timeout on " + methodName,
-					Toast.LENGTH_SHORT).show();
 			Log.e(Consts.LOG_TAG,
 					"Connection timeout in command " + methodName, e);
 		} catch (SocketTimeoutException e) {
-			Toast.makeText(f_context, "Socket Timeout on " + methodName,
-					Toast.LENGTH_SHORT).show();
 			Log.e(Consts.LOG_TAG, "Socket timeout in command " + methodName, e);
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
-		if (response == null){
+		if (response == null) {
 			return null;
 		}
 		process_cookies();
@@ -435,7 +428,7 @@ public class JSON {
 	}
 
 	protected void updateSettings() {
-		if (f_context == null){
+		if (f_context == null) {
 			return;
 		}
 		SharedPreferences settings = PreferenceManager
