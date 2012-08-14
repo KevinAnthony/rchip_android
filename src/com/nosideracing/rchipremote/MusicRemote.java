@@ -19,18 +19,15 @@ package com.nosideracing.rchipremote;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import com.nosideracing.rchipremote.Consts;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -44,32 +41,20 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class MusicRemote extends Activity implements Runnable, OnClickListener {
+public class MusicRemote extends Activity implements OnClickListener {
 
 	private TextView ARTIST;
 	private TextView ALBUM;
 	private TextView TITLE;
 	private TextView ETIME;
 	private TextView TOTTIME;
-	private long dontSwitch;
+	private long dont_switch_play_button_timer;
 	private Boolean update = false;
-	private volatile Thread updater;
+
 	PowerManager pm;
 	PowerManager.WakeLock wl;
 	JSON json;
-	Handler musicHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case Consts.UPDATEGUI:
-				if (update) {
-					updateTags();
-				}
-				break;
-			}
-			super.handleMessage(msg);
-		}
-	};
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -99,21 +84,22 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 				new runCmd().execute("NEXTRB", "");
 			}
 		});
-		new Thread(new Runnable() {
+
+		final Handler handler = new Handler();
+		Timer timer = new Timer();
+		int speed = Integer.parseInt(PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext())
+				.getString("delay", "5000"));
+		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				while (update) {
-					json.UpdateSongInfo();
-					try {
-						Thread.sleep(Integer.parseInt(PreferenceManager
-								.getDefaultSharedPreferences(
-										getApplicationContext()).getString(
-										"delay", "5000")));
-					} catch (InterruptedException e) {
-						Log.w(Consts.LOG_TAG, e);
+				handler.post(new Runnable() {
+					public void run() {
+						json.UpdateSongInfo();
+						updateTags();
 					}
-				}
+				});
 			}
-		}).start();
+		}, 0, speed);
 	}
 
 	@Override
@@ -129,7 +115,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 			update = true;
 		}
 		wl.acquire();
-		startThread();
 	}
 
 	@Override
@@ -137,7 +122,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		super.onStop();
 		wl.release();
 		update = false;
-		stopThread();
 	}
 
 	@Override
@@ -172,51 +156,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		}
 	}
 
-	private synchronized void startThread() {
-		if (updater == null) {
-			updater = new Thread(this);
-			updater.start();
-		} else {
-			Log.w(Consts.LOG_TAG,
-					"We Tried to start a thread when one existed already, MusicRemote->startThread()");
-		}
-	}
-
-	private synchronized void stopThread() {
-		if (updater != null) {
-			Thread moribund = updater;
-			updater = null;
-			moribund.interrupt();
-		} else {
-			Log.w(Consts.LOG_TAG,
-					"We Tried to kill a thread when one did not already exist");
-		}
-	}
-
-	public void run() {
-		NetworkInfo info = ((ConnectivityManager) getApplicationContext()
-				.getSystemService(Context.CONNECTIVITY_SERVICE))
-				.getActiveNetworkInfo();
-		while ((Thread.currentThread() == updater) && (update)) {
-			if (info.isConnected()) {
-				// TODO: Replace this with preferences
-				int itype = info.getType();
-				int sleep = 5000;
-				if (itype == 1) {
-					sleep = 1000;
-				}
-				try {
-					Message m = new Message();
-					m.what = Consts.UPDATEGUI;
-					musicHandler.sendMessage(m);
-					Thread.sleep(sleep);
-				} catch (Exception e) {
-					Log.e(Consts.LOG_TAG, "ERROR in message sender, sleep", e);
-				}
-			}
-		}
-	}
-
 	private void updateTags() {
 		try {
 			CompoundButton btn = (ToggleButton) findViewById(R.id.play);
@@ -231,11 +170,11 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 						.getTimeElapised())));
 			}
 			if (json.getSongLength() != null) {
-				TOTTIME.setText(formatIntoHHMMSS(Integer
-						.parseInt(json.getSongLength())));
+				TOTTIME.setText(formatIntoHHMMSS(Integer.parseInt(json
+						.getSongLength())));
 			}
 
-			if (System.currentTimeMillis() > dontSwitch + 7000L) {
+			if (System.currentTimeMillis() > dont_switch_play_button_timer + 7000L) {
 				if (json.getIsPlaying() == 1) {
 					btn.setChecked(true);
 				} else {
@@ -265,10 +204,10 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		CompoundButton btn = (ToggleButton) v;
 		if (btn.isChecked()) {
 			new runCmd().execute("PLAYRB", "");
-			dontSwitch = System.currentTimeMillis();
+			dont_switch_play_button_timer = System.currentTimeMillis();
 		} else {
 			new runCmd().execute("STOPRB", "");
-			dontSwitch = System.currentTimeMillis();
+			dont_switch_play_button_timer = System.currentTimeMillis();
 			updateTags();
 		}
 	};
