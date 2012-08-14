@@ -87,20 +87,6 @@ public class JSON {
 		httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 	}
 
-	protected void finalize(){
-		try {
-			super.finalize();
-		} catch (Throwable e) {	}
-		deauthenticate();
-		instance = null;
-		httpClient = null;
-		cookieStore = null;
-		httpContext = null;
-		songinfo = null;
-		URL = null;
-		HOSTNAME = null;
-	}
-
 	public static void initInstance(Context context) {
 		instance = new JSON(context);
 	}

@@ -40,7 +40,7 @@ public class CheckMessages extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		f_context = context;
-		Log.v(Consts.LOG_TAG,"Checking Messages");
+		Log.i(Consts.LOG_TAG,"Checking Messages");
 		JSON json = new JSON(context);
 		List<String[]> shows = new ArrayList<String[]>();
 		try {
@@ -82,7 +82,7 @@ public class CheckMessages extends BroadcastReceiver {
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Problem With Check Message", e);
 		}
-		json.finalize();
+		json.deauthenticate();
 	}
 
 	class passDataToShowWindow extends
