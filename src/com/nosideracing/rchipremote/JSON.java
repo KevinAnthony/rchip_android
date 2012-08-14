@@ -60,18 +60,18 @@ import android.widget.Toast;
 
 public class JSON {
 
-	public static Hashtable<String, String> songinfo = new Hashtable<String, String>();
-	private static String URL = null;
-	private static String HOSTNAME = null;
+	public Hashtable<String, String> songinfo = new Hashtable<String, String>();
+	private String URL = null;
+	private String HOSTNAME = null;
 
-	private static Context f_context;
+	private Context f_context;
 
-	private static DefaultHttpClient httpClient;
-	private static CookieStore cookieStore;
-	private static HttpContext httpContext;
+	private DefaultHttpClient httpClient;
+	private CookieStore cookieStore;
+	private HttpContext httpContext;
 
-	protected static boolean Authenticated = false;
-	protected static long Authenticate_timeout = 0;
+	protected boolean Authenticated = false;
+	protected long Authenticate_timeout = 0;
 	private static JSON instance = null;
 
 	public JSON(Context context) {
@@ -105,7 +105,7 @@ public class JSON {
 	public static JSON getInstance() {
 		return instance;
 	}
-	public static void set_context(Context context){
+	public void set_context(Context context){
 		f_context = context;
 	}
 	public boolean setNotification(String tickerString,
@@ -311,9 +311,6 @@ public class JSON {
 		httpGet = new HttpGet(getUrl);
 		try {
 			response = httpClient.execute(httpGet, httpContext);
-			if (methodName.equalsIgnoreCase("getcommand")){
-				Log.e(Consts.LOG_TAG,"Response:"+response);
-			}
 		} catch (ConnectTimeoutException e) {
 			Toast.makeText(f_context, "Connection Timeout on " + methodName,
 					Toast.LENGTH_SHORT).show();
@@ -333,9 +330,6 @@ public class JSON {
 		try {
 			if (response != null) {
 				json_string = EntityUtils.toString(response.getEntity());
-				if (methodName.equalsIgnoreCase("getcommand")){
-					Log.e(Consts.LOG_TAG,"Response String: "+json_string);
-				}
 				if (json_string != null) {
 					JSONObject json_object = (JSONObject) new JSONTokener(
 							json_string).nextValue();
@@ -441,6 +435,9 @@ public class JSON {
 	}
 
 	protected void updateSettings() {
+		if (f_context == null){
+			return;
+		}
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(f_context);
 		URL = settings.getString("serverurl", "http://www.nosideholdings.com/");
