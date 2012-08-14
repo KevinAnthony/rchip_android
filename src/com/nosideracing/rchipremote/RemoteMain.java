@@ -199,8 +199,8 @@ public class RemoteMain extends ListActivity {
 	private void start_activty(int FLAG) {
 		switch (FLAG) {
 		case Consts.START_AUTOMATION:
-			Intent isa = new Intent(this, HomeAutomation.class);
-			startActivityForResult(isa, Consts.RC_AUTOMATION);
+		/*	Intent isa = new Intent(this, HomeAutomation.class);
+			startActivityForResult(isa, Consts.RC_AUTOMATION);*/
 			break;
 		case Consts.START_MUSIC:
 			Intent ism = new Intent(this, MusicRemote.class);
