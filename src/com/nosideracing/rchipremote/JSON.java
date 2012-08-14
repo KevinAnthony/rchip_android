@@ -49,7 +49,6 @@ import com.nosideracing.rchipremote.Consts;
 
 import java.util.Date;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -59,8 +58,7 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.Toast;
 
-public class JSON extends Application {
-
+public class JSON {
 
 	public static Hashtable<String, String> songinfo = new Hashtable<String, String>();
 	private static String URL;
@@ -75,7 +73,6 @@ public class JSON extends Application {
 	protected static boolean Authenticated = false;
 	protected static long Authenticate_timeout = 0;
 	private static JSON instance = null;
-
 
 	public JSON(Context context) {
 		f_context = context;
@@ -93,10 +90,10 @@ public class JSON extends Application {
 	public static void initInstance(Context context) {
 		instance = new JSON(context);
 	}
-	public static JSON getInstance() {
-	    return instance;
-	  }
 
+	public static JSON getInstance() {
+		return instance;
+	}
 
 	public boolean setNotification(String tickerString,
 			String notificationTitle, String noticicationText, Context context) {
@@ -296,18 +293,27 @@ public class JSON extends Application {
 		}
 		httpGet = new HttpGet(getUrl);
 		try {
+			if (httpContext == null) {
+				Log.w(Consts.LOG_TAG, "httpContext was empty");
+				httpContext = new BasicHttpContext();
+				httpContext.setAttribute(ClientContext.COOKIE_STORE,
+						cookieStore);
+			}
 			response = httpClient.execute(httpGet, httpContext);
 		} catch (ConnectTimeoutException e) {
 			Toast.makeText(f_context, "Connection Timeout on " + methodName,
 					Toast.LENGTH_SHORT).show();
 			Log.e(Consts.LOG_TAG,
 					"Connection timeout in command " + methodName, e);
+			return null;
 		} catch (SocketTimeoutException e) {
 			Toast.makeText(f_context, "Socket Timeout on " + methodName,
 					Toast.LENGTH_SHORT).show();
 			Log.e(Consts.LOG_TAG, "Socket timeout in command " + methodName, e);
+			return null;
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
+			return null;
 		}
 		process_cookies();
 		try {
@@ -452,7 +458,5 @@ public class JSON extends Application {
 		return true;
 
 	}
-
-
 
 }
