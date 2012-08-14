@@ -62,10 +62,6 @@ public class RemoteMain extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (savedInstanceState == null) {
-			Log.w(Consts.LOG_TAG,
-					"SaveInstantsState is NULL if the program isn't starting for the first time, this is a problem");
-		}
 		setContentView(R.layout.main);
 		lists = new ArrayList<Main_List_Object>();
 		lists.add(new Main_List_Object(
