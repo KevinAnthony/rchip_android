@@ -42,6 +42,7 @@ public class CheckMessages extends BroadcastReceiver {
 		f_context = context;
 		Log.i(Consts.LOG_TAG,"Checking Messages");
 		JSON json = new JSON(context);
+		json.authenticate();
 		List<String[]> shows = new ArrayList<String[]>();
 		try {
 			TelephonyManager tManager = (TelephonyManager) f_context
@@ -78,6 +79,8 @@ public class CheckMessages extends BroadcastReceiver {
 					}
 				}
 				new passDataToShowWindow().execute(shows);
+			} else {
+				Log.w(Consts.LOG_TAG,"Response was NULL Checking for messages");
 			}
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Problem With Check Message", e);
