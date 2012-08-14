@@ -454,7 +454,7 @@ public class JSON {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("host", HOSTNAME);
 			String response = JSONSendCmd("getsonginfo", params);
-			if (!response.equals("")) {
+			if ((response != null) && (!response.equals(""))) {
 				JSONArray jsonArray = new JSONArray(response);
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObject = jsonArray.getJSONObject(i);
