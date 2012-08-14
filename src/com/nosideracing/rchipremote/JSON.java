@@ -61,8 +61,8 @@ import android.widget.Toast;
 public class JSON {
 
 	public static Hashtable<String, String> songinfo = new Hashtable<String, String>();
-	private static String URL;
-	private static String HOSTNAME;
+	private static String URL = null;
+	private static String HOSTNAME = null;
 
 	private static Context f_context;
 
@@ -87,14 +87,27 @@ public class JSON {
 		httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 	}
 
-	public static void initInstance(Context context) {
-		instance = new JSON(context);
+	public JSON() {
+		HttpParams myParams = new BasicHttpParams();
+		HttpConnectionParams
+				.setConnectionTimeout(myParams, Consts.http_timeout);
+		HttpConnectionParams.setSoTimeout(myParams, Consts.http_timeout);
+		httpClient = new DefaultHttpClient(myParams);
+		cookieStore = new BasicCookieStore();
+		httpContext = new BasicHttpContext();
+		httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+	}
+
+	public static void initInstance() {
+		instance = new JSON();
 	}
 
 	public static JSON getInstance() {
 		return instance;
 	}
-
+	public static void set_context(Context context){
+		f_context = context;
+	}
 	public boolean setNotification(String tickerString,
 			String notificationTitle, String noticicationText, Context context) {
 		if (Notifications.setStatusNotification(tickerString,
@@ -272,6 +285,9 @@ public class JSON {
 	}
 
 	public String JSONSendCmd(String methodName, Map<String, String> params) {
+		if ((URL == null) || (HOSTNAME == null)){
+			updateSettings();
+		}
 		String getUrl = URL + "json/" + methodName;
 		HttpResponse response = null;
 		HttpGet httpGet = null;
@@ -294,13 +310,10 @@ public class JSON {
 		}
 		httpGet = new HttpGet(getUrl);
 		try {
-			if (httpContext == null) {
-				Log.w(Consts.LOG_TAG, "httpContext was empty");
-				httpContext = new BasicHttpContext();
-				httpContext.setAttribute(ClientContext.COOKIE_STORE,
-						cookieStore);
-			}
 			response = httpClient.execute(httpGet, httpContext);
+			if (methodName.equalsIgnoreCase("getcommand")){
+				Log.e(Consts.LOG_TAG,"Response:"+response);
+			}
 		} catch (ConnectTimeoutException e) {
 			Toast.makeText(f_context, "Connection Timeout on " + methodName,
 					Toast.LENGTH_SHORT).show();
@@ -320,6 +333,9 @@ public class JSON {
 		try {
 			if (response != null) {
 				json_string = EntityUtils.toString(response.getEntity());
+				if (methodName.equalsIgnoreCase("getcommand")){
+					Log.e(Consts.LOG_TAG,"Response String: "+json_string);
+				}
 				if (json_string != null) {
 					JSONObject json_object = (JSONObject) new JSONTokener(
 							json_string).nextValue();
@@ -336,6 +352,9 @@ public class JSON {
 	}
 
 	public String JSONSendCmd(String methodName) {
+		if ((URL == null) || (HOSTNAME == null)){
+			updateSettings();
+		}
 		HttpResponse response = null;
 		HttpGet httpGet = null;
 		String json_string;
@@ -358,11 +377,12 @@ public class JSON {
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
 		}
+		if (response == null){
+			return null;
+		}
 		process_cookies();
 		try {
 			json_string = EntityUtils.toString(response.getEntity());
-			Log.d(Consts.LOG_TAG, new JSONTokener(json_string).nextValue()
-					.toString());
 			JSONObject json_object = (JSONObject) new JSONTokener(json_string)
 					.nextValue();
 			if (json_object.getBoolean("success")) {

@@ -34,7 +34,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -96,8 +95,8 @@ public class RemoteMain extends ListActivity {
 		mAdapter = new MyListAdapter(this);
 		setListAdapter(mAdapter);
 		f_context = getApplicationContext();
-		JSON.initInstance(f_context);
 		json = JSON.getInstance();
+		JSON.set_context(f_context);
 		if (!json.authenticate()) {
 			bad_password();
 		}

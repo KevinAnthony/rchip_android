@@ -68,10 +68,6 @@ public class VideoRemote extends Activity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		json = JSON.getInstance();
-		if (json == null){
-			JSON.initInstance(getApplicationContext());
-			json = JSON.getInstance();
-		}
 		setContentView(R.layout.watch);
 		Bundle incoming = getIntent().getExtras();
 		showString = incoming.getString("showString");

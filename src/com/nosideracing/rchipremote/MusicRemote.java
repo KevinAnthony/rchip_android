@@ -76,10 +76,6 @@ public class MusicRemote extends Activity implements Runnable, OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.music);
 		json = JSON.getInstance();
-		if (json == null){
-			JSON.initInstance(getApplicationContext());
-			json = JSON.getInstance();
-		}
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
 				| PowerManager.ON_AFTER_RELEASE, "msmusic");
