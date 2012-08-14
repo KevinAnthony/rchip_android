@@ -87,6 +87,20 @@ public class JSON {
 		httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 	}
 
+	protected void finalize(){
+		try {
+			super.finalize();
+		} catch (Throwable e) {	}
+		deauthenticate();
+		instance = null;
+		httpClient = null;
+		cookieStore = null;
+		httpContext = null;
+		songinfo = null;
+		URL = null;
+		HOSTNAME = null;
+	}
+
 	public static void initInstance(Context context) {
 		instance = new JSON(context);
 	}
@@ -265,6 +279,7 @@ public class JSON {
 	}
 
 	public void deauthenticate() {
+		Log.i(Consts.LOG_TAG,"Deauthenicating");
 		Authenticated = false;
 		Authenticate_timeout = 0;
 		JSONSendCmd("deauthenticate");
