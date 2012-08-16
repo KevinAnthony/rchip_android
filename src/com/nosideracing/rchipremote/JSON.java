@@ -154,6 +154,7 @@ public class JSON {
 		}
 	}
 
+	//TODO this should RETURN Boolean
 	public int getIsPlaying() {
 		try {
 			return Integer.parseInt(songinfo.get("is_playing"));

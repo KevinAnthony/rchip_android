@@ -49,7 +49,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 
 	private Button button_quit;
 	private Button button_mute;
-	private Button button_pause;
+	private Button button_stop;
 	private Button button_foward;
 	private Button button_rewind;
 	private CompoundButton button_fullscreen;
@@ -144,11 +144,8 @@ public class VideoRemote extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		CompoundButton btn = (ToggleButton) v;
 		if (btn.getId() == R.id.MSWMfullscreen) {
-			if (btn.isChecked()) {
-				new runCmd().execute("FULLONSM", "");
-			} else {
-				new runCmd().execute("FULLONSM", "");
-			}
+			new runCmd().execute(Consts.VIDEO_FULLSCREEN_TOGGLE, "");
+			
 		} else if (btn.getId() == R.id.MSWMplaypause) {
 
 			if (btn.isChecked()) {
@@ -156,7 +153,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 					String rootPath = json.getRootPath();
 					try {
 						loc = loc.replace("/mnt/raid/", rootPath);
-						new runCmd().execute("OPENSM", loc);
+						new runCmd().execute(Consts.VIDEO_OPEN, loc);
 						Thread.sleep(500);
 						firstPlay = false;
 					} catch (Exception e) {
@@ -168,14 +165,14 @@ public class VideoRemote extends Activity implements OnClickListener {
 					json.UpdateSongInfo();
 					if (json.getIsPlaying() == 1) {
 						Log.v(Consts.LOG_TAG, "Stopping Music to play Video");
-						new runCmd().execute("STOP", "");
+						new runCmd().execute(Consts.MUSIC_STOP, "");
 						Thread.sleep(500);
 					}
 				} catch (Exception e) {
 				}
-				new runCmd().execute("PLAYSM", "");
+				new runCmd().execute(Consts.VIDEO_PLAY, "");
 			} else {
-				new runCmd().execute("PAUSESM", "");
+				new runCmd().execute(Consts.VIDEO_PAUSE, "");
 			}
 		}
 	};
@@ -189,19 +186,19 @@ public class VideoRemote extends Activity implements OnClickListener {
 		button_rewind = (Button) findViewById(R.id.MSWMrewind);
 		button_rewind.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("SKIPBSM", "");
+				new runCmd().execute(Consts.VIDEO_SKIP_BACKWARDS, "");
 			}
 		});
 		button_foward = (Button) findViewById(R.id.MSWMfoward);
 		button_foward.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("SKIPFSM", "");
+				new runCmd().execute(Consts.VIDEO_SKIP_FOWARD, "");
 			}
 		});
-		button_pause = (Button) findViewById(R.id.MSWMstop);
-		button_pause.setOnClickListener(new OnClickListener() {
+		button_stop = (Button) findViewById(R.id.MSWMstop);
+		button_stop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("STOPSM", "");
+				new runCmd().execute(Consts.VIDEO_STOP, "");
 				CompoundButton btn = (ToggleButton) findViewById(R.id.MSWMfullscreen);
 				if (btn.isChecked()) {
 					btn.setChecked(false);
@@ -215,13 +212,13 @@ public class VideoRemote extends Activity implements OnClickListener {
 		button_mute = (Button) findViewById(R.id.MSWMmute);
 		button_mute.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("MUTESM", "");
+				new runCmd().execute(Consts.VIDEO_MUTE, "");
 			}
 		});
 		button_quit = (Button) findViewById(R.id.MSWMquit);
 		button_quit.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("QUITSM", "");
+				new runCmd().execute(Consts.VIDEO_QUIT, "");
 				quit(false);
 			}
 		});
@@ -240,7 +237,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 		ll2.setMinimumHeight(height / 3);
 		button_rewind.setWidth(button_width);
 		button_foward.setWidth(button_width);
-		button_pause.setWidth(button_width);
+		button_stop.setWidth(button_width);
 		button_mute.setWidth(button_width);
 		button_quit.setWidth(button_width);
 		button_fullscreen.setWidth(button_width);

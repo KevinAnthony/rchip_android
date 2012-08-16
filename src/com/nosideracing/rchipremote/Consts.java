@@ -35,7 +35,23 @@ public class Consts {
 	protected static final int START_SHOW_LIST = 0x0052;
 	protected static final int START_UPCOMING_SHOW_LIST = 0x0053;
 	protected static final int START_AUTOMATION = 0x0054;
-
+	
+	protected static final String MUSIC_STOP = "STOP";
+	protected static final String MUSIC_NEXT = "NEXT";
+	protected static final String MUSIC_BACK = "BACK";
+	protected static final String MUSIC_PLAYPAUSE_TOGGLE = "PLAY";
+	
+	protected static final String VIDEO_FULLSCREEN_TOGGLE = "FULLONSM";
+	protected static final String VIDEO_OPEN = "OPENSM";
+	protected static final String VIDEO_STOP = "STOPSM";
+	protected static final String VIDEO_PLAY = "PLAYSM";
+	protected static final String VIDEO_PAUSE = "PAUSESM";
+	protected static final String VIDEO_SKIP_FOWARD = "SKIPFSM";
+	protected static final String VIDEO_SKIP_BACKWARDS = "SKIPBSM";
+	protected static final String VIDEO_MUTE = "MUTESM";
+	protected static final String VIDEO_QUIT = "QUITSM";
+	
+	
 	protected static final int http_timeout = 10000;
 
 	protected static final String LOG_TAG = "rchip";

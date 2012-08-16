@@ -80,20 +80,20 @@ public class MusicRemote extends Activity implements OnClickListener {
 		back = (Button) findViewById(R.id.back);
 		back.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("BACK", "");
+				new runCmd().execute(Consts.MUSIC_BACK, "");
 			}
 		});
 		next = (Button) findViewById(R.id.next);
 		next.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("NEXT", "");
+				new runCmd().execute(Consts.MUSIC_NEXT, "");
 			}
 		});
 
 		stop = (Button) findViewById(R.id.stop);
 		stop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				new runCmd().execute("STOP", "");
+				new runCmd().execute(Consts.MUSIC_STOP, "");
 			}
 		});
 
@@ -226,7 +226,7 @@ public class MusicRemote extends Activity implements OnClickListener {
 	}
 
 	public void onClick(View v) {
-		new runCmd().execute("PLAY", "");
+		new runCmd().execute(Consts.MUSIC_PLAYPAUSE_TOGGLE, "");
 		dont_switch_play_button_timer = System.currentTimeMillis();
 		updateTags();
 	};
