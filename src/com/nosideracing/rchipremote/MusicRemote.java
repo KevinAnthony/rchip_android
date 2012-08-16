@@ -35,9 +35,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -50,10 +52,14 @@ public class MusicRemote extends Activity implements OnClickListener {
 	private long dont_switch_play_button_timer;
 	private Boolean update = false;
 
+	private Button back;
+	private Button next;
+	private Button stop;
+	private CompoundButton play;
+
 	PowerManager pm;
 	PowerManager.WakeLock wl;
 	JSON json;
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -67,19 +73,27 @@ public class MusicRemote extends Activity implements OnClickListener {
 		ALBUM = (TextView) findViewById(R.id.album);
 		TITLE = (TextView) findViewById(R.id.title);
 		TOTTIME = (TextView) findViewById(R.id.tottime);
-		CompoundButton btn = (ToggleButton) findViewById(R.id.play);
-		btn.setOnClickListener(this);
 
-		final Button button3 = (Button) findViewById(R.id.back);
-		button3.setOnClickListener(new OnClickListener() {
+		play = (ToggleButton) findViewById(R.id.play);
+		play.setOnClickListener(this);
+
+		back = (Button) findViewById(R.id.back);
+		back.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				new runCmd().execute("BACK", "");
 			}
 		});
-		final Button button4 = (Button) findViewById(R.id.next);
-		button4.setOnClickListener(new OnClickListener() {
+		next = (Button) findViewById(R.id.next);
+		next.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				new runCmd().execute("NEXT", "");
+			}
+		});
+
+		stop = (Button) findViewById(R.id.stop);
+		stop.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				new runCmd().execute("STOP", "");
 			}
 		});
 
@@ -98,6 +112,8 @@ public class MusicRemote extends Activity implements OnClickListener {
 				});
 			}
 		}, 0, speed);
+
+		set_sizes();
 	}
 
 	@Override
@@ -154,9 +170,24 @@ public class MusicRemote extends Activity implements OnClickListener {
 		}
 	}
 
+	private void set_sizes() {
+		int width = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
+				.getDefaultDisplay().getWidth();
+		int button_height = ((((WindowManager) getSystemService(Context.WINDOW_SERVICE))
+				.getDefaultDisplay().getHeight()) - play.getTop()) / 6;
+
+		LinearLayout ll1 = (LinearLayout) findViewById(R.id.LL_Next_Prev);
+		ll1.setMinimumHeight(button_height);
+
+		play.setMinHeight(button_height);
+		stop.setMinHeight(button_height);
+
+		back.setMinWidth(width / 2);
+		next.setMinWidth(width / 2);
+	}
+
 	private void updateTags() {
 		try {
-			CompoundButton btn = (ToggleButton) findViewById(R.id.play);
 			String text = json.getArtest();
 			ARTIST.setText(text == null ? " " : text);
 			text = json.getAlbum();
@@ -170,9 +201,9 @@ public class MusicRemote extends Activity implements OnClickListener {
 
 			if (System.currentTimeMillis() > dont_switch_play_button_timer + 7000L) {
 				if (json.getIsPlaying() == 1) {
-					btn.setChecked(true);
+					play.setChecked(true);
 				} else {
-					btn.setChecked(false);
+					play.setChecked(false);
 				}
 			}
 		} catch (Exception e) {
@@ -195,15 +226,9 @@ public class MusicRemote extends Activity implements OnClickListener {
 	}
 
 	public void onClick(View v) {
-		CompoundButton btn = (ToggleButton) v;
-		if (btn.isChecked()) {
-			new runCmd().execute("PLAY", "");
-			dont_switch_play_button_timer = System.currentTimeMillis();
-		} else {
-			new runCmd().execute("STOP", "");
-			dont_switch_play_button_timer = System.currentTimeMillis();
-			updateTags();
-		}
+		new runCmd().execute("PLAY", "");
+		dont_switch_play_button_timer = System.currentTimeMillis();
+		updateTags();
 	};
 
 	private class runCmd extends AsyncTask<String, Integer, Boolean> {

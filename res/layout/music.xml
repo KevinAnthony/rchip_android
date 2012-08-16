@@ -67,7 +67,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:layout_marginTop="15dp" >
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp" >
 
         <TextView
             android:id="@+id/of"
@@ -85,32 +86,40 @@
             android:layout_height="wrap_content"
             android:text="@+string/blank" >
         </TextView>
+
     </LinearLayout>
 
     <ToggleButton
         android:id="@+id/play"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
         android:checked="true"
         android:textOff="@+string/play"
-        android:textOn="@+string/stop" >
-    </ToggleButton>
+        android:textOn="@+string/pause" />
+
+    <LinearLayout
+        android:id="@+id/LL_Next_Prev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/back"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="@+string/previous" />
+
+        <Button
+            android:id="@+id/next"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="@+string/next" />
+
+    </LinearLayout>
 
     <Button
-        android:id="@+id/next"
+        android:id="@+id/stop"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="@+string/next" >
-    </Button>
-
-    <Button
-        android:id="@+id/back"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="@+string/previous" >
-    </Button>
+        android:text="@+string/stop" />
 
 </LinearLayout>

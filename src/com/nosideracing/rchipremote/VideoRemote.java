@@ -229,8 +229,8 @@ public class VideoRemote extends Activity implements OnClickListener {
 	}
 
 	private void set_sizes() {
-		int width = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
-				.getDefaultDisplay().getWidth();
+		int button_width = (((WindowManager) getSystemService(Context.WINDOW_SERVICE))
+				.getDefaultDisplay().getWidth())/3;
 		int height = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
 				.getDefaultDisplay().getHeight();
 
@@ -238,13 +238,13 @@ public class VideoRemote extends Activity implements OnClickListener {
 		ll1.setMinimumHeight(height / 3);
 		LinearLayout ll2 = (LinearLayout) findViewById(R.id.LL_buttons_second);
 		ll2.setMinimumHeight(height / 3);
-		button_rewind.setWidth(width / 3);
-		button_foward.setWidth(width / 3);
-		button_pause.setWidth(width / 3);
-		button_mute.setWidth(width / 3);
-		button_quit.setWidth(width / 3);
-		button_fullscreen.setWidth(width / 3);
-		button_playpause.setWidth(width / 3);
+		button_rewind.setWidth(button_width);
+		button_foward.setWidth(button_width);
+		button_pause.setWidth(button_width);
+		button_mute.setWidth(button_width);
+		button_quit.setWidth(button_width);
+		button_fullscreen.setWidth(button_width);
+		button_playpause.setWidth(button_width);
 	}
 
 	private void quit(Boolean quitProgram) {
