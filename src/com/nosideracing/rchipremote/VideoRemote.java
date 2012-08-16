@@ -168,7 +168,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 					json.UpdateSongInfo();
 					if (json.getIsPlaying() == 1) {
 						Log.v(Consts.LOG_TAG, "Stopping Music to play Video");
-						new runCmd().execute("STOPRB", "");
+						new runCmd().execute("STOP", "");
 						Thread.sleep(500);
 					}
 				} catch (Exception e) {
