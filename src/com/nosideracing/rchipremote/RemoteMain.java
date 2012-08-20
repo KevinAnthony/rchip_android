@@ -18,17 +18,12 @@
 package com.nosideracing.rchipremote;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.nosideracing.rchipremote.Consts;
 
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -51,9 +46,8 @@ public class RemoteMain extends ListActivity {
 	PendingIntent CheckMessagesPendingIntent;
 	AlarmManager alarm;
 	SharedPreferences settings;
-	private static Context f_context;
-	public static String msb_desthost;
-	public static String phoneNumber;
+	protected static Context f_context;
+	public String phoneNumber;
 	private JSON json;
 	private ListAdapter mAdapter;
 	private ArrayList<Main_List_Object> lists;
@@ -96,10 +90,9 @@ public class RemoteMain extends ListActivity {
 		setListAdapter(mAdapter);
 		f_context = getApplicationContext();
 		json = JSON.getInstance();
+		json.dialog = ProgressDialog.show(RemoteMain.this, "",
+				"Loading. Please wait...", true);
 		json.set_context(f_context);
-		if (!json.authenticate()) {
-			bad_password();
-		}
 		settings = PreferenceManager.getDefaultSharedPreferences(f_context);
 		settings.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
 			public void onSharedPreferenceChanged(SharedPreferences prefs,
@@ -113,14 +106,13 @@ public class RemoteMain extends ListActivity {
 		if (phoneNumber == null) {
 			phoneNumber = "1111111111";
 		}
-		msb_desthost = settings.getString("serverhostname", "Tomoya");
-
-		SharedPreferences.Editor editor = settings.edit();
 		if (settings.getBoolean("firstRun", true)) {
-			startActivity(new Intent(this, Preferences.class));
-			editor.putBoolean("firstRun", false);
-			editor.commit();
+			first_run();
+			json.dialog = ProgressDialog.show(RemoteMain.this, "",
+					"Loading. Please wait...", true);
+			json.set_context(f_context);
 		}
+
 		Intent intent = new Intent(f_context, CheckMessages.class);
 		CheckMessagesPendingIntent = PendingIntent.getBroadcast(this, 192837,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -129,10 +121,6 @@ public class RemoteMain extends ListActivity {
 				"300000"));
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 				delay, CheckMessagesPendingIntent);
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("device_name", phoneNumber);
-		params.put("state", "true");
-		json.JSONSendCmd("registerremotedevice", params);
 		Notifications.clearAllNotifications(f_context);
 	}
 
@@ -196,11 +184,20 @@ public class RemoteMain extends ListActivity {
 		}
 	}
 
+	private void first_run() {
+		final SharedPreferences.Editor editor = settings.edit();
+		startActivity(new Intent(this, Preferences.class));
+		editor.putBoolean("firstRun", false);
+		editor.commit();
+	}
+
 	private void start_activty(int FLAG) {
 		switch (FLAG) {
 		case Consts.START_AUTOMATION:
-		/*	Intent isa = new Intent(this, HomeAutomation.class);
-			startActivityForResult(isa, Consts.RC_AUTOMATION);*/
+			/*
+			 * Intent isa = new Intent(this, HomeAutomation.class);
+			 * startActivityForResult(isa, Consts.RC_AUTOMATION);
+			 */
 			break;
 		case Consts.START_MUSIC:
 			Intent ism = new Intent(this, MusicRemote.class);
@@ -215,30 +212,6 @@ public class RemoteMain extends ListActivity {
 			startActivityForResult(iusl, Consts.RC_SHOW_LIST);
 			break;
 		}
-	}
-
-	private void bad_password() {
-		AlertDialog alert;
-		AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
-		alt_bld.setMessage(getString(R.string.bad_password))
-				.setCancelable(false)
-				.setPositiveButton(getString(R.string.fix),
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-
-							}
-						})
-				.setNegativeButton(getString(R.string.exit),
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								quit();
-							}
-						});
-		alert = alt_bld.create();
-		alert.setTitle(getString(R.string.error));
-		alert.setIcon(R.drawable.application_icon);
-		alert.show();
-		startActivity(new Intent(this, Preferences.class));
 	}
 
 	private void quit() {

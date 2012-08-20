@@ -51,6 +51,11 @@ public class Consts {
 	protected static final String VIDEO_MUTE = "MUTESM";
 	protected static final String VIDEO_QUIT = "QUITSM";
 	
+	protected static final String PREF_DAEMONS = "STORED_DAEMONS";
+	protected static final String PREF_USERNAME = "username";
+	protected static final String PREF_PASSWORD = "password";
+	protected static final String PREF_DAEMON = "serverhostname";
+	protected static final String PREF_URL = "serverurl";
 	
 	protected static final int http_timeout = 10000;
 

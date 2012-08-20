@@ -29,7 +29,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,6 +53,7 @@ public class MusicRemote extends Activity implements OnClickListener {
 	private TextView TOTTIME;
 	private long dont_switch_play_button_timer;
 	private Boolean update = false;
+	private Timer timer;
 
 	private Button back;
 	private Button next;
@@ -64,6 +67,9 @@ public class MusicRemote extends Activity implements OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
+		StrictMode.setThreadPolicy(policy);
 		setContentView(R.layout.music);
 		json = JSON.getInstance();
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -98,7 +104,7 @@ public class MusicRemote extends Activity implements OnClickListener {
 		});
 
 		final Handler handler = new Handler();
-		Timer timer = new Timer();
+		timer = new Timer();
 		int speed = Integer.parseInt(PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext())
 				.getString("delay", "5000"));
@@ -134,6 +140,7 @@ public class MusicRemote extends Activity implements OnClickListener {
 	@Override
 	public void onStop() {
 		super.onStop();
+		timer.cancel();
 		wl.release();
 		update = false;
 	}
@@ -200,7 +207,7 @@ public class MusicRemote extends Activity implements OnClickListener {
 			}
 
 			if (System.currentTimeMillis() > dont_switch_play_button_timer + 7000L) {
-				if (json.getIsPlaying() == 1) {
+				if (json.getIsPlaying()) {
 					play.setChecked(true);
 				} else {
 					play.setChecked(false);
@@ -240,8 +247,13 @@ public class MusicRemote extends Activity implements OnClickListener {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("command", cmd);
 			params.put("command_text", cmdTxt);
-			params.put("source_hostname", RemoteMain.phoneNumber);
-			params.put("destination_hostname", RemoteMain.msb_desthost);
+			TelephonyManager tManager = (TelephonyManager) getApplicationContext()
+					.getSystemService(Context.TELEPHONY_SERVICE);
+			String phoneNumber = tManager.getLine1Number();
+			params.put("source_hostname", phoneNumber);
+			params.put("destination_hostname", PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext())
+					.getString("serverurl", null));
 			json.JSONSendCmd("sendcommand", params);
 			return true;
 		}

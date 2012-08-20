@@ -151,6 +151,10 @@ public class VideoRemote extends Activity implements OnClickListener {
 			if (btn.isChecked()) {
 				if (firstPlay) {
 					String rootPath = json.getRootPath();
+					if (rootPath == null){
+						json.set_context(getApplicationContext());
+						rootPath = json.getRootPath();
+					}
 					try {
 						loc = loc.replace("/mnt/raid/", rootPath);
 						new runCmd().execute(Consts.VIDEO_OPEN, loc);
@@ -163,7 +167,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 				}
 				try {
 					json.UpdateSongInfo();
-					if (json.getIsPlaying() == 1) {
+					if (json.getIsPlaying()) {
 						Log.v(Consts.LOG_TAG, "Stopping Music to play Video");
 						new runCmd().execute(Consts.MUSIC_STOP, "");
 						Thread.sleep(500);
