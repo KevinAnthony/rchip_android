@@ -236,7 +236,6 @@ public class JSON {
 	}
 
 	private Boolean getSongInfo() {
-		Log.i(Consts.LOG_TAG, "Updating Song Info");
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("host", ((TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number());
@@ -336,7 +335,6 @@ public class JSON {
 			Enumeration<String> keys = result.keys();
 			while (keys.hasMoreElements()) {
 				String key = keys.nextElement();
-				Log.i(Consts.LOG_TAG, "Proccessing "+key);
 				Object value = result.get(key);
 				try {
 					if (key.equalsIgnoreCase("")) {
