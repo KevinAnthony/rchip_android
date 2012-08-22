@@ -253,7 +253,7 @@ public class MusicRemote extends Activity implements OnClickListener {
 			params.put("source_hostname", phoneNumber);
 			params.put("destination_hostname", PreferenceManager
 					.getDefaultSharedPreferences(getApplicationContext())
-					.getString("serverurl", null));
+					.getString(Consts.PREF_DAEMON, null));
 			json.JSONSendCmd("sendcommand", params);
 			return true;
 		}
