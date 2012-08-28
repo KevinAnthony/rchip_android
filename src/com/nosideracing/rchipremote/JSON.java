@@ -211,13 +211,13 @@ public class JSON {
 		new doNetworking().execute(tasks);
 	}
 
-
 	private void update_network_info() {
 		ArrayList<networkTask> tasks = new ArrayList<networkTask>();
 		String hostname = ((TelephonyManager) f_context
 				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
 		String daemon = PreferenceManager
-				.getDefaultSharedPreferences(f_context).getString("serverhostname", null);
+				.getDefaultSharedPreferences(f_context).getString(
+						"serverhostname", null);
 		Map<String, String> getVideoPathParams = new HashMap<String, String>();
 		getVideoPathParams.put("host", daemon);
 		tasks.add(new networkTask("getvideopath", getVideoPathParams));
@@ -304,17 +304,23 @@ public class JSON {
 						|| key.equalsIgnoreCase("sendcommand")) {
 					Map<String, String> params = (Map<String, String>) value;
 					String networkString = JSONSendCommand(key, params);
-					if (networkString != null)
-						returnVal.put(key, networkString);
-					else
-						Log.w(Consts.LOG_TAG, "Problem with command " + key);
-
+					if (networkString != null) {
+						if (!networkString.equalsIgnoreCase("304")) {
+							returnVal.put(key, networkString);
+						}
+					} else {
+						Log.w(Consts.LOG_TAG, "Problem with command " + key
+								+ " with Parameters " + params.toString());
+					}
 				} else if (key != null) {
 					String networkString = JSONSendCommand(key);
-					if (networkString != null)
-						returnVal.put(key, networkString);
-					else
+					if (networkString != null) {
+						if (!networkString.equalsIgnoreCase("304")) {
+							returnVal.put(key, networkString);
+						}
+					} else {
 						Log.w(Consts.LOG_TAG, "Problem with command " + key);
+					}
 				}
 			}
 			return returnVal;
@@ -405,7 +411,7 @@ public class JSON {
 						for (int i = 0; i < jsonArray.length(); i++) {
 							JSONObject jsonObject = jsonArray.getJSONObject(i);
 							String object = (String) jsonObject.get("hostname");
-							
+
 							if (!daemons.equals("")) {
 								daemons = daemons + "|" + object;
 							} else {
@@ -466,10 +472,14 @@ public class JSON {
 
 				}
 			}
-			if (dialog != null){
+			if (dialog != null) {
 				dialog.cancel();
 				dialog = null;
 			}
+		}
+
+		private String JSONSendCommand(String methodName) {
+			return JSONSendCommand(methodName, null);
 		}
 
 		private String JSONSendCommand(String methodName,
@@ -482,8 +492,9 @@ public class JSON {
 				}
 				force_auth();
 			}
-			String url = PreferenceManager.getDefaultSharedPreferences(f_context)
-					.getString("serverurl", "http://www.nosideholdings.com/");
+			String url = PreferenceManager.getDefaultSharedPreferences(
+					f_context).getString("serverurl",
+					"http://www.nosideholdings.com/");
 			if (url.charAt(url.length() - 1) != '/') {
 				url = url + '/';
 			}
@@ -492,20 +503,22 @@ public class JSON {
 			HttpResponse response = null;
 			HttpGet httpGet = null;
 			String json_string = null;
-			boolean first_param = true;
-			for (Map.Entry<String, String> param : params.entrySet()) {
-				if (first_param) {
-					getUrl += "/?";
-					first_param = false;
-				} else {
-					getUrl += "&";
-				}
-				try {
-					getUrl += param.getKey() + "="
-							+ URLEncoder.encode(param.getValue(), "UTF-8");
-				} catch (Exception e) {
-					Log.w(Consts.LOG_TAG, "JSON URL:" + getUrl);
-					Log.w(Consts.LOG_TAG, "Couldn't encode parameter", e);
+			if (params != null) {
+				boolean first_param = true;
+				for (Map.Entry<String, String> param : params.entrySet()) {
+					if (first_param) {
+						getUrl += "/?";
+						first_param = false;
+					} else {
+						getUrl += "&";
+					}
+					try {
+						getUrl += param.getKey() + "="
+								+ URLEncoder.encode(param.getValue(), "UTF-8");
+					} catch (Exception e) {
+						Log.w(Consts.LOG_TAG, "JSON URL:" + getUrl);
+						Log.w(Consts.LOG_TAG, "Couldn't encode parameter", e);
+					}
 				}
 			}
 			httpGet = new HttpGet(getUrl);
@@ -526,6 +539,27 @@ public class JSON {
 			process_cookies();
 			try {
 				if (response != null) {
+					switch (response.getStatusLine().getStatusCode()) {
+					case 304:
+						Log.d(Consts.LOG_TAG, "Got a 304 for method "
+								+ methodName);
+						return "304";
+					case 403:
+						Log.w(Consts.LOG_TAG, "Got 304 for method "
+								+ methodName + ", Reattempting");
+						Authenticated = false;
+						force_auth();
+						response = httpClient.execute(httpGet, httpContext);
+						if (response.getStatusLine().getStatusCode() == 403) {
+							Log.e(Consts.LOG_TAG, "Got 304, again");
+							return null;
+						}
+					case 404:
+						Log.e(Consts.LOG_TAG, "Got 404 for method "
+								+ methodName);
+						Authenticated = false;
+						return null;
+					}
 					json_string = EntityUtils.toString(response.getEntity());
 					if (json_string != null) {
 						JSONObject json_object = (JSONObject) new JSONTokener(
@@ -546,67 +580,15 @@ public class JSON {
 				Log.e(Consts.LOG_TAG, "Error in SendCmd getting response", e);
 				return null;
 			}
+			Log.e(Consts.LOG_TAG,
+					"Got to End of Function, shouldn't have gotten here");
 			return null;
-		}
-
-		private String JSONSendCommand(String methodName) {
-			String url = PreferenceManager.getDefaultSharedPreferences(f_context)
-					.getString("serverurl", "http://www.nosideholdings.com/");
-			if (url.charAt(url.length() - 1) != '/') {
-				url = url + '/';
-			}
-			if (!Authenticated
-					|| Authenticate_timeout < System.currentTimeMillis()) {
-				Log.w(Consts.LOG_TAG, "Forcing Authentication");
-				force_auth();
-			}
-
-			HttpResponse response = null;
-			HttpGet httpGet = null;
-			String json_string = null;
-
-			String getUrl = url + "json/" + methodName + '/';
-			httpGet = new HttpGet(getUrl);
-			try {
-				response = httpClient.execute(httpGet, httpContext);
-			} catch (ConnectTimeoutException e) {
-				Log.e(Consts.LOG_TAG, "Connection timeout in command "
-						+ methodName, e);
-			} catch (SocketTimeoutException e) {
-				Log.e(Consts.LOG_TAG,
-						"Socket timeout in command " + methodName, e);
-			} catch (Exception e) {
-				Log.e(Consts.LOG_TAG, "Error in SendCmd sending command", e);
-			}
-			if (response == null) {
-				Log.w(Consts.LOG_TAG, "Response was null for command "
-						+ methodName);
-				return null;
-			}
-			process_cookies();
-			try {
-				json_string = EntityUtils.toString(response.getEntity());
-				JSONTokener json_token = null;
-				json_token = new JSONTokener(json_string);
-				JSONObject json_object = (JSONObject) json_token.nextValue();
-				if (json_object.getBoolean("success")) {
-					return json_object.getString("data");
-				} else {
-					Log.w(Consts.LOG_TAG, "No data tag for " + methodName);
-					return null;
-				}
-			} catch (Exception e) {
-				Log.e(Consts.LOG_TAG, "JSON URL:" + getUrl);
-				Log.e(Consts.LOG_TAG, "JSON STRING:" + json_string);
-				Log.e(Consts.LOG_TAG, "Error in SendCmd getting response", e);
-				return null;
-			}
 		}
 
 		private void process_cookies() {
 			List<Cookie> cookies = httpClient.getCookieStore().getCookies();
 			if (!cookies.isEmpty()) {
-				if (CookieSyncManager.getInstance() == null){
+				if (CookieSyncManager.getInstance() == null) {
 					CookieSyncManager.createInstance(f_context);
 				}
 				CookieManager cookieManager = CookieManager.getInstance();
@@ -623,12 +605,14 @@ public class JSON {
 		}
 
 		private void force_auth() {
+			Log.d(Consts.LOG_TAG, "Got To Force_Auth");
 			String uname = PreferenceManager.getDefaultSharedPreferences(
 					f_context).getString(Consts.PREF_USERNAME, "");
 			String pword = PreferenceManager.getDefaultSharedPreferences(
 					f_context).getString(Consts.PREF_PASSWORD, "");
-			String url = PreferenceManager.getDefaultSharedPreferences(f_context)
-					.getString(Consts.PREF_URL, "http://www.nosideholdings.com/");
+			String url = PreferenceManager.getDefaultSharedPreferences(
+					f_context).getString(Consts.PREF_URL,
+					"http://www.nosideholdings.com/");
 			if (url.charAt(url.length() - 1) != '/') {
 				url = url + '/';
 			}
