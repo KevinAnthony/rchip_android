@@ -110,17 +110,22 @@ public class Database extends SQLiteOpenHelper {
 			String LOC) {
 		try {
 			db = this.getWritableDatabase();
-			ContentValues values = new ContentValues();
-			values.put("ShowName", ShowName.replace("_", " "));
-			values.put("EpisodeNumber", EpsNumber);
-			values.put("EpisodeName", EpsName);
-			values.put("Location", LOC);
-			long rows = db.insert(TABLE_NAME_SL, null, values);
-			if (rows < 1) {
-				Log.e(Consts.LOG_TAG, "Couldn't insert into database");
-			} else {
-				Log.v(Consts.LOG_TAG, "Inserted " + rows + " into table "
-						+ TABLE_NAME_SL);
+			Cursor C = db.query(TABLE_NAME_SL, new String[] { "ID" },
+					"ShowName = ? and EpisodeNumber = ?", new String[] {
+							ShowName, EpsNumber }, null, null, null);
+			if (C.getCount() == 0) {
+				ContentValues values = new ContentValues();
+				values.put("ShowName", ShowName.replace("_", " "));
+				values.put("EpisodeNumber", EpsNumber);
+				values.put("EpisodeName", EpsName);
+				values.put("Location", LOC);
+				long rows = db.insert(TABLE_NAME_SL, null, values);
+				if (rows < 1) {
+					Log.e(Consts.LOG_TAG, "Couldn't insert into database");
+				} else {
+					Log.v(Consts.LOG_TAG, "Inserted " + rows + " into table "
+							+ TABLE_NAME_SL);
+				}
 			}
 		} catch (Exception e) {
 			Log.e(Consts.LOG_TAG, "Error in insertShow", e);
