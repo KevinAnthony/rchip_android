@@ -31,7 +31,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -59,7 +59,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 	private String loc;
 	private String showString;
 	private String destHost;
-	private String phoneNumber;
+	public static String DEVICE_ID;
 	private long ID = -1;
 	PowerManager.WakeLock wl;
 	JSON json;
@@ -75,12 +75,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 		loc = incoming.getString("Location");
 		destHost = PreferenceManager.getDefaultSharedPreferences(
 				getApplicationContext()).getString("serverhostname", "Tomoya");
-		TelephonyManager tManager = (TelephonyManager) getApplicationContext()
-				.getSystemService(Context.TELEPHONY_SERVICE);
-		phoneNumber = tManager.getLine1Number();
-		if (phoneNumber == null) {
-			phoneNumber = "1111111111";
-		}
+		DEVICE_ID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 		topText = (TextView) findViewById(R.id.MSWMTopText);
 		topText.setText(showString);
 		topText.setSelected(true);
@@ -152,7 +147,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 				if (firstPlay) {
 					String rootPath = json.getRootPath();
 					if (rootPath == null){
-						json.set_context(getApplicationContext());
+						json.set_context(getApplicationContext(),DEVICE_ID);
 						rootPath = json.getRootPath();
 					}
 					try {
@@ -298,7 +293,7 @@ public class VideoRemote extends Activity implements OnClickListener {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("command", cmd);
 			params.put("command_text", cmdTxt);
-			params.put("source_hostname", phoneNumber);
+			params.put("source_hostname", DEVICE_ID);
 			params.put("destination_hostname", destHost);
 			json.JSONSendCmd("sendcommand", params);
 			return true;

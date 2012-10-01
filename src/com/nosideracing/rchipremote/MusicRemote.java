@@ -31,7 +31,7 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -247,10 +247,8 @@ public class MusicRemote extends Activity implements OnClickListener {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("command", cmd);
 			params.put("command_text", cmdTxt);
-			TelephonyManager tManager = (TelephonyManager) getApplicationContext()
-					.getSystemService(Context.TELEPHONY_SERVICE);
-			String phoneNumber = tManager.getLine1Number();
-			params.put("source_hostname", phoneNumber);
+			params.put("source_hostname", Settings.Secure.getString(
+					getContentResolver(), Settings.Secure.ANDROID_ID));
 			params.put("destination_hostname", PreferenceManager
 					.getDefaultSharedPreferences(getApplicationContext())
 					.getString(Consts.PREF_DAEMON, null));

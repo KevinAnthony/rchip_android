@@ -20,7 +20,7 @@ package com.nosideracing.rchipremote;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.telephony.TelephonyManager;
+import android.os.Bundle;
 import android.util.Log;
 
 public class CheckMessages extends BroadcastReceiver {
@@ -29,11 +29,9 @@ public class CheckMessages extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		f_context = context;
 		Log.i(Consts.LOG_TAG, "Checking Messages");
-		JSON json = new JSON(context);
-		TelephonyManager tManager = (TelephonyManager) f_context
-				.getSystemService(Context.TELEPHONY_SERVICE);
-		json.getCommands(tManager.getLine1Number());
+		Bundle extra = intent.getExtras();
+		JSON json = new JSON(context, extra.getString("ID"));
+		json.getCommands(extra.getString("ID"));
 	}
 }

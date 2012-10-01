@@ -45,11 +45,33 @@ public class Database extends SQLiteOpenHelper {
 
 	private SQLiteDatabase db;
 
+	public void deleteOneEpisode(String ShowName, String EpisodeName,
+			String EpisodeNumber) {
+		db = this.getWritableDatabase();
+		Cursor C = db.query(TABLE_NAME_SL, new String[] { "ID" },
+				"ShowName = ? and EpisodeNumber = ?", new String[] { ShowName,
+						EpisodeNumber }, null, null, null);
+		Log.v(Consts.LOG_TAG, "Deleting " + ShowName + " - " + EpisodeNumber
+				+ ":" + EpisodeName + ":");
+		Log.v(Consts.LOG_TAG, "Total of " + C.getCount() + " Rows Deleted");
+		if (C.moveToFirst()) {
+			do {
+				deleteOneSL(C.getInt(0), db);
+			} while (C.moveToNext());
+		}
+		db.close();
+	}
+
 	public void deleteOneSL(int id) {
 		Log.d(Consts.LOG_TAG, "Deleting row #" + id + " from " + TABLE_NAME_SL);
 		db = this.getWritableDatabase();
 		db.execSQL("Delete from " + TABLE_NAME_SL + " where id = " + id);
 		db.close();
+	}
+
+	public void deleteOneSL(int id, SQLiteDatabase db) {
+		Log.d(Consts.LOG_TAG, "Deleting row #" + id + " from " + TABLE_NAME_SL);
+		db.execSQL("Delete from " + TABLE_NAME_SL + " where id = " + id);
 	}
 
 	public void deleteAllSL() {
@@ -150,7 +172,7 @@ public class Database extends SQLiteOpenHelper {
 			do {
 				writer.append(C.getString(0) + "|" + C.getString(1) + "|"
 						+ C.getString(2) + "|" + C.getString(3) + "|"
-						+ C.getString(4)+"\n");
+						+ C.getString(4) + "\n");
 				writer.flush();
 
 			} while (C.moveToNext());
@@ -181,7 +203,7 @@ public class Database extends SQLiteOpenHelper {
 		String line;
 		while ((line = in.readLine()) != null) {
 			ContentValues values = new ContentValues();
-			Log.d(Consts.LOG_TAG,line);
+			Log.d(Consts.LOG_TAG, line);
 			String[] line_parsed = line.split("\\|");
 			values.put("ShowName", line_parsed[0]);
 			values.put("EpisodeNumber", line_parsed[1]);

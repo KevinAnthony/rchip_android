@@ -20,7 +20,6 @@ package com.nosideracing.rchipremote;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.nosideracing.rchipremote.Consts;
 
 import android.app.ExpandableListActivity;
@@ -111,7 +110,8 @@ public class VideoList extends ExpandableListActivity {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
 		if (ExpandableListView.getPackedPositionType(info.packedPosition) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-			menu.setHeaderTitle(showGroupNames.get(ExpandableListView.getPackedPositionGroup(info.packedPosition)));
+			menu.setHeaderTitle(showGroupNames.get(ExpandableListView
+					.getPackedPositionGroup(info.packedPosition)));
 			menu.add(0, v.getId(), 4, getString(R.string.watch_next));
 			menu.add(0, v.getId(), 3, getString(R.string.remove_show));
 		} else {
@@ -145,8 +145,9 @@ public class VideoList extends ExpandableListActivity {
 			id = ((MyExpandableListAdapter) mAdapter).getlongID(groupPos,
 					childPos);
 		} else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-			id = ((MyExpandableListAdapter) mAdapter).getlongID(ExpandableListView.getPackedPositionGroup(info.packedPosition),
-					0);
+			id = ((MyExpandableListAdapter) mAdapter).getlongID(
+					ExpandableListView
+							.getPackedPositionGroup(info.packedPosition), 0);
 		}
 		int order = item.getOrder();
 		if ((order == 0) || (order == 4)) {
@@ -172,7 +173,7 @@ public class VideoList extends ExpandableListActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()){
+		switch (item.getItemId()) {
 		case R.id.settings:
 			startActivity(new Intent(this, Preferences.class));
 			return true;
@@ -233,14 +234,22 @@ public class VideoList extends ExpandableListActivity {
 		return;
 	}
 
-	private void delete(long id) {
-		rchipDB.deleteOneSL(showlist.get((int) id).ShowID);
+	private void delete(long lid) {
+		int id = (int) lid;
+		JSON.getInstance().deleteShow(showlist.get(id).ShowName,
+				showlist.get(id).ShowEpisodeName,
+				showlist.get(id).ShowEpisodeNumber);
+		rchipDB.deleteOneSL(showlist.get(id).ShowID);
 		refreshList();
 		return;
 	}
 
-	private void deleteWithoutRefresh(long id) {
-		rchipDB.deleteOneSL(showlist.get((int) id).ShowID);
+	private void deleteWithoutRefresh(long lid) {
+		int id = (int) lid;
+		JSON.getInstance().deleteShow(showlist.get(id).ShowName,
+				showlist.get(id).ShowEpisodeName,
+				showlist.get(id).ShowEpisodeNumber);
+		rchipDB.deleteOneSL(showlist.get(id).ShowID);
 		return;
 	}
 
@@ -306,13 +315,15 @@ public class VideoList extends ExpandableListActivity {
 			}
 			for (int i = 0; i < showlist.size(); i++) {
 				ShowList show = showlist.get(i);
-				ShowsGroup_ShowEpisodes.get(showGroupNames.indexOf(show.ShowName)).add(show);
+				ShowsGroup_ShowEpisodes.get(
+						showGroupNames.indexOf(show.ShowName)).add(show);
 			}
 
 		}
 
 		public Object getChild(int groupPosition, int childPosition) {
-			return ShowsGroup_ShowEpisodes.get(groupPosition).get(childPosition);
+			return ShowsGroup_ShowEpisodes.get(groupPosition)
+					.get(childPosition);
 		}
 
 		public long getChildId(int groupPosition, int childPosition) {
@@ -353,12 +364,12 @@ public class VideoList extends ExpandableListActivity {
 				holder = (ViewHolder) convertView.getTag();
 			}
 
-			holder.ShowName.setText(ShowsGroup_ShowEpisodes.get(groupPosition).get(
-					childPosition).ShowName);
-			holder.EpisodeNumber.setText(ShowsGroup_ShowEpisodes.get(groupPosition).get(
-					childPosition).ShowEpisodeNumber);
-			holder.EpisodeName.setText(ShowsGroup_ShowEpisodes.get(groupPosition).get(
-					childPosition).ShowEpisodeName);
+			holder.ShowName.setText(ShowsGroup_ShowEpisodes.get(groupPosition)
+					.get(childPosition).ShowName);
+			holder.EpisodeNumber.setText(ShowsGroup_ShowEpisodes.get(
+					groupPosition).get(childPosition).ShowEpisodeNumber);
+			holder.EpisodeName.setText(ShowsGroup_ShowEpisodes.get(
+					groupPosition).get(childPosition).ShowEpisodeName);
 
 			return convertView;
 		}

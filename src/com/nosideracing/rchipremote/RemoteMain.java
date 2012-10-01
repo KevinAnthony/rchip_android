@@ -28,7 +28,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,7 +48,7 @@ public class RemoteMain extends ListActivity {
 	AlarmManager alarm;
 	SharedPreferences settings;
 	protected static Context f_context;
-	public String phoneNumber;
+	public static String DEVICE_ID;
 	private JSON json;
 	private ListAdapter mAdapter;
 	private ArrayList<Main_List_Object> lists;
@@ -56,6 +57,7 @@ public class RemoteMain extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		DEVICE_ID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 		lists = new ArrayList<Main_List_Object>();
 		lists.add(new Main_List_Object(
 				getString(R.string.home_automation_title),
@@ -92,7 +94,7 @@ public class RemoteMain extends ListActivity {
 		json = JSON.getInstance();
 		json.dialog = ProgressDialog.show(RemoteMain.this, "",
 				"Loading. Please wait...", true);
-		json.set_context(f_context);
+		json.set_context(f_context,DEVICE_ID);
 		settings = PreferenceManager.getDefaultSharedPreferences(f_context);
 		settings.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
 			public void onSharedPreferenceChanged(SharedPreferences prefs,
@@ -100,20 +102,17 @@ public class RemoteMain extends ListActivity {
 				// TODO:Set somekind of flag here
 			}
 		});
-		TelephonyManager tManager = (TelephonyManager) f_context
-				.getSystemService(Context.TELEPHONY_SERVICE);
-		phoneNumber = tManager.getLine1Number();
-		if (phoneNumber == null) {
-			phoneNumber = "1111111111";
-		}
+		Log.e(Consts.LOG_TAG,"device id:"+DEVICE_ID);
 		if (settings.getBoolean("firstRun", true)) {
 			first_run();
 			json.dialog = ProgressDialog.show(RemoteMain.this, "",
 					"Loading. Please wait...", true);
-			json.set_context(f_context);
+			json.set_context(f_context,DEVICE_ID);
 		}
-
+		Bundle extra = new Bundle();
+		extra.putString("ID",DEVICE_ID);
 		Intent intent = new Intent(f_context, CheckMessages.class);
+		intent.putExtras(extra);
 		CheckMessagesPendingIntent = PendingIntent.getBroadcast(this, 192837,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarm = (AlarmManager) getSystemService(ALARM_SERVICE);

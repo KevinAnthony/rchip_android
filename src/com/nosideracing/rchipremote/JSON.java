@@ -52,7 +52,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -64,6 +63,7 @@ public class JSON {
 	private Hashtable<String, Object> networkInfomation = new Hashtable<String, Object>();
 	private ArrayList<UpcomingShowInfo> upcoming = new ArrayList<UpcomingShowInfo>();
 	private Context f_context;
+	private String DEVICE_ID;
 	public ProgressDialog dialog = null;
 	private CookieStore cookieStore;
 
@@ -72,7 +72,8 @@ public class JSON {
 
 	private static JSON instance = null;
 
-	public JSON(Context context) {
+	public JSON(Context context,String div_id) {
+		DEVICE_ID = div_id;
 		f_context = context;
 		cookieStore = new BasicCookieStore();
 	}
@@ -89,8 +90,10 @@ public class JSON {
 		return instance;
 	}
 
-	public void set_context(Context context) {
+	public void set_context(Context context, String div_id) {
 		f_context = context;
+		DEVICE_ID = div_id;
+		Log.e(Consts.LOG_TAG,div_id);
 		update_network_info();
 	}
 
@@ -139,9 +142,20 @@ public class JSON {
 		}
 	}
 
-	// TODO this should RETURN Boolean
 	public Boolean getIsPlaying() {
 		return (Boolean) songinfo.get("is_playing");
+	}
+
+	public void deleteShow(String show_name, String episode_name,
+			String episode_number) {
+		ArrayList<networkTask> tasks = new ArrayList<networkTask>();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("show_name", show_name);
+		params.put("episode_name", episode_name);
+		params.put("episode_number", episode_number);
+		params.put("device_name", RemoteMain.DEVICE_ID);
+		tasks.add(new networkTask("deleteshow", params));
+		new doNetworking().execute(tasks);
 	}
 
 	public Boolean UpdateSongInfo() {
@@ -213,32 +227,30 @@ public class JSON {
 
 	private void update_network_info() {
 		ArrayList<networkTask> tasks = new ArrayList<networkTask>();
-		String hostname = ((TelephonyManager) f_context
-				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
 		String daemon = PreferenceManager
 				.getDefaultSharedPreferences(f_context).getString(
 						"serverhostname", null);
 		Map<String, String> getVideoPathParams = new HashMap<String, String>();
 		getVideoPathParams.put("host", daemon);
 		tasks.add(new networkTask("getvideopath", getVideoPathParams));
-		Map<String, String> getSongInfoParams = new HashMap<String, String>();
-		getSongInfoParams.put("host", hostname);
-		tasks.add(new networkTask("getsonginfo", getSongInfoParams));
 		tasks.add(new networkTask("getupcomingshows", null));
 		tasks.add(new networkTask("getdaemons", null));
-		Map<String, String> RegisterRemoteDeviceParams = new HashMap<String, String>();
-		RegisterRemoteDeviceParams.put("device_name", hostname);
-		RegisterRemoteDeviceParams.put("state", "true");
-		tasks.add(new networkTask("registerremotedevice",
-				RegisterRemoteDeviceParams));
-
+		if (DEVICE_ID != null) {
+			Map<String, String> getSongInfoParams = new HashMap<String, String>();
+			getSongInfoParams.put("host", DEVICE_ID);
+			tasks.add(new networkTask("getsonginfo", getSongInfoParams));
+			Map<String, String> RegisterRemoteDeviceParams = new HashMap<String, String>();
+			RegisterRemoteDeviceParams.put("device_name", DEVICE_ID);
+			RegisterRemoteDeviceParams.put("state", "true");
+			tasks.add(new networkTask("registerremotedevice",
+					RegisterRemoteDeviceParams));
+		}
 		new doNetworking().execute(tasks);
 	}
 
 	private Boolean getSongInfo() {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("host", ((TelephonyManager) f_context
-				.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number());
+		params.put("host", DEVICE_ID);
 		ArrayList<networkTask> tasks = new ArrayList<networkTask>();
 		tasks.add(new networkTask("getsonginfo", params));
 		new doNetworking().execute(tasks);
@@ -301,7 +313,8 @@ public class JSON {
 						|| key.equalsIgnoreCase("getvideopath")
 						|| key.equalsIgnoreCase("getcommand")
 						|| key.equalsIgnoreCase("registerremotedevice")
-						|| key.equalsIgnoreCase("sendcommand")) {
+						|| key.equalsIgnoreCase("sendcommand")
+						|| key.equalsIgnoreCase("deleteshow")) {
 					Map<String, String> params = (Map<String, String>) value;
 					String networkString = JSONSendCommand(key, params);
 					if (networkString != null) {
@@ -420,6 +433,7 @@ public class JSON {
 						}
 						networkInfomation.put("daemons", daemons);
 					} else if (key.equalsIgnoreCase("getcommand")) {
+						Database mOpenHelper = new Database(f_context);
 						JSONArray jsonArray = new JSONArray((String) value);
 						List<String[]> shows = new ArrayList<String[]>();
 						if (jsonArray != null) {
@@ -437,6 +451,9 @@ public class JSON {
 												.setStatusNotification(
 														cmdTemp[0], cmdTemp[1],
 														cmdTemp[2], f_context);
+										if (curShow != null) {
+											shows.add(curShow);
+										}
 									}
 								} else if (cmd.equals("ADDS")) {
 									String[] cmdTemp = cmdTxt.split("\\|");
@@ -445,16 +462,23 @@ public class JSON {
 										curShow[1] = cmdTemp[1];
 										curShow[2] = cmdTemp[2];
 										curShow[3] = cmdTemp[3];
+										if (curShow != null) {
+											shows.add(curShow);
+										}
+									}
+								} else if (cmd.equals("DELS")) {
+									String[] cmdTemp = cmdTxt.split("\\|");
+									if (cmdTemp.length == 3) {
+										mOpenHelper.deleteOneEpisode(
+												cmdTemp[0], cmdTemp[1],
+												cmdTemp[2]);
 									}
 								} else {
 									Log.w(Consts.LOG_TAG, "Commad:" + cmd
 											+ " Not supported");
 								}
-								if (curShow != null) {
-									shows.add(curShow);
-								}
 							}
-							Database mOpenHelper = new Database(f_context);
+
 							try {
 								for (int i = 0; i < shows.size(); i++) {
 									String[] curShow = shows.get(i);
@@ -650,4 +674,5 @@ public class JSON {
 			}
 		}
 	}
+
 }
